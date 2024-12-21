@@ -9,6 +9,7 @@ import { Modal } from "@/components/modal/modal";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
+// 사용자 입력 데이터를 저장하는 상태
 export default function SignupForm() {
   const [formData, setFormData] = useState({
     id: "",
@@ -20,12 +21,15 @@ export default function SignupForm() {
     verificationCode: "",
   });
 
+  // 인증번호 입력 필드를 보여줄지 여부를 제어
   const [showVerificationInput, setShowVerificationInput] = useState(false);
+  // 모달 상태를 제어하는 상태
   const [modal, setModal] = useState({
     isOpen: false,
     message: "",
   });
 
+  // 약관 동의 상태를 관리
   const [terms, setTerms] = useState({
     all: false,
     terms1: false,
@@ -35,6 +39,7 @@ export default function SignupForm() {
     terms5: false,
   });
 
+  // 전체 약관 동의 상태를 관리하는 함수
   const handleAllTerms = (checked: boolean) => {
     setTerms({
       all: checked,
@@ -45,13 +50,14 @@ export default function SignupForm() {
       terms5: checked,
     });
   };
-
+  // 개별 약관 동의 상태를 관리하는 함수
   const handleSingleTerm = (term: string, checked: boolean) => {
     const newTerms = {
       ...terms,
       [term]: checked,
     };
 
+    // 모든 필수 약관이 선택되었는지 확인
     const allChecked = Object.entries(newTerms)
       .filter(([key]) => key !== "all")
       .every(([_, value]) => value);
@@ -61,7 +67,7 @@ export default function SignupForm() {
       all: allChecked,
     });
   };
-
+  // 아이디 또는 이메일 중복 확인 함수
   const handleDuplicateCheck = (type: string) => {
     const value = type === "id" ? formData.id : formData.email;
 
@@ -79,6 +85,7 @@ export default function SignupForm() {
     });
   };
 
+  // 인증번호 요청 함수
   const handleVerificationRequest = () => {
     setShowVerificationInput(true);
     setModal({
@@ -87,6 +94,7 @@ export default function SignupForm() {
     });
   };
 
+  // 인증번호 확인 함수
   const handleVerificationConfirm = () => {
     if (!formData.verificationCode) {
       setModal({
@@ -104,16 +112,21 @@ export default function SignupForm() {
 
   return (
     <>
+      {/* 모달 컴포넌트 */}
       <Modal
         isOpen={modal.isOpen}
         onClose={() => setModal({ ...modal, isOpen: false })}
         message={modal.message}
       />
+      {/* 회원가입 폼 컨테이너 */}
       <div className="mx-auto w-[360px] bg-white">
+        {/* 페이지 헤더 */}
         <Header title="로그인" />
 
+        {/* 회원가입 폼 */}
         <div className="mx-auto w-[360px] rounded-lg bg-white px-4 py-6">
           <form className="space-y-4">
+            {/* 아이디 입력 */}
             <div className="space-y-2">
               <Label htmlFor="id">
                 아이디<span className="text-red-500">*</span>
@@ -139,6 +152,7 @@ export default function SignupForm() {
               </div>
             </div>
 
+            {/* 비밀번호 입력 */}
             <div className="space-y-2">
               <Label htmlFor="password">
                 비밀번호<span className="text-red-500">*</span>
@@ -155,6 +169,7 @@ export default function SignupForm() {
               />
             </div>
 
+            {/* 비밀번호 확인 */}
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">
                 비밀번호 확인<span className="text-red-500">*</span>
@@ -174,6 +189,7 @@ export default function SignupForm() {
               />
             </div>
 
+            {/* 이름 입력 */}
             <div className="space-y-2">
               <Label htmlFor="name">
                 이름<span className="text-red-500">*</span>
@@ -189,6 +205,7 @@ export default function SignupForm() {
               />
             </div>
 
+            {/* 이메일 입력 */}
             <div className="space-y-2">
               <Label htmlFor="email">
                 이메일<span className="text-red-500">*</span>
@@ -215,6 +232,7 @@ export default function SignupForm() {
               </div>
             </div>
 
+            {/* 휴대폰 번호 입력 */}
             <div className="space-y-2">
               <Label htmlFor="phone">
                 휴대폰<span className="text-red-500">*</span>
@@ -263,6 +281,7 @@ export default function SignupForm() {
               )}
             </div>
 
+            {/* 약관 동의 */}
             <div className="space-y-2 pt-4">
               <h2 className="text-sm font-medium">
                 이용약관동의<span className="text-red-500">*</span>
@@ -312,11 +331,13 @@ export default function SignupForm() {
               </div>
             </div>
 
+            {/* 가입하기 버튼 */}
             <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white mt-6">
               가입하기
             </Button>
           </form>
         </div>
+        {/* 페이지 푸터 */}
         <Footer />
       </div>
     </>
