@@ -7,26 +7,16 @@ import { Button } from "@/components/ui/button";
 // isOpen (boolean): 모달이 열려 있는 상태인지 여부를 나타냅니다.
 // onClose (() => void): 모달을 닫는 동작을 수행하는 함수입니다.
 // message (string): 모달 안에 표시될 메시지입니다.
-interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  message: string;
-  type: "success" | "error";
-}
-
-export function Modal({ isOpen, onClose, message, type }: ModalProps) {
+export function Modal({ isOpen, onClose, message }) {
   return (
-    <Dialog open={isOpen} onOpenChange={() => onClose()}>
-      <DialogContent className="sm:max-w-[300px] p-0">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[300px] p-0 rounded-xl">
         <div className="p-6">
-          <p
-            className={`text-center mb-4 ${type === "success" ? "text-emerald-500" : "text-red-500"}`}
-          >
-            {message}
-          </p>
+          <p className="text-center mb-4">{message}</p>
           <Button
             onClick={onClose}
-            className={`w-full ${type === "success" ? "text-emerald-500" : "text-red-500"} bg-white hover:bg-white`}
+            variant="ghost"
+            className="w-full text-emerald-500 hover:bg-white hover:text-emerald-600"
           >
             확인
           </Button>
