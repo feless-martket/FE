@@ -60,6 +60,7 @@ export default function SignupForm() {
     // 모든 필수 약관이 선택되었는지 확인
     const allChecked = Object.entries(newTerms)
       .filter(([key]) => key !== "all")
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .every(([_, value]) => value);
 
     setTerms({
