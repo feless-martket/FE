@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 /**
  * Modal 컴포넌트
  *
- * @param {boolean} isOpen - 모달의 열림 상태를 제어
- * @param {() => void} onClose - 모달을 닫는 함수
- * @param {string} message - 모달 내부에 표시될 메시지
+ * {boolean} isOpen - 모달의 열림 상태를 제어
+ * {() => void} onClose - 모달을 닫는 함수
+ * {string} message - 모달 내부에 표시될 메시지
  *
- * @returns {JSX.Element} 모달 UI 컴포넌트를 반환
+ * returns {JSX.Element} 모달 UI 컴포넌트를 반환
  */
 export function Modal({ isOpen, onClose, message }) {
   return (
