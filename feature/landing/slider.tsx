@@ -82,7 +82,7 @@ export default function HeroSlider() {
   };
 
   return (
-    <div className="relative h-[326px] w-full overflow-hidden mt-9">
+    <div className="relative h-[326px] w-full overflow-hidden">
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={page}
