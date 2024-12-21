@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Home, Menu, Search, User } from "lucide-react";
 
 interface FooterProps {
   className?: string;
@@ -6,40 +7,37 @@ interface FooterProps {
 
 export function Footer({ className = "" }: FooterProps) {
   return (
-    <footer className={`fixed bottom-0 w-full border-t bg-white ${className}`}>
-      <div className="mx-auto w-[360px] px-4 py-2">
-        <nav className="flex items-center justify-between">
-          {/* Home */}
+    <footer
+      className={`fixed bottom-0 left-0 right-0 bg-gray-100 ${className}`}
+    >
+      <div className="w-full max-w-[360px] mx-auto bg-white">
+        <nav className="flex justify-between items-center px-4 py-2">
           <Link
             href="/"
             className="flex flex-col items-center gap-1 text-xs text-gray-600 hover:text-emerald-500"
           >
-            <img src="/icons/home.png" alt="홈" className="size-6" />
-            <span>홈</span>
-          </Link>
-          {/* Menu */}
-          <Link
-            href="/menu"
-            className="flex flex-col items-center gap-1 text-xs text-gray-600 hover:text-emerald-500"
-          >
-            <img src="/icons/menu.png" alt="메뉴" className="size-6" />
+            <Home size={24} />
           </Link>
 
-          {/* Search */}
+          <Link
+            href="/category"
+            className="flex flex-col items-center gap-1 text-xs text-gray-600 hover:text-emerald-500"
+          >
+            <Menu size={24} />
+          </Link>
+
           <Link
             href="/search"
             className="flex flex-col items-center gap-1 text-xs text-gray-600 hover:text-emerald-500"
           >
-            <img src="/icons/search.png" alt="검색" className="size-6" />
-            <span>검색</span>
+            <Search size={24} />
           </Link>
-          {/* MyPage */}
+
           <Link
             href="/mypage"
             className="flex flex-col items-center gap-1 text-xs text-gray-600 hover:text-emerald-500"
           >
-            <img src="/icons/user.png" alt="마이페이지" className="size-6" />
-            <span>마이페이지</span>
+            <User size={24} />
           </Link>
         </nav>
       </div>
