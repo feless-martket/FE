@@ -10,6 +10,7 @@ import { ProductCard } from "@/feature/landing/productCard";
 import Test1 from "@/public/img/test1.jpeg";
 import Test2 from "@/public/img/test2.jpeg";
 import Test3 from "@/public/img/test3.jpeg";
+import { Footer } from "@/components/layout/footer";
 
 export default function Page() {
   // const buttonLabels = ["추천", "신상품", "베스트", "알뜰쇼핑", "특가/혜택"];
@@ -64,6 +65,7 @@ export default function Page() {
             <ProductCard key={index} {...product} />
           ))}
         </div>
+        <Footer />
       </div>
     </div>
   );

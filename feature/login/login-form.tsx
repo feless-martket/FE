@@ -41,9 +41,11 @@ export default function LoginForm() {
           로그인
         </Button>
 
-        <Button variant="outline" className="w-full py-6" size="lg">
-          회원가입
-        </Button>
+        <Link href={"/signup"}>
+          <Button variant="outline" className="w-full py-6" size="lg">
+            회원가입
+          </Button>
+        </Link>
 
         {/* 아이디/비밀번호 찾기 */}
         <div className="flex justify-center space-x-4 text-sm text-gray-600">
