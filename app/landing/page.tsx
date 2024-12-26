@@ -8,7 +8,13 @@ import WeekendSaleSection from "@/feature/landing/weekendSaleSection";
 import { ProductCard } from "@/feature/landing/productCard";
 import { products as dummy } from "@/lib/dummy/products";
 
-// REVIEW: state, props와 관련없는 함수, 변수는 컴포넌트 밖에 선언한다.
+// feat/Landing 측에서 추가된 이미지 및 Footer 임포트
+import Test1 from "@/public/img/test1.jpeg";
+import Test2 from "@/public/img/test2.jpeg";
+import Test3 from "@/public/img/test3.jpeg";
+import { Footer } from "@/components/layout/footer";
+
+// develop 측에서 추가된 변수 (REVIEW)
 const products = dummy;
 
 export default function Page() {
@@ -19,21 +25,31 @@ export default function Page() {
       <div className="w-[360px] bg-white">
         {/* 헤더 */}
         <MarketHeader />
+
         {/* 상단 메뉴 */}
         <NavBar />
+
         {/* 이벤트 slider */}
         <HeroSlider />
+
         {/* 마감 세일 */}
         <SaleSection />
+
         {/* 세일 상품들 */}
         <CarouselImages />
+
         {/* 주말 특가 상품 */}
         <WeekendSaleSection />
+
+        {/* 상품 리스트 렌더링 */}
         <div className="flex flex-col gap-4">
           {products.map((product, index) => (
             <ProductCard key={index} {...product} />
           ))}
         </div>
+
+        {/* 하단 푸터 */}
+        <Footer />
       </div>
     </div>
   );
