@@ -11,7 +11,6 @@ import { SearchResults } from "@/feature/search/search-result";
 const ALL_KEYWORDS = [
   "기저귀",
   "아침식사",
-  "낮또",
   "식빵",
   "오리고기",
   "곤약밥",
@@ -23,7 +22,6 @@ const ALL_KEYWORDS = [
   "조선호텔김치",
   "오물리",
   "드레싱",
-  "짱기",
   "골드키위",
   "잣",
   "아메리카노",
