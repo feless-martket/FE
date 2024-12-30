@@ -13,36 +13,37 @@ import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import { Product } from "./search-api";
 
 const FILTER_OPTIONS = {
   카테고리: [
-    { name: "기저귀, 물티슈관", count: 170 },
-    { name: "여성, 위생용품", count: 7 },
-    { name: "배변, 위생", count: 3 },
-    { name: "휴지, 티슈", count: 1 },
-    { name: "세제, 청소용품", count: 1 },
-    { name: "이유, 수유용품", count: 1 },
+    { name: "fruit", count: 0 },
+    { name: "dailyNecessities", count: 0 },
+    { name: "electronicDevices", count: 0 },
+    { name: "vegetable", count: 0 },
   ],
-  브랜드: [
-    "하기스",
-    "마미포코",
-    "팸퍼스",
-    "굿페이스",
-    "설화수",
-    "다정옥",
-    "삼진어묵",
-  ],
+  브랜드: [],
   가격: ["1만원 이하", "1-3만원", "3-5만원", "5만원 이상"],
   혜택: ["할인상품", "쿠폰적용", "무료배송", "증정품"],
   "특정상품 제외": ["특가상품", "이벤트상품"],
 };
 
 interface SearchResultsProps {
-  results: Array<{ id: number; name: string; category: string }>;
+  results: Product[];
 }
 
 export function SearchResults({ results }: SearchResultsProps) {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+
+  // Update category counts
+  results.forEach((product) => {
+    const category = FILTER_OPTIONS.카테고리.find(
+      (c) => c.name === product.category
+    );
+    if (category) {
+      category.count++;
+    }
+  });
 
   return (
     <div className="flex flex-col h-full">
@@ -119,7 +120,7 @@ export function SearchResults({ results }: SearchResultsProps) {
 
                         <div className="p-4 border-t">
                           <Button className="w-full bg-emerald-500 hover:bg-emerald-600">
-                            190개 상품 보기
+                            {results.length}개 상품 보기
                           </Button>
                         </div>
                       </Tabs>
@@ -148,10 +149,10 @@ export function SearchResults({ results }: SearchResultsProps) {
       <ScrollArea className="flex-1">
         <div className="grid grid-cols-2 gap-4 p-4">
           {results.map((product) => (
-            <div key={product.id} className="space-y-2">
+            <div key={product.product_id} className="space-y-2">
               <div className="relative aspect-square">
                 <Image
-                  src="/placeholder.svg"
+                  src={product.imgurl || "/placeholder.svg"}
                   alt={product.name}
                   fill
                   className="rounded-lg object-cover"
@@ -178,7 +179,9 @@ export function SearchResults({ results }: SearchResultsProps) {
                 </h3>
                 <div className="flex items-baseline gap-1">
                   <span className="text-red-500 font-medium">35%</span>
-                  <span className="font-bold">4,480원</span>
+                  <span className="font-bold">
+                    {product.price.toLocaleString()}원
+                  </span>
                 </div>
               </div>
             </div>
