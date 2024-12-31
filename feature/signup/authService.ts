@@ -7,7 +7,7 @@ export interface SignupData {
 }
 
 export async function signupUser(
-  data: SignupData,
+  data: SignupData
 ): Promise<{ message: string }> {
   try {
     console.log("서버로 보낼 데이터:", data);
@@ -39,7 +39,7 @@ export async function checkEmailDuplicate(email: string): Promise<boolean> {
       `http://localhost:8080/users/email?e=${email}`,
       {
         method: "GET",
-      },
+      }
     );
 
     if (!response.ok) {
@@ -59,7 +59,7 @@ export async function checkIdDuplicate(userId: string): Promise<boolean> {
       `http://localhost:8080/users/id?id=${userId}`,
       {
         method: "GET",
-      },
+      }
     );
 
     if (!response.ok) {

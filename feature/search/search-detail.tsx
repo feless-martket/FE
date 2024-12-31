@@ -7,97 +7,94 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SearchResults } from "@/feature/search/search-result";
+import { searchProducts, getSuggestions, Product } from "./search-api";
 
+// 추천 검색어 (하드코딩)
 const ALL_KEYWORDS = [
   "기저귀",
   "아침식사",
+  "낫또",
   "식빵",
   "오리고기",
   "곤약밥",
   "핫도그",
-  "스낵",
+  "수박",
+];
+
+// 급상승 검색어 (하드코딩)
+const TRENDING_KEYWORDS = [
   "설화수",
   "다정옥",
   "삼진어묵",
   "조선호텔김치",
   "오물리",
   "드레싱",
+  "찜기",
   "골드키위",
   "잣",
   "아메리카노",
 ];
 
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "[두리] 점아식 기저귀 갈아대 (그래야 잘봄)",
-    category: "기저귀",
-  },
-  { id: 2, name: "[베베베베] DOG 기저귀 7종 (택1)", category: "기저귀" },
-  { id: 3, name: "[네띠] 밴드형 기저귀 1팩 12종 (택1)", category: "기저귀" },
-  {
-    id: 4,
-    name: "[마이포코] 리프리넘 밴드형 기저귀 1박스 4종 (택1)",
-    category: "기저귀",
-  },
-  {
-    id: 5,
-    name: "[마이포코] Flex 밴드형 기저귀 1박스 4종 (택1)",
-    category: "기저귀",
-  },
-  { id: 6, name: "설화수 윤조에센스", category: "화장품" },
-  { id: 7, name: "다정옥 냉면", category: "식품" },
-  { id: 8, name: "삼진어묵 모듬어묵", category: "식품" },
-  { id: 9, name: "조선호텔김치 포기김치", category: "식품" },
-  { id: 10, name: "오물리 된장찌개", category: "식품" },
-];
-
 export default function SearchFeature() {
-  const [searchValue, setSearchValue] = useState("");
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showResults, setShowResults] = useState(false);
-  const [searchResults, setSearchResults] = useState<typeof PRODUCTS>([]);
+  const [searchValue, setSearchValue] = useState(""); // 검색어 입력
+  const [suggestions, setSuggestions] = useState<string[]>([]); // 자동완성 추천어
+  const [showResults, setShowResults] = useState(false); // 검색 결과 화면
+  const [searchResults, setSearchResults] = useState<Product[]>([]); // 검색 결과
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false); // 자동완성 로딩 상태
 
+  // 자동완성 추천어 API 호출 : getSuggestions
   useEffect(() => {
-    if (searchValue) {
-      const filteredSuggestions = ALL_KEYWORDS.filter((keyword) =>
-        keyword.toLowerCase().includes(searchValue.toLowerCase())
-      );
-      setSuggestions(filteredSuggestions);
-    } else {
-      setSuggestions([]);
-    }
+    const fetchSuggestions = async () => {
+      if (searchValue.trim() === "") {
+        setSuggestions([]);
+        return;
+      }
+
+      setLoadingSuggestions(true);
+      try {
+        const suggestionsData = await getSuggestions(searchValue);
+        setSuggestions(suggestionsData); // 추천어 목록 업데이트
+      } catch (error) {
+        console.error("❌ 자동완성 오류:", error);
+      } finally {
+        setLoadingSuggestions(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      fetchSuggestions();
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
   }, [searchValue]);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
-    setShowResults(false);
-  };
-
-  const handleSearch = (e?: React.FormEvent) => {
+  // 검색: msearchProducts
+  const handleSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (searchValue) {
-      const results = PRODUCTS.filter(
-        (product) =>
-          product.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-          product.category.toLowerCase().includes(searchValue.toLowerCase())
-      );
-      setSearchResults(results);
+    if (searchValue.trim() === "") return;
+
+    try {
+      const products = await searchProducts(searchValue);
+      setSearchResults(products);
       setShowResults(true);
+    } catch (error) {
+      console.error("❌ 검색 오류:", error);
     }
   };
 
-  const handleKeywordClick = (keyword: string) => {
+  // 추천어 클릭 이벤트
+  const handleKeywordClick = async (keyword: string) => {
     setSearchValue(keyword);
-    const results = PRODUCTS.filter(
-      (product) =>
-        product.name.toLowerCase().includes(keyword.toLowerCase()) ||
-        product.category.toLowerCase().includes(keyword.toLowerCase())
-    );
-    setSearchResults(results);
-    setShowResults(true);
+    try {
+      const products = await searchProducts(keyword);
+      setSearchResults(products);
+      setShowResults(true);
+    } catch (error) {
+      console.error("❌ 검색 오류:", error);
+    }
   };
 
+  // 검색 초기화
   const clearSearch = () => {
     setSearchValue("");
     setSuggestions([]);
@@ -106,6 +103,7 @@ export default function SearchFeature() {
 
   return (
     <div className="flex flex-col h-full w-full max-w-[360px] bg-white">
+      {/* 검색 입력 필드 */}
       <div className="p-4 bg-white">
         <form onSubmit={handleSearch} className="relative flex items-center">
           <SearchIcon className="absolute left-3 h-4 w-4 text-gray-400" />
@@ -113,7 +111,7 @@ export default function SearchFeature() {
             type="text"
             placeholder="검색어를 입력해 주세요"
             value={searchValue}
-            onChange={handleSearchChange}
+            onChange={(e) => setSearchValue(e.target.value)}
             className="pl-10 pr-8 bg-gray-50"
           />
           {searchValue && (
@@ -130,37 +128,44 @@ export default function SearchFeature() {
         </form>
       </div>
 
+      {/* 자동완성 추천어 */}
       {!showResults && suggestions.length > 0 && (
         <ScrollArea className="flex-grow">
           <div className="p-4 space-y-4">
-            {suggestions.map((suggestion, index) => (
-              <div
-                key={index}
-                role="button"
-                tabIndex={0}
-                className="cursor-pointer p-2 rounded-md hover:bg-gray-100"
-                onClick={() => handleKeywordClick(suggestion)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    handleKeywordClick(suggestion);
-                  }
-                }}
-              >
-                {suggestion}
-              </div>
-            ))}
+            {loadingSuggestions && (
+              <div className="text-sm text-gray-500">로딩 중...</div>
+            )}
+            {!loadingSuggestions &&
+              suggestions.map((suggestion, index) => (
+                <div
+                  key={index}
+                  role="button"
+                  tabIndex={0}
+                  className="cursor-pointer p-2 rounded-md hover:bg-gray-100"
+                  onClick={() => handleKeywordClick(suggestion)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      handleKeywordClick(suggestion);
+                    }
+                  }}
+                >
+                  {suggestion}
+                </div>
+              ))}
           </div>
         </ScrollArea>
       )}
 
+      {/* 검색 결과 */}
       {showResults && <SearchResults results={searchResults} />}
 
+      {/* 추천 및 급상승 검색어 */}
       {!showResults && suggestions.length === 0 && (
         <ScrollArea className="flex-grow">
           <div className="p-4">
             <h2 className="font-medium mb-3">추천 검색어</h2>
             <div className="flex flex-wrap gap-2">
-              {ALL_KEYWORDS.slice(0, 8).map((keyword) => (
+              {ALL_KEYWORDS.map((keyword) => (
                 <Badge
                   key={keyword}
                   variant="secondary"
@@ -172,10 +177,11 @@ export default function SearchFeature() {
               ))}
             </div>
           </div>
+
           <div className="p-4">
             <h2 className="font-medium mb-3">급상승 검색어</h2>
-            <div className="space-y-4">
-              {ALL_KEYWORDS.slice(8, 18).map((keyword, index) => (
+            <div className="space-y-2">
+              {TRENDING_KEYWORDS.map((keyword, index) => (
                 <div
                   key={keyword}
                   role="button"
