@@ -9,9 +9,6 @@ import { ProductCard } from "@/feature/landing/productCard";
 import { products as dummy } from "@/lib/dummy/products";
 
 // feat/Landing 측에서 추가된 이미지 및 Footer 임포트
-import Test1 from "@/public/img/test1.jpeg";
-import Test2 from "@/public/img/test2.jpeg";
-import Test3 from "@/public/img/test3.jpeg";
 import { Footer } from "@/components/layout/footer";
 
 // develop 측에서 추가된 변수 (REVIEW)
@@ -22,7 +19,7 @@ export default function Page() {
 
   return (
     <div className="flex size-full justify-center bg-gray-100">
-      <div className="w-[360px] bg-white">
+      <div className="bg-wh ite w-[360px]">
         {/* 헤더 */}
         <MarketHeader />
 

@@ -35,7 +35,6 @@ export async function signupUser(
 
 export async function checkEmailDuplicate(email: string): Promise<boolean> {
   try {
-    console.log(email);
     const response = await fetch(
       `http://localhost:8080/users/email?e=${email}`,
       {
@@ -56,7 +55,6 @@ export async function checkEmailDuplicate(email: string): Promise<boolean> {
 
 export async function checkIdDuplicate(userId: string): Promise<boolean> {
   try {
-    console.log(userId);
     const response = await fetch(
       `http://localhost:8080/users/id?id=${userId}`,
       {
@@ -69,6 +67,53 @@ export async function checkIdDuplicate(userId: string): Promise<boolean> {
     }
 
     const isDuplicate = await response.json(); // true 또는 false 라고 가정
+    return isDuplicate;
+  } catch (error: any) {
+    throw new Error(error.message || "서버에 문제가 발생했습니다.");
+  }
+}
+
+export async function sendEmailVerificationCode(
+  email: string,
+): Promise<boolean> {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/users/email/verification-requests?e=${email}`,
+      {
+        method: "POST",
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error("이메일 인증코드를 발송하는 중 오류가 발생했습니다.");
+    }
+
+    const isDuplicate = await response.json();
+
+    return isDuplicate;
+  } catch (error: any) {
+    throw new Error(error.message || "서버에 문제가 발생했습니다.");
+  }
+}
+
+export async function emailVerification(
+  email: string,
+  code: string,
+): Promise<boolean> {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/users/email/verification?e=${email}&code=${code}`,
+      {
+        method: "GET",
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error("이메일 인증을 진행하는 중 오류가 발생했습니다.");
+    }
+
+    console.log(response);
+    const isDuplicate = await response.json();
     return isDuplicate;
   } catch (error: any) {
     throw new Error(error.message || "서버에 문제가 발생했습니다.");
