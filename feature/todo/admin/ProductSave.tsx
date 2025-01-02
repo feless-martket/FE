@@ -49,13 +49,13 @@ export default function ProductForm() {
 
     // 상품명과 상품설명 추가
     const productName = (e.target as HTMLFormElement).elements.namedItem(
-      "productName"
+      "productName",
     ) as HTMLInputElement;
     const productDescription = (e.target as HTMLFormElement).elements.namedItem(
-      "productDescription"
+      "productDescription",
     ) as HTMLInputElement;
     const productPrice = (e.target as HTMLFormElement).elements.namedItem(
-      "productPrice"
+      "productPrice",
     ) as HTMLInputElement;
 
     const formData = {
@@ -77,7 +77,7 @@ export default function ProductForm() {
           headers: {
             "Content-Type": "application/json", // JSON 형식으로 보내기
           },
-        }
+        },
       );
 
       console.log("서버 응답:", response.data);
@@ -89,7 +89,7 @@ export default function ProductForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="px-4 py-2 space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 px-4 py-2">
       <div className="flex justify-center">
         <h1 className="text-2xl">상품등록</h1>
       </div>
@@ -106,7 +106,7 @@ export default function ProductForm() {
               setSelectedCategory(e.target.value);
               setSelectedSubCategory(""); // 카테고리 변경 시 서브카테고리 초기화
             }}
-            className="w-full appearance-none px-3 py-2 bg-white border rounded-md pr-8"
+            className="w-full appearance-none rounded-md border bg-white px-3 py-2 pr-8"
           >
             <option value="">분류1</option>
             {categories.map((category) => (
@@ -115,7 +115,7 @@ export default function ProductForm() {
               </option>
             ))}
           </select>
-          <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-5 w-5 pointer-events-none text-gray-400" />
+          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
         </div>
 
         {/* 서브카테고리 선택 */}
@@ -123,7 +123,7 @@ export default function ProductForm() {
           <select
             value={selectedSubCategory}
             onChange={(e) => setSelectedSubCategory(e.target.value)}
-            className="w-full appearance-none px-3 py-2 bg-white border rounded-md pr-8"
+            className="w-full appearance-none rounded-md border bg-white px-3 py-2 pr-8"
             disabled={!selectedCategory} // 카테고리가 선택되지 않으면 서브카테고리 비활성화
           >
             <option value="">분류2</option>
@@ -142,7 +142,7 @@ export default function ProductForm() {
                   ))
                 : null}
           </select>
-          <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-5 w-5 pointer-events-none text-gray-400" />
+          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
         </div>
       </div>
 
@@ -154,7 +154,7 @@ export default function ProductForm() {
           type="text"
           name="productName"
           placeholder="상품명을 입력해 주세요."
-          className="w-full px-3 py-2 border rounded-md"
+          className="w-full rounded-md border px-3 py-2"
         />
       </div>
 
@@ -166,7 +166,7 @@ export default function ProductForm() {
           type="text"
           name="productDescription"
           placeholder="상품을 설명해 주세요."
-          className="w-full px-3 py-2 border rounded-md"
+          className="w-full rounded-md border px-3 py-2"
         />
       </div>
       <div>
@@ -177,7 +177,7 @@ export default function ProductForm() {
           type="text"
           name="productPrice" // 상품 가격 입력 필드 추가
           placeholder="₩"
-          className="w-full px-3 py-2 border rounded-md"
+          className="w-full rounded-md border px-3 py-2"
         />
       </div>
 
@@ -188,7 +188,7 @@ export default function ProductForm() {
         <select
           value={selectedQuantity}
           onChange={(e) => setSelectedQuantity(e.target.value)}
-          className="w-full appearance-none px-3 py-2 bg-white border rounded-md pr-8"
+          className="w-full appearance-none rounded-md border bg-white px-3 py-2 pr-8"
         >
           <option value="">수량</option>
           {quantities.map((quantity) => (
@@ -197,7 +197,7 @@ export default function ProductForm() {
             </option>
           ))}
         </select>
-        <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-5 w-5 pointer-events-none text-gray-400" />
+        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
       </div>
 
       <div>
@@ -206,7 +206,7 @@ export default function ProductForm() {
       <div className="px-4 py-2">
         <div
           onClick={handleImageClick}
-          className="w-full px-3 py-2 border rounded-md h-32 flex items-center justify-center text-gray-500 cursor-pointer"
+          className="flex h-32 w-full cursor-pointer items-center justify-center rounded-md border px-3 py-2 text-gray-500"
         >
           {selectedImage ? selectedImage.name : "이미지를 첨부해 주세요."}
         </div>
@@ -221,7 +221,7 @@ export default function ProductForm() {
 
       <button
         type="submit"
-        className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-md font-medium"
+        className="w-full rounded-md bg-emerald-500 py-3 font-medium text-white hover:bg-emerald-600"
       >
         상품등록
       </button>
