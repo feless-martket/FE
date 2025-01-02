@@ -20,8 +20,9 @@ const meatSubCategories: Option[] = [
 ];
 
 const vegetableSubCategories: Option[] = [
-  { value: "onion", label: "양파" },
-  { value: "cucumber", label: "오이" },
+  { value: "CUCUMBER", label: "오이" },
+  { value: "LETTUCE", label: "상추" },
+  { value: "CARROT", label: "당근" },
 ];
 const quantities: Option[] = Array.from({ length: 100 }, (_, i) => ({
   value: String(i + 1),
@@ -32,12 +33,25 @@ export default function ProductForm() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
   const [selectedQuantity, setSelectedQuantity] = useState<string>("");
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedImage(e.target.files[0]);
+      const file = e.target.files[0];
+      const base64Image = await convertToBase64(file); // Base64로 변환
+      setSelectedImage(base64Image); // 상태에 Base64 값 저장
     }
+  };
+
+  const convertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result as string); // Base64 문자열로 반환
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file); // 파일을 Base64로 변환
+    });
   };
 
   const handleImageClick = () => {
@@ -71,7 +85,7 @@ export default function ProductForm() {
     try {
       // 상품 등록 API 호출
       const response = await axios.post(
-        "http://localhost:8080/product/save",
+        "http://localhost:8080/admin/saveProduct",
         formData,
         {
           headers: {
@@ -106,9 +120,11 @@ export default function ProductForm() {
               setSelectedCategory(e.target.value);
               setSelectedSubCategory(""); // 카테고리 변경 시 서브카테고리 초기화
             }}
-            className="w-full appearance-none px-3 py-2 bg-white border rounded-md pr-8"
+            className="w-full appearance-none px-3 py-2 bg-white border rounded-md pr-8 text-sm text-gray-800"
           >
-            <option value="">분류1</option>
+            <option value="" className="text-gray-400">
+              카테고리를 선택해주세요
+            </option>
             {categories.map((category) => (
               <option key={category.value} value={category.value}>
                 {category.label}
@@ -208,7 +224,15 @@ export default function ProductForm() {
           onClick={handleImageClick}
           className="w-full px-3 py-2 border rounded-md h-32 flex items-center justify-center text-gray-500 cursor-pointer"
         >
-          {selectedImage ? selectedImage.name : "이미지를 첨부해 주세요."}
+          {selectedImage ? (
+            <img
+              src={selectedImage}
+              alt="선택된 이미지"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            "이미지를 첨부해 주세요."
+          )}
         </div>
         <input
           id="imageInput"
