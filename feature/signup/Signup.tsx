@@ -12,6 +12,8 @@ import {
   signupUser,
   checkEmailDuplicate,
   checkIdDuplicate,
+  sendEmailVerificationCode,
+  emailVerification,
 } from "@/feature/signup/authService";
 
 // 폼 유효성 검사 함수
@@ -21,11 +23,13 @@ function validateForm(formData: {
   confirmPassword: string;
   name: string;
   email: string;
+  emailVerificationCode: string;
   phone: string;
 }) {
   const errors: { [key: string]: string } = {};
 
   // 아이디 검증
+
   if (!formData.userId) {
     errors.id = "아이디를 입력해주세요";
   } else if (formData.userId.length < 4) {
@@ -78,8 +82,16 @@ function validateTerms(terms: { [key: string]: boolean }) {
 export default function SignupForm() {
   // 로딩 상태 추가
   const [isLoading, setIsLoading] = useState(false);
+
+  // 중복 상태
   const [isIdDuplicate, setIsIdDuplicate] = useState(false);
   const [isEmailDuplicate, setIsEmailDuplicate] = useState(false);
+  //이메일 인증 상태
+  const [isEmailCodeChecked, setisEmailCodeChecked] = useState(false);
+
+  // 중복 확인
+  const [isIdChecked, setIsIdChecked] = useState(false);
+  const [isEmailChecked, setIsEmailChecked] = useState(false);
 
   const [formData, setFormData] = useState({
     userId: "",
@@ -88,10 +100,13 @@ export default function SignupForm() {
     name: "",
     email: "",
     phone: "",
+    emailVerificationCode: "",
     verificationCode: "",
   });
 
   const [showVerificationInput, setShowVerificationInput] = useState(false);
+  const [showEmailVerificationInput, setEmailShowVerificationInput] =
+    useState(false);
   const [modal, setModal] = useState({
     isOpen: false,
     message: "",
@@ -105,6 +120,14 @@ export default function SignupForm() {
     terms4: false,
     terms5: false,
   });
+
+  // useEffect(() => {
+  //   console.log("");
+  //   console.log("isIdChecked:", isIdChecked);
+  //   console.log("isEmailChecked:", isEmailChecked);
+  //   console.log("isIdDuplicate:", isIdDuplicate);
+  //   console.log("isEmailDuplicate:", isEmailDuplicate);
+  // }, [isIdChecked, isEmailChecked, isIdDuplicate, isEmailDuplicate]);
 
   const handleAllTerms = (checked: boolean) => {
     setTerms({
@@ -132,37 +155,6 @@ export default function SignupForm() {
       all: allChecked,
     });
   };
-
-  // const handleDuplicateCheck = async (type: string) => {
-  //   const value = type === "id" ? formData.userId : formData.email;
-
-  //   if (!value) {
-  //     setModal({
-  //       isOpen: true,
-  //       message: `${type === "id" ? "아이디" : "이메일"}를 입력해주세요.`,
-  //     });
-  //     return;
-  //   }
-
-  //   // 실제 중복 검사 API 호출 로직 추가 필요
-  //   try {
-  //     setIsLoading(true);
-  //     // API 호출 로직
-  //     await new Promise((resolve) => setTimeout(resolve, 1000)); // 임시 지연
-
-  //     setModal({
-  //       isOpen: true,
-  //       message: `사용 가능한 ${type === "id" ? "아이디" : "이메일"}입니다.`,
-  //     });
-  //   } catch (error) {
-  //     setModal({
-  //       isOpen: true,
-  //       message: `중복 확인 중 오류가 발생했습니다.`,
-  //     });
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   const handleVerificationRequest = async () => {
     if (!formData.phone) {
@@ -201,6 +193,7 @@ export default function SignupForm() {
       });
       return;
     }
+    console.log(formData.verificationCode);
 
     try {
       setIsLoading(true);
@@ -221,7 +214,47 @@ export default function SignupForm() {
     }
   };
 
-  //값 유효성 검사 후 회원가입 API 호출
+  // 이메일 인증번호 확인
+  const handleEmailVerificationConfirm = async () => {
+    if (!formData.emailVerificationCode) {
+      setModal({
+        isOpen: true,
+        message: "인증번호를 입력해주세요.",
+      });
+      return;
+    }
+
+    console.log(formData.emailVerificationCode);
+    try {
+      setIsLoading(true);
+      const emailVerificationResult = await emailVerification(
+        formData.email,
+        formData.emailVerificationCode,
+      );
+      if (emailVerificationResult.status) {
+        setModal({
+          isOpen: true,
+          message: "인증이 완료되었습니다.",
+        });
+        setisEmailCodeChecked(true);
+      } else {
+        setModal({
+          isOpen: true,
+          message: "인증번호가 일치하지 않습니다.",
+        });
+        setisEmailCodeChecked(false);
+      }
+    } catch (error) {
+      setModal({
+        isOpen: true,
+        message: "인증번호가 일치하지 않습니다.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // "가입하기" 클릭 시 값 유효성 검사 후 회원가입 API 호출
   const handleSignup = async () => {
     if (isLoading) return;
 
@@ -244,6 +277,15 @@ export default function SignupForm() {
         });
         return;
       }
+
+      if (!isIdChecked) {
+        setModal({
+          isOpen: true,
+          message: "중복되는 아이디를 입력하셨습니다. 다시 입력해주세요.",
+        });
+        return;
+      }
+
       if (isIdDuplicate) {
         setModal({
           isOpen: true,
@@ -251,10 +293,26 @@ export default function SignupForm() {
         });
         return;
       }
+
+      if (!isEmailChecked) {
+        setModal({
+          isOpen: true,
+          message: "중복되는 이메일을 입력하셨습니다. 다시 입력해주세요.",
+        });
+        return;
+      }
+
       if (isEmailDuplicate) {
         setModal({
           isOpen: true,
           message: "중복된 이메일입니다. 다른 이메일을 사용해주세요.",
+        });
+        return;
+      }
+      if (!isEmailCodeChecked) {
+        setModal({
+          isOpen: true,
+          message: "인증번호가 일치하지 않습니다.",
         });
         return;
       }
@@ -281,6 +339,7 @@ export default function SignupForm() {
         name: "",
         email: "",
         phone: "",
+        emailVerificationCode: "",
         verificationCode: "",
       });
 
@@ -295,6 +354,8 @@ export default function SignupForm() {
       });
 
       // 인증번호 입력 필드 초기화
+      setIsIdChecked(false);
+      setIsEmailChecked(false);
       setShowVerificationInput(false);
       setIsIdDuplicate(false);
       setIsEmailDuplicate(false);
@@ -326,11 +387,15 @@ export default function SignupForm() {
       if (type === "id") {
         const isDuplicate = await checkIdDuplicate(value);
         if (isDuplicate === true) {
+          setIsIdDuplicate(true);
+          setIsIdChecked(false);
           setModal({
             isOpen: true,
             message: "중복된 ID가 있습니다.",
           });
         } else {
+          setIsIdDuplicate(false);
+          setIsIdChecked(true);
           setModal({
             isOpen: true,
             message: "사용 가능한 ID입니다.",
@@ -339,24 +404,42 @@ export default function SignupForm() {
       } else {
         // === 이메일 중복확인 로직 ===
         const isDuplicate = await checkEmailDuplicate(value); // <-- 함수 호출
+        setIsEmailChecked(true);
         if (isDuplicate === true) {
           setIsEmailDuplicate(true);
+          setIsEmailChecked(false);
           setModal({
             isOpen: true,
             message: "중복된 이메일이 있습니다.",
           });
         } else {
           setIsEmailDuplicate(false);
+          setIsEmailChecked(true);
           setModal({
             isOpen: true,
             message: "사용 가능한 이메일입니다.",
           });
+
+          setEmailShowVerificationInput(true);
+          const sendEmailCode = await sendEmailVerificationCode(value);
+          if (sendEmailCode) {
+            setModal({
+              isOpen: true,
+              message: "인증번호가 발송되었습니다.",
+            });
+          } else {
+            setModal({
+              isOpen: true,
+              message: "인증번호 발송 중 오류가 발생했습니다.",
+            });
+          }
         }
       }
     } catch (error) {
+      console.log(error);
       setModal({
         isOpen: true,
-        message: `중복 확인 중 오류가 발생했습니다.`,
+        message: `중복 확인 중 오류가 발생했습니다.1`,
       });
     } finally {
       setIsLoading(false);
@@ -391,7 +474,7 @@ export default function SignupForm() {
                 />
                 <Button
                   variant="outline"
-                  className="whitespace-nowrap text-emerald-500 border-emerald-500"
+                  className="whitespace-nowrap border-emerald-500 text-emerald-500"
                   onClick={() => handleDuplicateCheck("id")}
                   type="button"
                   disabled={isLoading}
@@ -472,7 +555,7 @@ export default function SignupForm() {
                 />
                 <Button
                   variant="outline"
-                  className="whitespace-nowrap text-emerald-500 border-emerald-500"
+                  className="whitespace-nowrap border-emerald-500 text-emerald-500"
                   onClick={() => handleDuplicateCheck("email")}
                   type="button"
                   disabled={isLoading}
@@ -480,6 +563,30 @@ export default function SignupForm() {
                   중복확인
                 </Button>
               </div>
+              {showEmailVerificationInput && (
+                <div className="mt-2 flex gap-2">
+                  <Input
+                    placeholder="인증번호를 입력해주세요"
+                    value={formData.emailVerificationCode}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        emailVerificationCode: e.target.value,
+                      })
+                    }
+                    disabled={isLoading || !formData.email}
+                  />
+                  <Button
+                    variant="outline"
+                    className="whitespace-nowrap border-emerald-500 text-emerald-500"
+                    type="button"
+                    onClick={handleEmailVerificationConfirm}
+                    disabled={isLoading}
+                  >
+                    인증번호 확인
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* 휴대폰 번호 입력 */}
@@ -499,7 +606,7 @@ export default function SignupForm() {
                 />
                 <Button
                   variant="outline"
-                  className="whitespace-nowrap text-emerald-500 border-emerald-500"
+                  className="whitespace-nowrap border-emerald-500 text-emerald-500"
                   onClick={handleVerificationRequest}
                   type="button"
                   disabled={isLoading || !formData.phone}
@@ -508,7 +615,7 @@ export default function SignupForm() {
                 </Button>
               </div>
               {showVerificationInput && (
-                <div className="flex gap-2 mt-2">
+                <div className="mt-2 flex gap-2">
                   <Input
                     placeholder="인증번호를 입력해주세요"
                     value={formData.verificationCode}
@@ -521,7 +628,7 @@ export default function SignupForm() {
                   />
                   <Button
                     variant="outline"
-                    className="whitespace-nowrap text-emerald-500 border-emerald-500"
+                    className="whitespace-nowrap border-emerald-500 text-emerald-500"
                     type="button"
                     onClick={handleVerificationConfirm}
                     disabled={isLoading}
@@ -551,7 +658,7 @@ export default function SignupForm() {
                     전체 동의합니다.
                   </label>
                 </div>
-                <p className="text-xs text-gray-500 ml-6">
+                <p className="ml-6 text-xs text-gray-500">
                   선택항목에 동의하지 않은 경우도 회원가입 및 일반적인 서비스를
                   이용할 수 있습니다.
                 </p>
@@ -565,7 +672,7 @@ export default function SignupForm() {
                     terms5: "본인은 만 14세 이상입니다. (필수)",
                   };
                   return (
-                    <div key={key} className="flex items-center space-x-2 ml-4">
+                    <div key={key} className="ml-4 flex items-center space-x-2">
                       <Checkbox
                         id={key}
                         checked={value}
@@ -584,7 +691,7 @@ export default function SignupForm() {
 
             {/* 가입하기 버튼 */}
             <Button
-              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white mt-6"
+              className="mt-6 w-full bg-emerald-500 text-white hover:bg-emerald-600"
               onClick={handleSignup}
               disabled={isLoading}
             >
