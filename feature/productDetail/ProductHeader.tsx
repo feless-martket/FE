@@ -11,7 +11,7 @@ export default function ProductHeader({ productName }: ProductHeader) {
   return (
     <header className="p-4 border-b">
       <div className="flex items-center justify-between">
-        <Link href="/" className="text-gray-500 text-lg font-semibold">
+        <Link href="/search" className="text-gray-500 text-lg font-semibold">
           <IoArrowBack className="text-lg" />
         </Link>
 

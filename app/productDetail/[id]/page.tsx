@@ -1,4 +1,4 @@
-// app/productDetail/page.tsx
+// app/productDetail/[id]/page.tsx
 
 import ProductHeader from "@/feature/productDetail/ProductHeader";
 import ProductImage from "@/feature/productDetail/ProductImage";
@@ -8,6 +8,7 @@ import ProductDetails from "@/feature/productDetail/ProductDetails";
 import ProductInfo from "@/feature/productDetail/ProductInfo";
 import DeliveryInfo from "@/feature/productDetail/DeliveryInfo";
 import ProductImages from "@/feature/productDetail/ProductImages";
+import { Footer } from "@/components/layout/footer";
 // 상품 데이터 타입 정의
 interface ProductData {
   name: string;
@@ -16,18 +17,25 @@ interface ProductData {
   price: number;
 }
 
-export default async function ProductPage() {
-  // POST 요청 설정
-  const res = await fetch("http://localhost:8080/product/getProduct/6", {
-    method: "POST", // POST 요청으로 변경
+// Dynamic Route에서 id 가져오기
+export default async function ProductPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const { id } = params; // URL에서 id 추출
+
+  // 서버 요청
+  const res = await fetch(`http://localhost:8080/product/getProduct/${id}`, {
+    method: "POST", // POST 요청
     headers: {
-      "Content-Type": "application/json", // JSON 형식으로 데이터 전송
+      "Content-Type": "application/json", // JSON 형식 전송
     },
-    body: JSON.stringify({ id: 1 }), // 필요한 경우 추가 데이터를 body에 포함
-    cache: "no-store", // 항상 최신 데이터를 가져오기 위해 캐시 비활성화
+    body: JSON.stringify({ id: parseInt(id, 10) }), // id를 body에도 포함
+    cache: "no-store", // 캐시 비활성화
   });
 
-  // 요청 실패 시 에러 처리
+  // 요청 실패 시 처리
   if (!res.ok) {
     return (
       <div className="max-w-md mx-auto bg-white text-center py-8">
@@ -42,16 +50,17 @@ export default async function ProductPage() {
   return (
     <div className="max-w-md mx-auto bg-white">
       <ProductHeader productName={productData.name} />
-      <Home></Home>
+      <Home />
       <ProductImage imageUrl={productData.imageUrl} />
       <ProductInfo
         productName={productData.name}
         productPrice={productData.price}
       />
-      <DeliveryInfo></DeliveryInfo>
-      <ProductDetails></ProductDetails>
+      <DeliveryInfo />
+      <ProductDetails />
       <ProductImages imageUrl={productData.imageUrl} />
       <PurchaseButton />
+      <Footer></Footer>
     </div>
   );
 }

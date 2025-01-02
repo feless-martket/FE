@@ -20,8 +20,9 @@ const meatSubCategories: Option[] = [
 ];
 
 const vegetableSubCategories: Option[] = [
-  { value: "onion", label: "양파" },
-  { value: "cucumber", label: "오이" },
+  { value: "CUCUMBER", label: "오이" },
+  { value: "LETTUCE", label: "상추" },
+  { value: "CARROT", label: "당근" },
 ];
 const quantities: Option[] = Array.from({ length: 100 }, (_, i) => ({
   value: String(i + 1),
@@ -119,9 +120,11 @@ export default function ProductForm() {
               setSelectedCategory(e.target.value);
               setSelectedSubCategory(""); // 카테고리 변경 시 서브카테고리 초기화
             }}
-            className="w-full appearance-none px-3 py-2 bg-white border rounded-md pr-8"
+            className="w-full appearance-none px-3 py-2 bg-white border rounded-md pr-8 text-sm text-gray-800"
           >
-            <option value="">분류1</option>
+            <option value="" className="text-gray-400">
+              카테고리를 선택해주세요
+            </option>
             {categories.map((category) => (
               <option key={category.value} value={category.value}>
                 {category.label}
