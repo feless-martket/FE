@@ -1,43 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { ChevronDown, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { fetchProducts } from "@/feature/productList/productList-api";
 
 const TABS = ["전체보기", "친환경", "고구마·감자·당근", "시금치·쌈채소"];
 
-const products = [
-  {
-    id: "1",
-    name: "[하기스] 2023 네이처썸머 팬티형 기저귀 1박스 3종 (택1)",
-    price: 4480,
-    originalPrice: 6900,
-    discount: 35,
-    image: "/placeholder.svg",
-    delivery: "생필배송",
-    category: "전체보기",
-  },
-  {
-    id: "2",
-    name: "[하기스] 2023 네이처썸머 팬티형 기저귀 1박스 3종 (택1)",
-    price: 4480,
-    originalPrice: 6900,
-    discount: 35,
-    image: "/placeholder.svg",
-    delivery: "생필배송",
-    category: "고구마·감자·당근",
-  },
-];
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  originalPrice: number;
+  discount: number;
+  image: string;
+  delivery: string;
+  category: string;
+}
 
 export default function ProductList() {
   const [selectedTab, setSelectedTab] = useState("전체보기");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredProducts =
-    selectedTab === "전체보기"
-      ? products
-      : products.filter((product) => product.category === selectedTab);
+  // 카테고리 변경 시 상품 목록 불러오기
+  useEffect(() => {
+    const loadProducts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchProducts(selectedTab);
+        setProducts(data);
+      } catch (err: any) {
+        setError("상품을 불러오는 데 실패했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, [selectedTab]);
 
   return (
     <div className="flex flex-col">
@@ -71,11 +76,15 @@ export default function ProductList() {
         <Badge className="absolute right-4 top-4 bg-purple-500">COUPON</Badge>
       </div>
 
+      {/* Loading & Error State */}
+      {loading && (
+        <div className="text-center text-gray-500">상품을 불러오는 중...</div>
+      )}
+      {error && <div className="text-center text-red-500">{error}</div>}
+
       {/* Product Count and Filters */}
       <div className="flex justify-between items-center px-4 mb-4">
-        <span className="text-sm text-gray-600">
-          총 {filteredProducts.length}개
-        </span>
+        <span className="text-sm text-gray-600">총 {products.length}개</span>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="text-sm">
             추천순 <ChevronDown className="ml-1 h-4 w-4" />
@@ -104,7 +113,7 @@ export default function ProductList() {
 
       {/* Product Grid */}
       <div className="grid grid-cols-2 gap-4 px-4">
-        {filteredProducts.map((product) => (
+        {products.map((product) => (
           <div key={product.id} className="relative">
             <div className="relative aspect-square mb-2">
               <Image
