@@ -68,7 +68,7 @@ export default function SearchFeature() {
     return () => clearTimeout(debounceTimer);
   }, [searchValue]);
 
-  // 검색: searchProducts
+  // 검색: msearchProducts
   const handleSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (searchValue.trim() === "") return;

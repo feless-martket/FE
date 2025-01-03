@@ -6,15 +6,22 @@ import { ChevronDown, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { fetchProducts } from "@/feature/productList/productList-api";
+import ProductImage from "@/feature/productDetail/ProductImage"; // ProductImage 컴포넌트 불러오기
+
+// TABS와 DB 카테고리 매핑
+const CATEGORY_MAP: Record<string, string> = {
+  전체보기: "ALL",
+  친환경: "FASHION",
+  "고구마·감자·당근": "pork",
+  "시금치·쌈채소": "CUCUMBER",
+};
 
 const TABS = ["전체보기", "친환경", "고구마·감자·당근", "시금치·쌈채소"];
 
 interface Product {
   id: string;
   name: string;
-  price: number;
-  originalPrice: number;
-  discount: number;
+  price: number; // 정가
   image: string;
   delivery: string;
   category: string;
@@ -32,7 +39,8 @@ export default function ProductList() {
       setLoading(true);
       setError(null);
       try {
-        const data = await fetchProducts(selectedTab);
+        const category = CATEGORY_MAP[selectedTab] || "ALL";
+        const data = await fetchProducts(category);
         setProducts(data);
       } catch (err: any) {
         setError("상품을 불러오는 데 실패했습니다.");
@@ -95,58 +103,59 @@ export default function ProductList() {
         </div>
       </div>
 
-      {/* Filter Buttons */}
-      <div className="flex gap-2 px-4 mb-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
-        <Button variant="outline" size="sm" className="whitespace-nowrap">
-          브랜드 <ChevronDown className="ml-1 h-4 w-4" />
-        </Button>
-        <Button variant="outline" size="sm" className="whitespace-nowrap">
-          가격 <ChevronDown className="ml-1 h-4 w-4" />
-        </Button>
-        <Button variant="outline" size="sm" className="whitespace-nowrap">
-          혜택 <ChevronDown className="ml-1 h-4 w-4" />
-        </Button>
-        <Button variant="outline" size="sm" className="whitespace-nowrap">
-          유형 <ChevronDown className="ml-1 h-4 w-4" />
-        </Button>
-      </div>
-
       {/* Product Grid */}
       <div className="grid grid-cols-2 gap-4 px-4">
-        {products.map((product) => (
-          <div key={product.id} className="relative">
-            <div className="relative aspect-square mb-2">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover rounded-lg"
-              />
-            </div>
-            <Button
-              size="icon"
-              variant="secondary"
-              className="absolute right-2 top-2"
+        {products.map((product) => {
+          // 20% 할인 가격 계산
+          const discountedPrice = Math.round(product.price * 0.8);
+
+          return (
+            <div
+              key={product.id}
+              className="relative p-2 rounded-none shadow-sm flex flex-col bg-white"
             >
-              <ShoppingBag className="h-4 w-4" />
-            </Button>
-            <div className="space-y-1">
-              <p className="text-sm text-gray-500">{product.delivery}</p>
-              <h3 className="font-medium">{product.name}</h3>
-              <div className="flex items-center gap-1">
-                <span className="text-rose-500 font-bold">
-                  {product.discount}%
+              {/* 할인 쿠폰 라벨 */}
+              {/* <div className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10">
+                +15% 카드쿠폰
+              </div> */}
+
+              {/* 상품 이미지 */}
+              <ProductImage imageUrl={product.image || "/img/baseball2.jpg"} />
+
+              {/* 장바구니 버튼 */}
+              <Button
+                size="icon"
+                variant="secondary"
+                className="absolute right-2 bottom-2 bg-gray-200 p-1 rounded-full z-10"
+              >
+                <ShoppingBag className="h-5 w-5 text-gray-600" />
+              </Button>
+
+              {/* 상품 배송 타입 */}
+              <p className="text-xs text-gray-500 mb-1">샛별배송</p>
+
+              {/* 상품 이름 */}
+              <h3 className="text-sm font-medium text-gray-800 line-clamp-1 mb-1">
+                {product.name}
+              </h3>
+
+              {/* 할인율 및 할인 가격 */}
+              <div className="flex items-center mb-1">
+                <span className="text-rose-500 text-base font-bold mr-1">
+                  35%
                 </span>
-                <span className="font-bold">
-                  {product.price.toLocaleString()}원
+                <span className="text-base font-bold">
+                  {(product.price * 0.65).toLocaleString()}원
                 </span>
               </div>
-              <p className="text-sm text-gray-500 line-through">
-                {product.originalPrice.toLocaleString()}원
+
+              {/* 정가 */}
+              <p className="text-xs text-gray-400 line-through">
+                {product.price.toLocaleString()}원
               </p>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
