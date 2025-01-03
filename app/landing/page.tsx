@@ -15,7 +15,9 @@ export default function Page() {
         <MarketHeader />
 
         {/* 상단 메뉴 */}
-        <NavBar />
+        <div className="grow overflow-y-auto">
+          <NavBar />
+        </div>
 
         {/* 하단 푸터 */}
         <Footer />

@@ -23,8 +23,8 @@ export function OrderItems() {
   const displayItems = showMore ? SAMPLE_ITEMS : [SAMPLE_ITEMS[0]];
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-2">
-      <CollapsibleTrigger className="flex w-full items-center justify-between py-2 font-medium">
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-2 ">
+      <CollapsibleTrigger className="flex w-full items-center justify-between font-medium">
         주문상품
         {isOpen ? (
           <ChevronUp className="size-4" />

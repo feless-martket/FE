@@ -7,8 +7,10 @@ interface FooterProps {
 
 export function Footer({ className = "" }: FooterProps) {
   return (
-    <footer className={`inset-x-0 bg-gray-100 ${className}`}>
-      <div className="mx-auto w-full max-w-[360px] bg-white">
+    <footer
+      className={`fixed inset-x-0 bottom-0 z-50 bg-gray-100 ${className}`}
+    >
+      <div className=" mx-auto w-full max-w-[360px] bg-white">
         <nav className="flex items-center justify-between px-4 py-2">
           <Link
             href="/landing"

@@ -8,7 +8,7 @@ import { products } from "@/lib/dummy/products";
 export default function RecommendedSection() {
   return (
     <div className="flex size-full justify-center bg-gray-100">
-      <div className="w-[360px] bg-white">
+      <div className="w-[360px] bg-white ">
         {/* 이벤트 slider */}
         <HeroSlider />
 

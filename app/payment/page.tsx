@@ -14,6 +14,7 @@ import type {
   //   DeliveryAddress,
   OrderFormData,
 } from "@/feature/payment/types/orders";
+import { CheckoutPage } from "@/feature/payment/checkoutPage";
 
 export default function OrderPage() {
   const [formData, setFormData] = useState<Partial<OrderFormData>>({
@@ -49,12 +50,14 @@ export default function OrderPage() {
           <Button variant="ghost" size="icon">
             <ChevronLeft className="size-4" />
           </Button>
-          <h1 className="text-lg font-medium">주문서</h1>
+          <h1 className="text-lg font-bold">주문서</h1>
         </div>
 
         <OrderItems />
+        <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
 
         <CustomerInfoSection info={formData.customerInfo as CustomerInfo} />
+        <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
 
         <DeliveryAddressSection
           savedAddress={formData.deliveryAddress}
@@ -62,14 +65,14 @@ export default function OrderPage() {
             setFormData((prev) => ({ ...prev, deliveryAddress: address }))
           }
         />
-
+        <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
         <DeliveryNotes />
-
+        <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
         <PointsSection
           availablePoints={962}
           onPointsChange={(points) => setUsedPoints(points)}
         />
-
+        <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
         <PaymentMethod isEnabled={isPaymentEnabled} />
 
         <div className="space-y-2 border-t pt-4">
@@ -92,6 +95,7 @@ export default function OrderPage() {
             <span>{total.toLocaleString()}원</span>
           </div>
         </div>
+        <CheckoutPage />
 
         <Button className="w-full bg-emerald-500 hover:bg-emerald-600">
           {total.toLocaleString()}원 결제하기
