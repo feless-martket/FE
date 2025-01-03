@@ -106,9 +106,6 @@ export default function ProductList() {
       {/* Product Grid */}
       <div className="grid grid-cols-2 gap-4 px-4">
         {products.map((product) => {
-          // 20% 할인 가격 계산
-          const discountedPrice = Math.round(product.price * 0.8);
-
           return (
             <div
               key={product.id}
