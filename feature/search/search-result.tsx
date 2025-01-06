@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Product } from "./search-api";
-import Link from "next/link";
+
 const FILTER_OPTIONS = {
   카테고리: [
     { name: "fruit", count: 0 },
@@ -145,50 +145,46 @@ export function SearchResults({ results }: SearchResultsProps) {
           </div>
         </ScrollArea>
       </div>
+
       <ScrollArea className="flex-1">
         <div className="grid grid-cols-2 gap-4 p-4">
-          {results.map((Product) => (
-            <Link
-              key={Product.id} // Link 컴포넌트에 key 추가
-              href={`/productDetail/${Product.id}`}
-            >
-              <div className="space-y-2">
-                <div className="relative aspect-square">
-                  <Image
-                    src={Product.imgurl || "/placeholder.svg"}
-                    alt={Product.name}
-                    fill
-                    className="rounded-lg object-cover"
-                  />
-                  <Button
-                    size="icon"
+          {results.map((product) => (
+            <div key={product.product_id} className="space-y-2">
+              <div className="relative aspect-square">
+                <Image
+                  src={product.imgurl || "/placeholder.svg"}
+                  alt={product.name}
+                  fill
+                  className="rounded-lg object-cover"
+                />
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="absolute bottom-2 right-2 h-8 w-8"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-1">
+                  <Badge
                     variant="secondary"
-                    className="absolute bottom-2 right-2 h-8 w-8"
+                    className="bg-emerald-100 text-emerald-700"
                   >
-                    <ShoppingCart className="h-4 w-4" />
-                  </Button>
+                    +10% 쿠폰
+                  </Badge>
                 </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1">
-                    <Badge
-                      variant="secondary"
-                      className="bg-emerald-100 text-emerald-700"
-                    >
-                      +10% 쿠폰
-                    </Badge>
-                  </div>
-                  <h3 className="font-medium text-sm line-clamp-2">
-                    {Product.name}
-                  </h3>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-red-500 font-medium">35%</span>
-                    <span className="font-bold">
-                      {Product.price.toLocaleString()}원
-                    </span>
-                  </div>
+                <h3 className="font-medium text-sm line-clamp-2">
+                  {product.name}
+                </h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-red-500 font-medium">35%</span>
+                  <span className="font-bold">
+                    {product.price.toLocaleString()}원
+                  </span>
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </ScrollArea>

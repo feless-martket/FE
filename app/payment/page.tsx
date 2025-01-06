@@ -8,7 +8,7 @@ import { CustomerInfoSection } from "@/feature/payment/customerInfo";
 import { DeliveryAddressSection } from "@/feature/payment/deliveryAddress";
 import { DeliveryNotes } from "@/feature/payment/deliveryNote";
 import { PointsSection } from "@/feature/payment/pointSection";
-import { PaymentMethod } from "@/feature/payment/paymentMethod";
+// import { PaymentMethod } from "@/feature/payment/paymentMethod";
 import type {
   CustomerInfo,
   //   DeliveryAddress,
@@ -28,11 +28,11 @@ export default function OrderPage() {
   });
   const [usedPoints, setUsedPoints] = useState(0);
 
-  const isPaymentEnabled = !!(
-    formData.customerInfo &&
-    formData.deliveryAddress &&
-    formData.items
-  );
+  // const isPaymentEnabled = !!(
+  //   formData.customerInfo &&
+  //   formData.deliveryAddress &&
+  //   formData.items
+  // );
 
   const subtotal =
     formData.items?.reduce(
@@ -72,8 +72,6 @@ export default function OrderPage() {
           availablePoints={962}
           onPointsChange={(points) => setUsedPoints(points)}
         />
-        <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
-        <PaymentMethod isEnabled={isPaymentEnabled} />
 
         <div className="space-y-2 border-t pt-4">
           <div className="flex justify-between">
@@ -97,9 +95,9 @@ export default function OrderPage() {
         </div>
         <CheckoutPage />
 
-        <Button className="w-full bg-emerald-500 hover:bg-emerald-600">
+        {/* <Button className="w-full bg-emerald-500 hover:bg-emerald-600">
           {total.toLocaleString()}원 결제하기
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

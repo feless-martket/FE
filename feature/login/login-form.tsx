@@ -63,7 +63,7 @@ export default function LoginForm() {
         </div>
 
         <Button
-          className="w-full bg-[#FEE500] py-6 text-black hover:bg-[#FDD800]"
+          className="w-full bg-[#FEE500] py-6 text-black hover:bg-[#FDD800] "
           size="lg"
         >
           카카오로 시작하기

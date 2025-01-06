@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface Category {
@@ -37,7 +38,12 @@ const categories: Category[] = [
 ];
 
 export function CategoryList() {
+  const router = useRouter();
   const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  const handleSubCategoryClick = (subCategory: string) => {
+    router.push(`/productList?category=${encodeURIComponent(subCategory)}`);
+  };
 
   return (
     <div>
@@ -63,6 +69,7 @@ export function CategoryList() {
                 <button
                   key={index}
                   className="w-full px-2 py-3 text-left text-gray-600 hover:text-emerald-500"
+                  onClick={() => handleSubCategoryClick(subCategory)}
                 >
                   {subCategory}
                 </button>

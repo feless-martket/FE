@@ -231,6 +231,7 @@ export default function SignupForm() {
         formData.email,
         formData.emailVerificationCode,
       );
+      console.log(emailVerificationResult.status);
       if (emailVerificationResult.status) {
         setModal({
           isOpen: true,
