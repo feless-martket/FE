@@ -1,0 +1,20 @@
+<svg
+  width="300"
+  height="300"
+  viewBox="0 0 300 300"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="none"
+>
+  <rect width="300" height="300" rx="8" fill="#E5E7EB" />
+  <text
+    x="50%"
+    y="50%"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    fill="#9CA3AF"
+    font-size="14"
+    font-family="Arial, sans-serif"
+  >
+    이미지 준비 중
+  </text>
+</svg>

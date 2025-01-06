@@ -85,7 +85,7 @@ export default function ProductForm() {
     try {
       // 상품 등록 API 호출
       const response = await axios.post(
-        "http://localhost:8080/admin/saveProduct",
+        "http://localhost:8080/product/save",
         formData,
         {
           headers: {

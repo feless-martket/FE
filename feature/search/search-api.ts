@@ -1,5 +1,5 @@
 export interface Product {
-  id: number;
+  product_id: number;
   name: string;
   price: number;
   description: string;
@@ -9,52 +9,33 @@ export interface Product {
   product_status: string | null;
 }
 
+// ✅ 검색 API (일반 검색)
 export async function searchProducts(keyword: string): Promise<Product[]> {
-  try {
-    console.log("🔍 검색 API 호출:", keyword);
-    const response = await fetch(
-      `http://localhost:8080/search?keyword=${encodeURIComponent(keyword)}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("검색 API 호출 실패");
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("❌ 검색 오류:", error);
-    throw error;
+  const response = await fetch(
+    `http://localhost:8080/search/results?keyword=${encodeURIComponent(keyword)}`
+  );
+  if (!response.ok) {
+    throw new Error("검색 API 호출 실패");
   }
+  return await response.json();
 }
 
+// ✅ 추천 검색어 API
 export async function getSuggestions(keyword: string): Promise<string[]> {
-  try {
-    console.log("🔄 자동완성 API 호출:", keyword);
-    const response = await fetch(
-      `http://localhost:8080/search/suggestions?keyword=${encodeURIComponent(keyword)}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("자동완성 API 호출 실패");
-    }
-
-    const suggestions: string[] = await response.json();
-    console.log("✅ 자동완성 결과:", suggestions);
-    return suggestions;
-  } catch (error) {
-    console.error("❌ 자동완성 오류:", error);
-    throw error;
+  const response = await fetch(
+    `http://localhost:8080/search/suggestions?keyword=${encodeURIComponent(keyword)}`
+  );
+  if (!response.ok) {
+    throw new Error("추천 검색어 API 호출 실패");
   }
+  return await response.json();
+}
+
+// ✅ 추천 검색어 및 급상승 검색어 API
+export async function getRecommendations(): Promise<string[]> {
+  const response = await fetch(`http://localhost:8080/search`);
+  if (!response.ok) {
+    throw new Error("추천 검색어 API 호출 실패");
+  }
+  return await response.json();
 }
