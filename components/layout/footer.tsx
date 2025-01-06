@@ -7,13 +7,11 @@ interface FooterProps {
 
 export function Footer({ className = "" }: FooterProps) {
   return (
-    <footer
-      className={`fixed bottom-0 left-0 right-0 bg-gray-100 ${className}`}
-    >
-      <div className="w-full max-w-[360px] mx-auto bg-white">
-        <nav className="flex justify-between items-center px-4 py-2">
+    <footer className={`fixed inset-x-0 bottom-0 bg-gray-100 ${className}`}>
+      <div className="mx-auto w-full max-w-[360px] bg-white">
+        <nav className="flex items-center justify-between px-4 py-2">
           <Link
-            href="/"
+            href="/landing"
             className="flex flex-col items-center gap-1 text-xs text-gray-600 hover:text-emerald-500"
           >
             <Home size={24} />
@@ -34,7 +32,7 @@ export function Footer({ className = "" }: FooterProps) {
           </Link>
 
           <Link
-            href="/mypage"
+            href="/login"
             className="flex flex-col items-center gap-1 text-xs text-gray-600 hover:text-emerald-500"
           >
             <User size={24} />
