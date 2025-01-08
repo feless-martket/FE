@@ -3,6 +3,43 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Minus, Plus, X } from "lucide-react";
+import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
+
+interface DeleteConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}
+
+function DeleteConfirmModal({
+  isOpen,
+  onClose,
+  onConfirm,
+}: DeleteConfirmModalProps) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[320px] p-0">
+        <div className="p-6">
+          <p className="text-center text-base">삭제하시겠습니까?</p>
+        </div>
+        <DialogFooter className="border-t flex p-0">
+          <button
+            onClick={onClose}
+            className="flex-1 p-4 text-sm border-r hover:bg-gray-50"
+          >
+            취소
+          </button>
+          <button
+            onClick={onConfirm}
+            className="flex-1 p-4 text-sm text-green-600 hover:bg-gray-50"
+          >
+            확인
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 interface CartItem {
   cartItemId: number;
@@ -26,6 +63,8 @@ export const ShoppingCart = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemsToDelete, setItemsToDelete] = useState<number[]>([]);
 
   const shippingFee = 3000;
 
@@ -36,7 +75,7 @@ export const ShoppingCart = () => {
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8080",
     headers: {
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3MzYzMjE0MTQsImV4cCI6MTczNjMyMzIxNH0.qT4ol4To3D4AFexwwS8ZIuoLXQveeZZRDmNjKxLpL1w`,
+      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3MzYzMjM0NTAsImV4cCI6MTczNjMyNTI1MH0.WfUpwCd3V8E9IhU3KE2sPU9b3r9ZOCe-DJ1ZtdkH3yI`,
     },
   });
 
@@ -133,13 +172,19 @@ export const ShoppingCart = () => {
     }
   };
 
+  const handleDeleteClick = (items: number[]) => {
+    setItemsToDelete(items);
+    setIsDeleteModalOpen(true);
+  };
+
   const deleteSelectedItems = async () => {
     try {
       await Promise.all(
-        selectedItems.map((cartItemId) =>
+        itemsToDelete.map((cartItemId) =>
           axiosInstance.delete(`/cart/item/${cartItemId}`)
         )
       );
+      setIsDeleteModalOpen(false);
       fetchCartData(); // Refresh cart data after deletion
     } catch (err) {
       setError("선택한 상품 삭제 중 오류가 발생했습니다.");
@@ -193,7 +238,7 @@ export const ShoppingCart = () => {
               </span>
             </div>
             <button
-              onClick={deleteSelectedItems}
+              onClick={() => handleDeleteClick(selectedItems)}
               className="text-sm text-gray-500"
             >
               선택삭제
@@ -273,6 +318,11 @@ export const ShoppingCart = () => {
           <p className="text-sm text-gray-500 text-center mt-2">저장 중...</p>
         )}
       </div>
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={deleteSelectedItems}
+      />
     </div>
   );
 };
