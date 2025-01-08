@@ -5,10 +5,11 @@ import axios from "axios";
 import { Minus, Plus, X } from "lucide-react";
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 
+// 삭제 확인 모달 컴포넌트
 interface DeleteConfirmModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
+  isOpen: boolean; // 모달 열림
+  onClose: () => void; // 모달 닫기
+  onConfirm: () => void; // 삭제 확인 함수
 }
 
 function DeleteConfirmModal({
@@ -41,6 +42,7 @@ function DeleteConfirmModal({
   );
 }
 
+// 장바구니 아이템 타입
 interface CartItem {
   cartItemId: number;
   productId: number;
@@ -51,34 +53,38 @@ interface CartItem {
   isSelected?: boolean;
 }
 
+// 장바구니 데이터 타입
 interface CartData {
   cartId: number;
   cartItems: CartItem[];
   totalPrice: number;
 }
 
+// 장바구니 컴포넌트
 export const ShoppingCart = () => {
-  const [cartData, setCartData] = useState<CartData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [cartData, setCartData] = useState<CartData | null>(null); // 장바구니 데이터 상테
+  const [loading, setLoading] = useState(true); // 로딩 상태
+  const [error, setError] = useState<string | null>(null); // 오류 상태
+  const [isSaving, setIsSaving] = useState(false); // 저장 상태
+  const [selectedItems, setSelectedItems] = useState<number[]>([]); // 선택된 아이템
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // 삭제 모달
   const [itemsToDelete, setItemsToDelete] = useState<number[]>([]);
 
-  const shippingFee = 3000;
+  const shippingFee = 3000; // 배송비 고정
 
   useEffect(() => {
     fetchCartData();
   }, []);
 
+  // 인증 구현 미 완성으로 헤더 직접 넣음
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8080",
     headers: {
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3MzYzMjM0NTAsImV4cCI6MTczNjMyNTI1MH0.WfUpwCd3V8E9IhU3KE2sPU9b3r9ZOCe-DJ1ZtdkH3yI`,
+      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3MzYzMjYxNDAsImV4cCI6MTczNjMyNzk0MH0.bGieKqEu3Q3JptQeSetmtA9Suubn_kIGLO-8KAweRb0`,
     },
   });
 
+  // 장바구니 데이터 가져오기
   const fetchCartData = async () => {
     try {
       setLoading(true);
@@ -95,6 +101,7 @@ export const ShoppingCart = () => {
     }
   };
 
+  // 수량 업데이트
   const updateQuantity = (cartItemId: number, newQuantity: number) => {
     setCartData((prev) => {
       if (!prev) return prev;
@@ -117,6 +124,7 @@ export const ShoppingCart = () => {
     debounceSaveCart(cartItemId, newQuantity);
   };
 
+  // 수량 저장 디바운스
   let saveTimeout: NodeJS.Timeout;
   const debounceSaveCart = (cartItemId: number, quantity: number) => {
     if (saveTimeout) clearTimeout(saveTimeout);
@@ -125,6 +133,7 @@ export const ShoppingCart = () => {
     }, 1000);
   };
 
+  // 수량 저장 요청
   const saveCartItemToServer = async (cartItemId: number, quantity: number) => {
     try {
       setIsSaving(true);
@@ -147,6 +156,7 @@ export const ShoppingCart = () => {
     }
   };
 
+  // 결제 처리
   const handleCheckout = async () => {
     if (!cartData) return;
     const selectedItemsTotal = calculateSelectedItemsTotal();
@@ -154,6 +164,7 @@ export const ShoppingCart = () => {
     alert("결제 페이지로 이동합니다!");
   };
 
+  // 개별 항목 선택 토글
   const toggleItemSelection = (cartItemId: number) => {
     setSelectedItems((prev) =>
       prev.includes(cartItemId)
@@ -162,6 +173,7 @@ export const ShoppingCart = () => {
     );
   };
 
+  // 전체 선택 토글
   const toggleSelectAll = () => {
     if (!cartData) return;
 
@@ -172,26 +184,31 @@ export const ShoppingCart = () => {
     }
   };
 
+  // 삭제 모달
   const handleDeleteClick = (items: number[]) => {
     setItemsToDelete(items);
     setIsDeleteModalOpen(true);
   };
 
+  // 선택 항목 상제
   const deleteSelectedItems = async () => {
     try {
+      // 선택된 cartItemId를 기반으로 삭제 요청
       await Promise.all(
         itemsToDelete.map((cartItemId) =>
           axiosInstance.delete(`/cart/item/${cartItemId}`)
         )
       );
-      setIsDeleteModalOpen(false);
-      fetchCartData(); // Refresh cart data after deletion
-    } catch (err) {
+
+      setIsDeleteModalOpen(false); // 모달 닫기
+      fetchCartData(); // 데이터 새로고침
+    } catch (err: any) {
       setError("선택한 상품 삭제 중 오류가 발생했습니다.");
-      console.error("❌ Error deleting items:", err);
+      console.error("Error deleting items:", err);
     }
   };
 
+  // 선택된 항목 총 금액 계산
   const calculateSelectedItemsTotal = () => {
     if (!cartData) return 0;
     return cartData.cartItems
@@ -208,7 +225,11 @@ export const ShoppingCart = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
   if (!cartData || !cartData.cartItems || cartData.cartItems.length === 0) {
-    return <div>장바구니가 비어있습니다.</div>;
+    return (
+      <div className="flex justify-center items-center h-[50vh] text-2xl font-bold text-gray-500">
+        🛒 장바구니가 비어있습니다.
+      </div>
+    );
   }
 
   const selectedTotal = calculateSelectedItemsTotal();
@@ -307,16 +328,13 @@ export const ShoppingCart = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
+      <div className="mt-6">
         <button
           onClick={handleCheckout}
-          className="w-full py-4 bg-green-500 text-white font-medium rounded-md"
+          className="w-full py-3 bg-green-500 text-white font-bold text-lg rounded-md"
         >
           {finalTotal.toLocaleString()}원 결제하기
         </button>
-        {isSaving && (
-          <p className="text-sm text-gray-500 text-center mt-2">저장 중...</p>
-        )}
       </div>
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
