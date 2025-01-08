@@ -2,33 +2,30 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { Minus, Plus, X } from "lucide-react";
 
-// 장바구니에 담긴 각 상품의 정보
 interface CartItem {
+  cartItemId: number;
   productId: number;
   productName: string;
   quantity: number;
   price: number;
   imgURL: string;
+  isSelected?: boolean;
 }
 
-// 전체 장바구니의 데이터
 interface CartData {
   cartId: number;
   cartItems: CartItem[];
   totalPrice: number;
 }
 
-/**
-cartData: 장바구니 정보를 저장. API 호출로 데이터를 불러와서 저장함
-loading: 데이터가 로드되는 동안 true, 완료되면 false.
-error: API 호출 중 에러가 발생할 경우 에러 메시지를 저장
-shippingFee: 배송비를 고정값으로 설정
- */
 export const ShoppingCart = () => {
   const [cartData, setCartData] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   const shippingFee = 3000;
 
@@ -39,145 +36,242 @@ export const ShoppingCart = () => {
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8080",
     headers: {
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3MzYyNTQ2NDAsImV4cCI6MTczNjI1NjQ0MH0.yX9tj68Zvma9_BO04TY8M_gaZ3QnWpg8dG8RUuV84gg`, // Swagger로 발급받은 JWT 토큰
+      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3MzYzMjE0MTQsImV4cCI6MTczNjMyMzIxNH0.qT4ol4To3D4AFexwwS8ZIuoLXQveeZZRDmNjKxLpL1w`,
     },
   });
 
-  // 데이터 불러오기
   const fetchCartData = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get<CartData>("/cart"); // /cart API에서 장바구니 데이터를 가져옴
-      setCartData(response.data); // 성공하면 데이터 저장
+      const response = await axiosInstance.get<CartData>("/cart");
+      setCartData(response.data);
+      // Initially select all items
+      setSelectedItems(response.data.cartItems.map((item) => item.cartItemId));
       setError(null);
     } catch (err) {
-      // 오류 발생시 에러에 메세지 저장
       setError("장바구니 데이터를 불러오는 중 오류가 발생했습니다.");
-      console.error("Error fetching cart data:", err);
+      console.error("❌ Error fetching cart data:", err);
     } finally {
-      // finally: loading 상태를 false로 설정하여 로딩 상태 해제.
       setLoading(false);
     }
   };
 
-  // 수량 업데이트
-  const updateQuantity = async (itemId: number, newQuantity: number) => {
+  const updateQuantity = (cartItemId: number, newQuantity: number) => {
+    setCartData((prev) => {
+      if (!prev) return prev;
+
+      const updatedCartItems = prev.cartItems.map((item) =>
+        item.cartItemId === cartItemId
+          ? { ...item, quantity: Math.max(newQuantity, 1) }
+          : item
+      );
+
+      const updatedTotalPrice = calculateTotalPrice(updatedCartItems);
+
+      return {
+        ...prev,
+        cartItems: updatedCartItems,
+        totalPrice: updatedTotalPrice,
+      };
+    });
+
+    debounceSaveCart(cartItemId, newQuantity);
+  };
+
+  let saveTimeout: NodeJS.Timeout;
+  const debounceSaveCart = (cartItemId: number, quantity: number) => {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      saveCartItemToServer(cartItemId, quantity);
+    }, 1000);
+  };
+
+  const saveCartItemToServer = async (cartItemId: number, quantity: number) => {
     try {
-      await axios.post("/cart", {
-        // /cart로 cartItemId와 quantity를 전달해 수량을 업데이트
-        cartItemId: itemId,
-        quantity: newQuantity,
+      setIsSaving(true);
+      const response = await axiosInstance.post("/cart/update", null, {
+        params: {
+          cartItemId: cartItemId,
+          quantity: quantity,
+        },
       });
-      fetchCartData(); // 업데이트 후 데이터 새로고침
-    } catch (err) {
-      setError("수량을 업데이트하는 중 오류가 발생했습니다.");
-      console.error("Error updating quantity:", err);
+      console.log("✅ 수량 업데이트 성공:", response.data);
+    } catch (err: any) {
+      if (err.response?.status === 400) {
+        setError("잘못된 요청입니다. 수량은 1 이상이어야 합니다.");
+      } else {
+        setError("수량 업데이트 중 오류가 발생했습니다.");
+      }
+      console.error("❌ Error saving cart item:", err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  /**
-   *
-   * loading: 로딩 중에는 Loading... 표시.
-   * error: 오류 발생 시 에러 메시지 표시.
-   * cartData가 없을 경우 No items in cart 표시.
-   */
+  const handleCheckout = async () => {
+    if (!cartData) return;
+    const selectedItemsTotal = calculateSelectedItemsTotal();
+    await saveCartItemToServer(cartData.cartId, selectedItemsTotal);
+    alert("결제 페이지로 이동합니다!");
+  };
+
+  const toggleItemSelection = (cartItemId: number) => {
+    setSelectedItems((prev) =>
+      prev.includes(cartItemId)
+        ? prev.filter((id) => id !== cartItemId)
+        : [...prev, cartItemId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (!cartData) return;
+
+    if (selectedItems.length === cartData.cartItems.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(cartData.cartItems.map((item) => item.cartItemId));
+    }
+  };
+
+  const deleteSelectedItems = async () => {
+    try {
+      await Promise.all(
+        selectedItems.map((cartItemId) =>
+          axiosInstance.delete(`/cart/item/${cartItemId}`)
+        )
+      );
+      fetchCartData(); // Refresh cart data after deletion
+    } catch (err) {
+      setError("선택한 상품 삭제 중 오류가 발생했습니다.");
+      console.error("❌ Error deleting items:", err);
+    }
+  };
+
+  const calculateSelectedItemsTotal = () => {
+    if (!cartData) return 0;
+    return cartData.cartItems
+      .filter((item) => selectedItems.includes(item.cartItemId))
+      .reduce((total, item) => total + item.price * item.quantity, 0);
+  };
+
+  const calculateTotalPrice = (items: CartItem[]) => {
+    return items
+      .filter((item) => selectedItems.includes(item.cartItemId))
+      .reduce((total, item) => total + item.price * item.quantity, 0);
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
   if (!cartData || !cartData.cartItems || cartData.cartItems.length === 0) {
-    return <div>No items in cart</div>;
+    return <div>장바구니가 비어있습니다.</div>;
   }
 
-  const totalPrice = cartData.totalPrice + shippingFee;
+  const selectedTotal = calculateSelectedItemsTotal();
+  const finalTotal = selectedTotal + shippingFee;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <header className="flex items-center justify-center relative border-b pb-3">
-        <button className="absolute left-0 text-xl text-gray-500">✕</button>
-        <h1 className="text-lg font-bold">장바구니</h1>
+    <div className="min-h-screen bg-gray-50">
+      <header className="flex items-center justify-center relative border-b p-4">
+        <button className="absolute left-4">
+          <X className="h-6 w-6 text-gray-500" />
+        </button>
+        <h1 className="text-lg font-medium">장바구니</h1>
       </header>
 
-      <div className="mt-4">
-        {/* 상품 정보 */}
+      <div className="p-4">
         <div className="border-b pb-4">
-          <div className="flex items-center space-x-2 mb-3">
-            <input
-              type="checkbox"
-              checked
-              className="form-checkbox h-5 w-5 text-green-500"
-            />
-            <p className="text-sm text-gray-600">
-              전체 선택 ({cartData.cartItems.length}/{cartData.cartItems.length}
-              )
-            </p>
-            <button className="text-sm text-gray-500">선택삭제</button>
-          </div>
-          {cartData.cartItems.map((item) => (
-            <div key={item.productId} className="flex space-x-4 mb-4">
-              <img
-                src={item.imgURL}
-                alt={item.productName}
-                className="w-16 h-16 rounded-md border"
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={selectedItems.length === cartData.cartItems.length}
+                onChange={toggleSelectAll}
+                className="h-5 w-5 rounded border-gray-300 text-green-500 focus:ring-green-500"
               />
-              <div className="flex-1">
-                <p className="text-sm font-medium">{item.productName}</p>
-                <p className="text-sm text-gray-700 mt-1">
-                  {item.price.toLocaleString()}원
-                </p>
-                <div className="flex items-center mt-2">
-                  <button
-                    className="w-8 h-8 border rounded text-gray-700"
-                    onClick={() =>
-                      updateQuantity(
-                        item.productId,
-                        Math.max(1, item.quantity - 1)
-                      )
-                    }
-                  >
-                    -
-                  </button>
-                  <p className="px-4">{item.quantity}</p>
-                  <button
-                    className="w-8 h-8 border rounded text-gray-700"
-                    onClick={() =>
-                      updateQuantity(item.productId, item.quantity + 1)
-                    }
-                  >
-                    +
-                  </button>
+              <span className="text-sm text-gray-600">
+                전체 선택 ({selectedItems.length}/{cartData.cartItems.length})
+              </span>
+            </div>
+            <button
+              onClick={deleteSelectedItems}
+              className="text-sm text-gray-500"
+            >
+              선택삭제
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {cartData.cartItems.map((item) => (
+              <div key={item.cartItemId} className="flex items-start gap-4">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.includes(item.cartItemId)}
+                  onChange={() => toggleItemSelection(item.cartItemId)}
+                  className="mt-2 h-5 w-5 rounded border-gray-300 text-green-500 focus:ring-green-500"
+                />
+                <div className="flex-1 flex gap-4">
+                  <img
+                    src={item.imgURL}
+                    alt={item.productName}
+                    className="h-20 w-20 rounded-md object-cover"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-sm font-medium">{item.productName}</h3>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {item.price.toLocaleString()}원
+                    </p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <button
+                        onClick={() =>
+                          updateQuantity(item.cartItemId, item.quantity - 1)
+                        }
+                        className="rounded-md border p-2"
+                      >
+                        <Minus className="h-4 w-4" />
+                      </button>
+                      <span className="w-8 text-center">{item.quantity}</span>
+                      <button
+                        onClick={() =>
+                          updateQuantity(item.cartItemId, item.quantity + 1)
+                        }
+                        className="rounded-md border p-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <button className="text-gray-400">✕</button>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
-        {/* 가격 정보 */}
-        <div className="mt-4 text-sm text-gray-600">
-          <div className="flex justify-between mb-2">
-            <p>상품금액</p>
-            <p>{cartData.totalPrice.toLocaleString()}원</p>
+        <div className="mt-4 space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">상품금액</span>
+            <span>{selectedTotal.toLocaleString()}원</span>
           </div>
-          <div className="flex justify-between mb-2">
-            <p>상품할인금액</p>
-            <p>0원</p>
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">배송비</span>
+            <span>{shippingFee.toLocaleString()}원</span>
           </div>
-          <div className="flex justify-between mb-2">
-            <p>배송비</p>
-            <p>{shippingFee.toLocaleString()}원</p>
-          </div>
-          <div className="flex justify-between font-bold text-gray-800 mt-2">
-            <p>결제예정금액</p>
-            <p>{totalPrice.toLocaleString()}원</p>
+          <div className="flex justify-between text-base font-medium pt-2 border-t">
+            <span>결제예정금액</span>
+            <span>{finalTotal.toLocaleString()}원</span>
           </div>
         </div>
       </div>
 
-      {/* 결제 버튼 */}
-      <div className="mt-6">
-        <button className="w-full py-3 bg-green-500 text-white font-bold text-lg rounded-md">
-          {totalPrice.toLocaleString()}원 결제하기
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
+        <button
+          onClick={handleCheckout}
+          className="w-full py-4 bg-green-500 text-white font-medium rounded-md"
+        >
+          {finalTotal.toLocaleString()}원 결제하기
         </button>
+        {isSaving && (
+          <p className="text-sm text-gray-500 text-center mt-2">저장 중...</p>
+        )}
       </div>
     </div>
   );
