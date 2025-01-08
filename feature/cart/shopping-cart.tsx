@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Minus, Plus, X } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import { Header } from "@/components/layout/header";
 
 // 삭제 확인 모달 컴포넌트
 interface DeleteConfirmModalProps {
@@ -80,7 +81,7 @@ export const ShoppingCart = () => {
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8080",
     headers: {
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3MzYzMjYxNDAsImV4cCI6MTczNjMyNzk0MH0.bGieKqEu3Q3JptQeSetmtA9Suubn_kIGLO-8KAweRb0`,
+      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3MzYzMjg3NDgsImV4cCI6MTczNjMzMDU0OH0.JFBrcKhXiAf-csLs8z8S_1pq3YgeQW34Yp_lUOotb-E `,
     },
   });
 
@@ -95,7 +96,7 @@ export const ShoppingCart = () => {
       setError(null);
     } catch (err) {
       setError("장바구니 데이터를 불러오는 중 오류가 발생했습니다.");
-      console.error("❌ Error fetching cart data:", err);
+      console.error("Error fetching cart data:", err);
     } finally {
       setLoading(false);
     }
@@ -143,14 +144,14 @@ export const ShoppingCart = () => {
           quantity: quantity,
         },
       });
-      console.log("✅ 수량 업데이트 성공:", response.data);
+      console.log("수량 업데이트 성공:", response.data);
     } catch (err: any) {
       if (err.response?.status === 400) {
         setError("잘못된 요청입니다. 수량은 1 이상이어야 합니다.");
       } else {
         setError("수량 업데이트 중 오류가 발생했습니다.");
       }
-      console.error("❌ Error saving cart item:", err);
+      console.error("Error saving cart item:", err);
     } finally {
       setIsSaving(false);
     }
@@ -226,8 +227,12 @@ export const ShoppingCart = () => {
   if (error) return <div>{error}</div>;
   if (!cartData || !cartData.cartItems || cartData.cartItems.length === 0) {
     return (
-      <div className="flex justify-center items-center h-[50vh] text-2xl font-bold text-gray-500">
-        🛒 장바구니가 비어있습니다.
+      <div className="min-h-screen bg-gray-50">
+        {/* 공통 Header 사용 */}
+        <Header title="장바구니" />
+        <div className="flex justify-center items-center h-[50vh] text-2xl font-bold text-gray-500">
+          🛒 장바구니가 비어있습니다.
+        </div>
       </div>
     );
   }
@@ -237,13 +242,7 @@ export const ShoppingCart = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="flex items-center justify-center relative border-b p-4">
-        <button className="absolute left-4">
-          <X className="h-6 w-6 text-gray-500" />
-        </button>
-        <h1 className="text-lg font-medium">장바구니</h1>
-      </header>
-
+      <Header title="장바구니" />
       <div className="p-4">
         <div className="border-b pb-4">
           <div className="flex items-center justify-between mb-4">
