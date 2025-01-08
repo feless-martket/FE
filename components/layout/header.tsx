@@ -1,6 +1,8 @@
-import Link from "next/link";
+"use client";
+
 import { ReactNode } from "react";
 import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   title: string;
@@ -17,19 +19,24 @@ export function Header({
   closeButton,
   className = "",
 }: HeaderProps) {
+  const router = useRouter();
+
   return (
-    <div className={`relative mb-4 ${showDivider ? "pb-4" : ""} ${className}`}>
-      <div className="text-center text-lg font-medium ">{title}</div>
-      {closeButton || (
-        <Link
-          href="/"
-          className="absolute left-0 top-1 flex size-5 items-center justify-center"
-        >
-          <X className="size-5" />
-        </Link>
-      )}
+    <div className={`relative ${showDivider ? "pb-4" : ""} ${className}`}>
+      <div className="flex items-center justify-center ">
+        {closeButton || (
+          <button
+            onClick={() => router.back()}
+            className="absolute left-0 flex size-5 h-full items-center justify-center"
+          >
+            <X size={24} />
+          </button>
+        )}
+        <div className="text-lg font-bold">{title}</div>
+      </div>
+
       {showDivider && (
-        <div className={`absolute inset-x-0 bottom-0 ${dividerClassName}`} />
+        <div className={`mt-5 w-full border ${dividerClassName}`}></div>
       )}
     </div>
   );
