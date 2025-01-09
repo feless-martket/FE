@@ -20,9 +20,8 @@ const meatSubCategories: Option[] = [
 ];
 
 const vegetableSubCategories: Option[] = [
-  { value: "CUCUMBER", label: "오이" },
-  { value: "LETTUCE", label: "상추" },
-  { value: "CARROT", label: "당근" },
+  { value: "onion", label: "양파" },
+  { value: "cucumber", label: "오이" },
 ];
 const quantities: Option[] = Array.from({ length: 100 }, (_, i) => ({
   value: String(i + 1),
@@ -33,25 +32,12 @@ export default function ProductForm() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
   const [selectedQuantity, setSelectedQuantity] = useState<string>("");
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const base64Image = await convertToBase64(file); // Base64로 변환
-      setSelectedImage(base64Image); // 상태에 Base64 값 저장
+      setSelectedImage(e.target.files[0]);
     }
-  };
-
-  const convertToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        resolve(reader.result as string); // Base64 문자열로 반환
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file); // 파일을 Base64로 변환
-    });
   };
 
   const handleImageClick = () => {
@@ -63,13 +49,13 @@ export default function ProductForm() {
 
     // 상품명과 상품설명 추가
     const productName = (e.target as HTMLFormElement).elements.namedItem(
-      "productName",
+      "productName",,
     ) as HTMLInputElement;
     const productDescription = (e.target as HTMLFormElement).elements.namedItem(
-      "productDescription",
+      "productDescription",,
     ) as HTMLInputElement;
     const productPrice = (e.target as HTMLFormElement).elements.namedItem(
-      "productPrice",
+      "productPrice",,
     ) as HTMLInputElement;
 
     const formData = {
@@ -99,6 +85,7 @@ export default function ProductForm() {
   }
 
   return (
+  
     <form onSubmit={handleSubmit} className="space-y-4 px-4 py-2">
       <div className="flex justify-center">
         <h1 className="text-2xl">상품등록</h1>
@@ -118,9 +105,7 @@ export default function ProductForm() {
             }}
             className="w-full appearance-none rounded-md border bg-white px-3 py-2 pr-8 text-sm text-gray-800"
           >
-            <option value="" className="text-gray-400">
-              카테고리를 선택해주세요
-            </option>
+            <option value="">분류1</option>
             {categories.map((category) => (
               <option key={category.value} value={category.value}>
                 {category.label}

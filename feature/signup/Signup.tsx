@@ -15,6 +15,7 @@ import {
   sendEmailVerificationCode,
   emailVerification,
 } from "@/feature/signup/authService";
+import { useRouter } from "next/navigation";
 
 // 폼 유효성 검사 함수
 function validateForm(formData: {
@@ -107,9 +108,11 @@ export default function SignupForm() {
   const [showVerificationInput, setShowVerificationInput] = useState(false);
   const [showEmailVerificationInput, setEmailShowVerificationInput] =
     useState(false);
+
   const [modal, setModal] = useState({
     isOpen: false,
     message: "",
+    onConfirm: null,
   });
 
   const [terms, setTerms] = useState({
@@ -120,6 +123,11 @@ export default function SignupForm() {
     terms4: false,
     terms5: false,
   });
+
+  const router = useRouter();
+  const goToLogin = () => {
+    router.push("/login");
+  };
 
   // useEffect(() => {
   //   console.log("");
@@ -161,6 +169,7 @@ export default function SignupForm() {
       setModal({
         isOpen: true,
         message: "휴대폰 번호를 입력해주세요.",
+        onConfirm: null,
       });
       return;
     }
@@ -174,11 +183,13 @@ export default function SignupForm() {
       setModal({
         isOpen: true,
         message: "인증번호가 발송되었습니다.",
+        onConfirm: null,
       });
     } catch (error) {
       setModal({
         isOpen: true,
         message: "인증번호 발송 중 오류가 발생했습니다.",
+        onConfirm: null,
       });
     } finally {
       setIsLoading(false);
@@ -190,6 +201,7 @@ export default function SignupForm() {
       setModal({
         isOpen: true,
         message: "인증번호를 입력해주세요.",
+        onConfirm: null,
       });
       return;
     }
@@ -203,11 +215,13 @@ export default function SignupForm() {
       setModal({
         isOpen: true,
         message: "인증이 완료되었습니다.",
+        onConfirm: null,
       });
     } catch (error) {
       setModal({
         isOpen: true,
         message: "인증번호가 일치하지 않습니다.",
+        onConfirm: null,
       });
     } finally {
       setIsLoading(false);
@@ -220,6 +234,7 @@ export default function SignupForm() {
       setModal({
         isOpen: true,
         message: "인증번호를 입력해주세요.",
+        onConfirm: null,
       });
       return;
     }
@@ -229,18 +244,21 @@ export default function SignupForm() {
       setIsLoading(true);
       const emailVerificationResult = await emailVerification(
         formData.email,
-        formData.emailVerificationCode
+        formData.emailVerificationCode,
       );
+      console.log(emailVerificationResult.status);
       if (emailVerificationResult.status) {
         setModal({
           isOpen: true,
           message: "인증이 완료되었습니다.",
+          onConfirm: null,
         });
         setisEmailCodeChecked(true);
       } else {
         setModal({
           isOpen: true,
           message: "인증번호가 일치하지 않습니다.",
+          onConfirm: null,
         });
         setisEmailCodeChecked(false);
       }
@@ -248,6 +266,7 @@ export default function SignupForm() {
       setModal({
         isOpen: true,
         message: "인증번호가 일치하지 않습니다.",
+        onConfirm: null,
       });
     } finally {
       setIsLoading(false);
@@ -265,6 +284,7 @@ export default function SignupForm() {
         setModal({
           isOpen: true,
           message: Object.values(formErrors)[0],
+          onConfirm: null,
         });
         return;
       }
@@ -274,6 +294,7 @@ export default function SignupForm() {
         setModal({
           isOpen: true,
           message: "필수 약관에 모두 동의해주세요.",
+          onConfirm: null,
         });
         return;
       }
@@ -282,6 +303,7 @@ export default function SignupForm() {
         setModal({
           isOpen: true,
           message: "중복되는 아이디를 입력하셨습니다. 다시 입력해주세요.",
+          onConfirm: null,
         });
         return;
       }
@@ -290,6 +312,7 @@ export default function SignupForm() {
         setModal({
           isOpen: true,
           message: "중복된 아이디입니다. 다른 아이디를 사용해주세요.",
+          onConfirm: null,
         });
         return;
       }
@@ -298,6 +321,7 @@ export default function SignupForm() {
         setModal({
           isOpen: true,
           message: "중복되는 이메일을 입력하셨습니다. 다시 입력해주세요.",
+          onConfirm: null,
         });
         return;
       }
@@ -306,6 +330,7 @@ export default function SignupForm() {
         setModal({
           isOpen: true,
           message: "중복된 이메일입니다. 다른 이메일을 사용해주세요.",
+          onConfirm: null,
         });
         return;
       }
@@ -313,6 +338,7 @@ export default function SignupForm() {
         setModal({
           isOpen: true,
           message: "인증번호가 일치하지 않습니다.",
+          onConfirm: null,
         });
         return;
       }
@@ -329,6 +355,11 @@ export default function SignupForm() {
       setModal({
         isOpen: true,
         message: result.message,
+        // onConfirm: () => {
+        //   // 모달의 확인 버튼을 누르면 로그인 페이지로 이동
+        //   router.push("/login");
+        // },
+        onConfirm: null,
       });
 
       // 성공 시 폼 초기화
@@ -364,6 +395,7 @@ export default function SignupForm() {
       setModal({
         isOpen: true,
         message: error.message || "회원가입 중 오류가 발생했습니다.",
+        onConfirm: null,
       });
     } finally {
       setIsLoading(false);
@@ -377,6 +409,7 @@ export default function SignupForm() {
       setModal({
         isOpen: true,
         message: `${type === "id" ? "아이디" : "이메일"}를 입력해주세요.`,
+        onConfirm: null,
       });
       return;
     }
@@ -392,6 +425,7 @@ export default function SignupForm() {
           setModal({
             isOpen: true,
             message: "중복된 ID가 있습니다.",
+            onConfirm: null,
           });
         } else {
           setIsIdDuplicate(false);
@@ -399,6 +433,7 @@ export default function SignupForm() {
           setModal({
             isOpen: true,
             message: "사용 가능한 ID입니다.",
+            onConfirm: null,
           });
         }
       } else {
@@ -411,6 +446,7 @@ export default function SignupForm() {
           setModal({
             isOpen: true,
             message: "중복된 이메일이 있습니다.",
+            onConfirm: null,
           });
         } else {
           setIsEmailDuplicate(false);
@@ -418,6 +454,7 @@ export default function SignupForm() {
           setModal({
             isOpen: true,
             message: "사용 가능한 이메일입니다.",
+            onConfirm: null,
           });
 
           setEmailShowVerificationInput(true);
@@ -426,11 +463,13 @@ export default function SignupForm() {
             setModal({
               isOpen: true,
               message: "인증번호가 발송되었습니다.",
+              onConfirm: null,
             });
           } else {
             setModal({
               isOpen: true,
               message: "인증번호 발송 중 오류가 발생했습니다.",
+              onConfirm: null,
             });
           }
         }
@@ -440,6 +479,7 @@ export default function SignupForm() {
       setModal({
         isOpen: true,
         message: `중복 확인 중 오류가 발생했습니다.1`,
+        onConfirm: null,
       });
     } finally {
       setIsLoading(false);
@@ -455,7 +495,7 @@ export default function SignupForm() {
       />
       <div className="mx-auto w-[360px] bg-white">
         <Header title="회원가입" />
-        <div className="mx-auto w-[360px] rounded-lg bg-white px-4 py-6">
+        <div className="mx-auto w-[360px] rounded-lg bg-white px-4 pb-8">
           <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
             {/* 아이디 입력 */}
             <div className="space-y-2">

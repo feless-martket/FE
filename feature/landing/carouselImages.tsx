@@ -14,7 +14,7 @@ export default function CarouselImages() {
   return (
     <Carousel>
       <CarouselContent className="h-[271px] gap-3">
-        <CarouselItem className="basis-1/3 ml-2">
+        <CarouselItem className="ml-2 basis-1/3">
           <Image className="h-44 w-[126px]" src={Test1} alt={""} />
           <ul>
             test1
@@ -23,7 +23,7 @@ export default function CarouselImages() {
           </ul>
         </CarouselItem>
 
-        <CarouselItem className="basis-1/3 ml-2">
+        <CarouselItem className="ml-2 basis-1/3">
           <Image className="h-44 w-[126px]" src={Test2} alt={""} />
           <ul>
             test2
@@ -32,7 +32,7 @@ export default function CarouselImages() {
           </ul>
         </CarouselItem>
 
-        <CarouselItem className="basis-1/3 ml-2">
+        <CarouselItem className="ml-2 basis-1/3">
           <Image className="h-44 w-[126px]" src={Test3} alt={""} />
           <ul>
             test3
@@ -41,7 +41,7 @@ export default function CarouselImages() {
           </ul>
         </CarouselItem>
 
-        <CarouselItem className="basis-1/3 ml-2">
+        <CarouselItem className="ml-2 basis-1/3">
           <Image className="h-44 w-[126px]" src={Test1} alt={""} />
           <ul>
             test4
