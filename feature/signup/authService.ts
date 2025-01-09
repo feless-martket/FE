@@ -1,7 +1,7 @@
 import { baseURL } from "@/lib/axios";
 
 export interface SignupData {
-  userId: string;
+  userName: string;
   password: string;
   name: string;
   email: string;
@@ -52,7 +52,7 @@ export async function checkEmailDuplicate(email: string): Promise<boolean> {
   }
 }
 
-export async function checkIdDuplicate(userId: string): Promise<boolean> {
+export async function checkIdDuplicate(userName: string): Promise<boolean> {
   try {
     const response = await fetch(baseURL + `/users/id?id=${userId}`, {
       method: "GET",
@@ -70,14 +70,14 @@ export async function checkIdDuplicate(userId: string): Promise<boolean> {
 }
 
 export async function sendEmailVerificationCode(
-  email: string,
+  email: string
 ): Promise<boolean> {
   try {
     const response = await fetch(
       baseURL + `/users/email/verification-requests?e=${email}`,
       {
         method: "POST",
-      },
+      }
     );
 
     if (!response.ok) {
@@ -94,14 +94,14 @@ export async function sendEmailVerificationCode(
 
 export async function emailVerification(
   email: string,
-  code: string,
+  code: string
 ): Promise<boolean> {
   try {
     const response = await fetch(
       baseURL + `/users/email/verification?e=${email}&code=${code}`,
       {
         method: "GET",
-      },
+      }
     );
 
     if (!response.ok) {
