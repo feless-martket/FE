@@ -456,7 +456,7 @@ export default function SignupForm() {
       />
       <div className="mx-auto w-[360px] bg-white">
         <Header title="회원가입" />
-        <div className="mx-auto w-[360px] rounded-lg bg-white px-4 py-6">
+        <div className="mx-auto w-[360px] rounded-lg bg-white px-4 pb-8">
           <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
             {/* 아이디 입력 */}
             <div className="space-y-2">

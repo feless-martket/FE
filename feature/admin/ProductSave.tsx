@@ -85,7 +85,7 @@ export default function ProductForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 px-4 py-2">
+  
     <form onSubmit={handleSubmit} className="space-y-4 px-4 py-2">
       <div className="flex justify-center">
         <h1 className="text-2xl">상품등록</h1>

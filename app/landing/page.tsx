@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 import HeroSlider from "@/feature/landing/slider";
->>>>>>> 14ccbcdb55147baa4a18fd69d885b91b8f460e36
 import MarketHeader from "@/feature/landing/marketHeader";
 import NavBar from "@/feature/landing/navBar";
 

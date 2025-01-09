@@ -5,7 +5,8 @@ import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import { v4 as uuidv4 } from "uuid";
 
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
-const customerKey = uuidv4();
+// const customerKey = uuidv4();
+const customerKey = "aVdpl5piLwdkLcdHXaWab";
 
 export function CheckoutPage() {
   const [amount, setAmount] = useState({

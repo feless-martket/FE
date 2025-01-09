@@ -20,7 +20,7 @@ export async function signupUser(
       },
       body: JSON.stringify(data),
     });
-
+    console.log(response);
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "회원가입에 실패했습니다.");
@@ -54,7 +54,7 @@ export async function checkEmailDuplicate(email: string): Promise<boolean> {
 
 export async function checkIdDuplicate(userName: string): Promise<boolean> {
   try {
-    const response = await fetch(baseURL + `/users/id?id=${userId}`, {
+    const response = await fetch(baseURL + `/users/id?id=${userName}`, {
       method: "GET",
     });
 
