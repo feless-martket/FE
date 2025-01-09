@@ -6,12 +6,10 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Header } from "@/components/layout/header";
 import { loginApiCall } from "@/feature/login/api/login-api";
-import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter();
 
   /**
    * "로그인" 버튼 클릭 시 실행
@@ -26,14 +24,10 @@ export default function LoginForm() {
       // 응답 데이터: { username, accessToken, refreshToken, message }
       console.log("로그인 성공 >>>", data);
 
-      // 토큰 저장(일단 localStorage, 추후에 보안대책 변경 시 수정 예정
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
-
       alert("로그인 성공");
       // 이후 필요한 동작 구현 (페이지 이동 등)
       // 예) router.push("/"), window.location.href="/"
-      router.push("/landing");
+      window.location.href = "/landing";
     } catch (error) {
       console.error("로그인 실패>>>", error);
       alert(
