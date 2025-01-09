@@ -32,5 +32,17 @@ export async function loginApiCall(
   const data: LoginResponseDto = await res.data;
   console.log("로그인 API 성공 >>>", data);
 
+  // 응답 헤더에서 토큰 추출
+  const accessToken = res.headers.get("Authorization")?.replace("Bearer ", "");
+  const refreshToken = res.headers.get("Refresh-Token")?.replace("Bearer ", "");
+
+  // 토큰이 존재하면 LocalStorage에 저장(현재는 개발단계니 localStorage저장, 추후에 보안대책 변경 시 수정 예정 아마 HttpOnly Cookie에 저장할 듯함.)
+  if (accessToken && refreshToken) {
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
+  } else {
+    console.log("토큰 정보를 헤더에서 추출하지 못했습니다.");
+  }
+
   return data;
 }

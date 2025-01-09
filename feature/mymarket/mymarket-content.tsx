@@ -29,7 +29,13 @@ const menuItems: MenuItem[] = [
   { id: "settings", name: "앱 설정", link: "/settings" },
 ];
 
-export function MyMarketContent() {
+interface MyMarketContentProps {
+  userInfo: {
+    username: string;
+  } | null;
+}
+
+export function MyMarketContent({ userInfo }: MyMarketContentProps) {
   return (
     <div className="pb-16">
       <div className="px-4 pb-4 pt-5">
@@ -37,7 +43,9 @@ export function MyMarketContent() {
           <div className="flex h-[38px] w-[52px] items-center justify-center rounded-lg border-2 border-emerald-500 bg-white text-sm text-emerald-500">
             일반
           </div>
-          <div className="text-base font-bold">천상현님</div>
+          <div className="text-base font-bold">
+            {userInfo?.username || "사용자"}
+          </div>
         </div>
 
         <div className="flex gap-2">
