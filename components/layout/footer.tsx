@@ -33,7 +33,7 @@ export function Footer({ className = "" }: FooterProps) {
 
           <Link
             href="/mymarket"
-            className="flex flex-col items-center gap-1 text-xs text-gray-600 hover:text-emerald-500"
+            className="flex flex-1 flex-col items-center gap-1 text-xs text-gray-600 hover:text-emerald-500"
           >
             <User size={24} />
           </Link>
