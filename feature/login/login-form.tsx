@@ -33,14 +33,16 @@ export default function LoginForm() {
       alert(
         `로그인 실패: ${
           error instanceof Error ? error.message : "로그인 중 오류 발생"
-        }`
+        }`,
       );
     }
   };
   return (
-    <div className="mx-auto w-[360px] rounded-lg bg-white px-4 py-6">
+    <div className="w-[360px] rounded-lg bg-white px-4 py-6">
       {/* Header */}
-      <Header title="로그인" />
+      <div className="w-full">
+        <Header title="로그인" />
+      </div>
 
       {/* Input Fields */}
       <div className="mt-6 space-y-4">
