@@ -289,12 +289,7 @@ export const ShoppingCart = () => {
       <div className="p-4">
         <div className="min-h-screen bg-gray-50 p-4">
           <header className="relative flex items-center justify-center border-b pb-3">
-            <button
-              className="absolute left-0 text-xl text-gray-500"
-              onClick={goToBack}
-            >
-              ✕
-            </button>
+            <button className="absolute left-0 text-xl text-gray-500">✕</button>
             <h1 className="text-lg font-bold">장바구니</h1>
           </header>
 
