@@ -124,10 +124,11 @@ export default function SignupForm() {
     terms5: false,
   });
 
-  const router = useRouter();
-  const goToLogin = () => {
-    router.push("/login");
-  };
+  // const router = useRouter();
+  // const goToLogin = () => {
+  //   onclick();
+  //   router.push("/login");
+  // };
 
   // useEffect(() => {
   //   console.log("");
