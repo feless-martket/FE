@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { fetchProducts } from "@/feature/productList/productList-api";
 import ProductImage from "@/feature/productDetail/ProductImage"; // ProductImage 컴포넌트 불러오기
+import { useSearchParams } from "next/navigation";
 
 // TABS와 DB 카테고리 매핑
 const CATEGORY_MAP: Record<string, string> = {
@@ -28,10 +29,24 @@ interface Product {
 }
 
 export default function ProductList() {
-  const [selectedTab, setSelectedTab] = useState("전체보기");
+  const searchParams = useSearchParams();
+  const paramCategory = searchParams.get("category");
+
+  const [selectedTab, setSelectedTab] = useState(() => {
+    if (paramCategory && TABS.includes(paramCategory)) {
+      return paramCategory;
+    }
+    return "전체보기";
+  });
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (paramCategory && TABS.includes(paramCategory)) {
+      setSelectedTab(paramCategory);
+    }
+  }, [paramCategory]);
 
   // 카테고리 변경 시 상품 목록 불러오기
   useEffect(() => {
@@ -55,14 +70,14 @@ export default function ProductList() {
   return (
     <div className="flex flex-col">
       {/* Navigation Tabs */}
-      <div className="flex border-b mb-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
+      <div className="scrollbar-hide mb-4 flex overflow-x-auto whitespace-nowrap border-b">
         {TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setSelectedTab(tab)}
-            className={`px-4 py-2 whitespace-nowrap ${
+            className={`whitespace-nowrap px-4 py-2 ${
               tab === selectedTab
-                ? "text-emerald-600 border-b-2 border-emerald-600"
+                ? "border-b-2 border-emerald-600 text-emerald-600"
                 : "text-gray-500"
             }`}
           >
@@ -72,14 +87,14 @@ export default function ProductList() {
       </div>
 
       {/* Promotion Banner */}
-      <div className="relative h-[120px] mb-4 bg-gray-100">
+      <div className="relative mb-4 h-[120px] bg-gray-100">
         <div className="p-4">
           <h2 className="text-xl font-medium">
             농식품부와 함께하는
             <br />
             20% 쿠폰 할인행사
           </h2>
-          <p className="text-sm text-gray-500 mt-1">~6월 14일(수) 24시</p>
+          <p className="mt-1 text-sm text-gray-500">~6월 14일(수) 24시</p>
         </div>
         <Badge className="absolute right-4 top-4 bg-purple-500">COUPON</Badge>
       </div>
@@ -91,11 +106,11 @@ export default function ProductList() {
       {error && <div className="text-center text-red-500">{error}</div>}
 
       {/* Product Count and Filters */}
-      <div className="flex justify-between items-center px-4 mb-4">
+      <div className="mb-4 flex items-center justify-between px-4">
         <span className="text-sm text-gray-600">총 {products.length}개</span>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="text-sm">
-            추천순 <ChevronDown className="ml-1 h-4 w-4" />
+            추천순 <ChevronDown className="ml-1 size-4" />
           </Button>
           <Button variant="outline" size="sm" className="text-sm">
             필터
@@ -109,7 +124,7 @@ export default function ProductList() {
           return (
             <div
               key={product.id}
-              className="relative p-2 rounded-none shadow-sm flex flex-col bg-white"
+              className="relative flex flex-col rounded-none bg-white p-2 shadow-sm"
             >
               {/* 할인 쿠폰 라벨 */}
               {/* <div className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10">
@@ -123,22 +138,22 @@ export default function ProductList() {
               <Button
                 size="icon"
                 variant="secondary"
-                className="absolute right-2 bottom-2 bg-gray-200 p-1 rounded-full z-10"
+                className="absolute bottom-2 right-2 z-10 rounded-full bg-gray-200 p-1"
               >
-                <ShoppingBag className="h-5 w-5 text-gray-600" />
+                <ShoppingBag className="size-5 text-gray-600" />
               </Button>
 
               {/* 상품 배송 타입 */}
-              <p className="text-xs text-gray-500 mb-1">샛별배송</p>
+              <p className="mb-1 text-xs text-gray-500">샛별배송</p>
 
               {/* 상품 이름 */}
-              <h3 className="text-sm font-medium text-gray-800 line-clamp-1 mb-1">
+              <h3 className="mb-1 line-clamp-1 text-sm font-medium text-gray-800">
                 {product.name}
               </h3>
 
               {/* 할인율 및 할인 가격 */}
-              <div className="flex items-center mb-1">
-                <span className="text-rose-500 text-base font-bold mr-1">
+              <div className="mb-1 flex items-center">
+                <span className="mr-1 text-base font-bold text-rose-500">
                   35%
                 </span>
                 <span className="text-base font-bold">

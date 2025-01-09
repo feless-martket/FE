@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Product } from "./search-api";
+import Link from "next/link";
 
 const FILTER_OPTIONS = {
   카테고리: [
@@ -38,7 +39,7 @@ export function SearchResults({ results }: SearchResultsProps) {
   // Update category counts
   results.forEach((product) => {
     const category = FILTER_OPTIONS.카테고리.find(
-      (c) => c.name === product.category
+      (c) => c.name === product.category,
     );
     if (category) {
       category.count++;
@@ -46,17 +47,17 @@ export function SearchResults({ results }: SearchResultsProps) {
   });
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-2 border-b flex items-center justify-between">
+    <div className="flex h-full flex-col">
+      <div className="flex items-center justify-between border-b p-2">
         <div className="text-sm">총 {results.length}개</div>
         <Button variant="ghost" size="sm" className="text-sm font-normal">
-          추천순 <ChevronDown className="ml-1 h-4 w-4" />
+          추천순 <ChevronDown className="ml-1 size-4" />
         </Button>
       </div>
 
       <div className="border-b">
         <ScrollArea className="whitespace-nowrap">
-          <div className="flex p-2 gap-2">
+          <div className="flex gap-2 p-2">
             {Object.keys(FILTER_OPTIONS)
               .slice(0, 4)
               .map((filter) => (
@@ -65,17 +66,17 @@ export function SearchResults({ results }: SearchResultsProps) {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="rounded-full text-sm font-normal h-8"
+                      className="h-8 rounded-full text-sm font-normal"
                     >
-                      {filter} <ChevronDown className="ml-1 h-4 w-4" />
+                      {filter} <ChevronDown className="ml-1 size-4" />
                     </Button>
                   </SheetTrigger>
                   <SheetContent
                     side="bottom"
-                    className="h-[50vh] w-full sm:max-w-[360px] mx-auto p-0"
+                    className="mx-auto h-[50vh] w-full p-0 sm:max-w-[360px]"
                   >
-                    <div className="flex flex-col h-full">
-                      <SheetHeader className="px-4 py-3 border-b">
+                    <div className="flex h-full flex-col">
+                      <SheetHeader className="border-b px-4 py-3">
                         <SheetTitle className="text-lg font-medium">
                           필터
                         </SheetTitle>
@@ -83,12 +84,12 @@ export function SearchResults({ results }: SearchResultsProps) {
 
                       <Tabs defaultValue="카테고리" className="flex-1">
                         <ScrollArea className="border-b">
-                          <TabsList className="p-0 h-auto bg-transparent border-0">
+                          <TabsList className="h-auto border-0 bg-transparent p-0">
                             {Object.keys(FILTER_OPTIONS).map((tab) => (
                               <TabsTrigger
                                 key={tab}
                                 value={tab}
-                                className="px-4 py-2 text-sm font-normal data-[state=active]:bg-transparent data-[state=active]:text-emerald-500 data-[state=active]:border-b-2 data-[state=active]:border-emerald-500 rounded-none"
+                                className="rounded-none px-4 py-2 text-sm font-normal data-[state=active]:border-b-2 data-[state=active]:border-emerald-500 data-[state=active]:bg-transparent data-[state=active]:text-emerald-500"
                               >
                                 {tab}
                               </TabsTrigger>
@@ -102,7 +103,7 @@ export function SearchResults({ results }: SearchResultsProps) {
                               {FILTER_OPTIONS.카테고리.map((item) => (
                                 <label
                                   key={item.name}
-                                  className="flex items-center gap-3 cursor-pointer"
+                                  className="flex cursor-pointer items-center gap-3"
                                 >
                                   <Checkbox />
                                   <span className="flex-1 text-sm">
@@ -118,7 +119,7 @@ export function SearchResults({ results }: SearchResultsProps) {
                           {/* Other tabs content */}
                         </ScrollArea>
 
-                        <div className="p-4 border-t">
+                        <div className="border-t p-4">
                           <Button className="w-full bg-emerald-500 hover:bg-emerald-600">
                             {results.length}개 상품 보기
                           </Button>
@@ -129,16 +130,16 @@ export function SearchResults({ results }: SearchResultsProps) {
                 </Sheet>
               ))}
           </div>
-          <div className="px-2 pb-2 flex gap-2">
+          <div className="flex gap-2 px-2 pb-2">
             <Badge
               variant="secondary"
-              className="bg-emerald-50 text-emerald-700 rounded-sm"
+              className="rounded-sm bg-emerald-50 text-emerald-700"
             >
               +10% 쿠폰
             </Badge>
             <Badge
               variant="secondary"
-              className="bg-emerald-50 text-emerald-700 rounded-sm"
+              className="rounded-sm bg-emerald-50 text-emerald-700"
             >
               +15% 카드쿠폰
             </Badge>
@@ -149,42 +150,47 @@ export function SearchResults({ results }: SearchResultsProps) {
       <ScrollArea className="flex-1">
         <div className="grid grid-cols-2 gap-4 p-4">
           {results.map((product) => (
-            <div key={product.product_id} className="space-y-2">
-              <div className="relative aspect-square">
-                <Image
-                  src={product.imgurl || "/placeholder.svg"}
-                  alt={product.name}
-                  fill
-                  className="rounded-lg object-cover"
-                />
-                <Button
-                  size="icon"
-                  variant="secondary"
-                  className="absolute bottom-2 right-2 h-8 w-8"
-                >
-                  <ShoppingCart className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-1">
-                  <Badge
+            <Link
+              key={product.id} // Link 컴포넌트에 key 추가
+              href={`/productDetail/${product.id}`}
+            >
+              <div key={product.id} className="space-y-2">
+                <div className="relative aspect-square">
+                  <Image
+                    src={product.imgurl || "/placeholder.svg"}
+                    alt={product.name}
+                    fill
+                    className="rounded-lg object-cover"
+                  />
+                  <Button
+                    size="icon"
                     variant="secondary"
-                    className="bg-emerald-100 text-emerald-700"
+                    className="absolute bottom-2 right-2 size-8"
                   >
-                    +10% 쿠폰
-                  </Badge>
+                    <ShoppingCart className="size-4" />
+                  </Button>
                 </div>
-                <h3 className="font-medium text-sm line-clamp-2">
-                  {product.name}
-                </h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-red-500 font-medium">35%</span>
-                  <span className="font-bold">
-                    {product.price.toLocaleString()}원
-                  </span>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1">
+                    <Badge
+                      variant="secondary"
+                      className="bg-emerald-100 text-emerald-700"
+                    >
+                      +10% 쿠폰
+                    </Badge>
+                  </div>
+                  <h3 className="line-clamp-2 text-sm font-medium">
+                    {product.name}
+                  </h3>
+                  <div className="flex items-baseline gap-1">
+                    <span className="font-medium text-red-500">35%</span>
+                    <span className="font-bold">
+                      {product.price.toLocaleString()}원
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </ScrollArea>

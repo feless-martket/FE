@@ -1,3 +1,5 @@
+import { baseURL } from "@/lib/axios";
+
 export interface SignupData {
   userName: string;
   password: string;
@@ -7,18 +9,18 @@ export interface SignupData {
 }
 
 export async function signupUser(
-  data: SignupData
+  data: SignupData,
 ): Promise<{ message: string }> {
   try {
     console.log("서버로 보낼 데이터:", data);
-    const response = await fetch("http://localhost:8080/users/signup", {
+    const response = await fetch(baseURL + "/users/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
-
+    console.log(response);
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "회원가입에 실패했습니다.");
@@ -35,12 +37,9 @@ export async function signupUser(
 
 export async function checkEmailDuplicate(email: string): Promise<boolean> {
   try {
-    const response = await fetch(
-      `http://localhost:8080/users/email?e=${email}`,
-      {
-        method: "GET",
-      }
-    );
+    const response = await fetch(baseURL + `/users/email?e=${email}`, {
+      method: "GET",
+    });
 
     if (!response.ok) {
       throw new Error("이메일 중복 확인 요청 중 오류가 발생했습니다.");
@@ -55,12 +54,9 @@ export async function checkEmailDuplicate(email: string): Promise<boolean> {
 
 export async function checkIdDuplicate(userName: string): Promise<boolean> {
   try {
-    const response = await fetch(
-      `http://localhost:8080/users/id?id=${userName}`,
-      {
-        method: "GET",
-      }
-    );
+    const response = await fetch(baseURL + `/users/id?id=${userName}`, {
+      method: "GET",
+    });
 
     if (!response.ok) {
       throw new Error("Id 중복 확인 요청 중 오류가 발생했습니다.");
@@ -74,14 +70,14 @@ export async function checkIdDuplicate(userName: string): Promise<boolean> {
 }
 
 export async function sendEmailVerificationCode(
-  email: string
+  email: string,
 ): Promise<boolean> {
   try {
     const response = await fetch(
-      `http://localhost:8080/users/email/verification-requests?e=${email}`,
+      baseURL + `/users/email/verification-requests?e=${email}`,
       {
         method: "POST",
-      }
+      },
     );
 
     if (!response.ok) {
@@ -98,14 +94,14 @@ export async function sendEmailVerificationCode(
 
 export async function emailVerification(
   email: string,
-  code: string
+  code: string,
 ): Promise<boolean> {
   try {
     const response = await fetch(
-      `http://localhost:8080/users/email/verification?e=${email}&code=${code}`,
+      baseURL + `/users/email/verification?e=${email}&code=${code}`,
       {
         method: "GET",
-      }
+      },
     );
 
     if (!response.ok) {

@@ -1,5 +1,5 @@
 export interface Product {
-  product_id: number;
+  id: number;
   name: string;
   price: number;
   description: string;
@@ -12,7 +12,7 @@ export interface Product {
 // ✅ 검색 API (일반 검색)
 export async function searchProducts(keyword: string): Promise<Product[]> {
   const response = await fetch(
-    `http://localhost:8080/search/results?keyword=${encodeURIComponent(keyword)}`
+    `http://localhost:8080/search/results?keyword=${encodeURIComponent(keyword)}`,
   );
   if (!response.ok) {
     throw new Error("검색 API 호출 실패");
@@ -23,7 +23,7 @@ export async function searchProducts(keyword: string): Promise<Product[]> {
 // ✅ 추천 검색어 API
 export async function getSuggestions(keyword: string): Promise<string[]> {
   const response = await fetch(
-    `http://localhost:8080/search/suggestions?keyword=${encodeURIComponent(keyword)}`
+    `http://localhost:8080/search/suggestions?keyword=${encodeURIComponent(keyword)}`,
   );
   if (!response.ok) {
     throw new Error("추천 검색어 API 호출 실패");
