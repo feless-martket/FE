@@ -18,7 +18,7 @@ import {
 
 // 폼 유효성 검사 함수
 function validateForm(formData: {
-  username: string;
+  userName: string;
   password: string;
   confirmPassword: string;
   name: string;
@@ -30,9 +30,9 @@ function validateForm(formData: {
 
   // 아이디 검증
 
-  if (!formData.username) {
+  if (!formData.userName) {
     errors.id = "아이디를 입력해주세요";
-  } else if (formData.username.length < 4) {
+  } else if (formData.userName.length < 4) {
     errors.id = "아이디는 4자 이상이어야 합니다";
   }
 
@@ -94,7 +94,7 @@ export default function SignupForm() {
   const [isEmailChecked, setIsEmailChecked] = useState(false);
 
   const [formData, setFormData] = useState({
-    username: "",
+    userName: "",
     password: "",
     confirmPassword: "",
     name: "",
@@ -320,7 +320,7 @@ export default function SignupForm() {
 
       setIsLoading(true);
       const result = await signupUser({
-        username: formData.username,
+        userName: formData.userName,
         password: formData.password,
         name: formData.name,
         email: formData.email,
@@ -334,7 +334,7 @@ export default function SignupForm() {
 
       // 성공 시 폼 초기화
       setFormData({
-        username: "",
+        userName: "",
         password: "",
         confirmPassword: "",
         name: "",
@@ -372,7 +372,7 @@ export default function SignupForm() {
   };
 
   const handleDuplicateCheck = async (type: string) => {
-    const value = type === "id" ? formData.username : formData.email;
+    const value = type === "id" ? formData.userName : formData.email;
 
     if (!value) {
       setModal({
@@ -467,9 +467,9 @@ export default function SignupForm() {
                 <Input
                   id="id"
                   placeholder="아이디를 입력해주세요"
-                  value={formData.username}
+                  value={formData.userName}
                   onChange={(e) =>
-                    setFormData({ ...formData, username: e.target.value })
+                    setFormData({ ...formData, userName: e.target.value })
                   }
                   required
                 />

@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { ReactNode } from "react";
 import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 interface HeaderProps {
@@ -37,7 +37,7 @@ export function Header({
         </Link>
       )}
       {showDivider && (
-        <div className={`absolute inset-x-0 bottom-0 ${dividerClassName}`} />
+        <div className={`mt-5 w-full border ${dividerClassName}`}></div>
       )}
     </div>
   );

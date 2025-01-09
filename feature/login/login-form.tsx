@@ -5,15 +5,50 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Header } from "@/components/layout/header";
+import { loginApiCall } from "@/feature/login/api/login-api";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
+  /**
+   * "로그인" 버튼 클릭 시 실행
+   */
+
+  const handleLogin = async () => {
+    console.log("로그인 버튼 클릭 >>>", { id, password });
+    try {
+      // 백엔드로 로그인 요청
+      const data = await loginApiCall(id, password);
+
+      // 응답 데이터: { username, accessToken, refreshToken, message }
+      console.log("로그인 성공 >>>", data);
+
+      // 토큰 저장(일단 localStorage, 추후에 보안대책 변경 시 수정 예정
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+
+      alert("로그인 성공");
+      // 이후 필요한 동작 구현 (페이지 이동 등)
+      // 예) router.push("/"), window.location.href="/"
+      router.push("/landing");
+    } catch (error) {
+      console.error("로그인 실패>>>", error);
+      alert(
+        `로그인 실패: ${
+          error instanceof Error ? error.message : "로그인 중 오류 발생"
+        }`,
+      );
+    }
+  };
   return (
-    <div className="mx-auto w-[360px] rounded-lg bg-white px-4 py-6">
+    <div className="w-[360px] rounded-lg bg-white px-4 py-6">
       {/* Header */}
-      <Header title="로그인" />
+      <div className="w-full">
+        <Header title="로그인" />
+      </div>
 
       {/* Input Fields */}
       <div className="mt-6 space-y-4">
@@ -25,7 +60,7 @@ export default function LoginForm() {
           onChange={(e) => setId(e.target.value)}
           className="w-full rounded-md px-4 py-3"
         />
-
+        {/* Password Input */}
         <Input
           type="password"
           placeholder="비밀번호를 입력해주세요"
@@ -37,6 +72,7 @@ export default function LoginForm() {
         <Button
           className="w-full bg-emerald-500 py-6 text-white hover:bg-emerald-600"
           size="lg"
+          onClick={handleLogin}
         >
           로그인
         </Button>

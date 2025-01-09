@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import axios from "axios";
+import myApi from "@/lib/axios";
 
 interface Option {
   value: string;
@@ -49,13 +49,13 @@ export default function ProductForm() {
 
     // 상품명과 상품설명 추가
     const productName = (e.target as HTMLFormElement).elements.namedItem(
-      "productName",
+      "productName",,
     ) as HTMLInputElement;
     const productDescription = (e.target as HTMLFormElement).elements.namedItem(
-      "productDescription",
+      "productDescription",,
     ) as HTMLInputElement;
     const productPrice = (e.target as HTMLFormElement).elements.namedItem(
-      "productPrice",
+      "productPrice",,
     ) as HTMLInputElement;
 
     const formData = {
@@ -70,15 +70,11 @@ export default function ProductForm() {
 
     try {
       // 상품 등록 API 호출
-      const response = await axios.post(
-        "http://localhost:8080/product/save",
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json", // JSON 형식으로 보내기
-          },
+      const response = await myApi.post("/product/save", formData, {
+        headers: {
+          "Content-Type": "application/json", // JSON 형식으로 보내기
         },
-      );
+      });
 
       console.log("서버 응답:", response.data);
       alert("상품이 등록되었습니다.");
@@ -89,6 +85,7 @@ export default function ProductForm() {
   }
 
   return (
+    <form onSubmit={handleSubmit} className="space-y-4 px-4 py-2">
     <form onSubmit={handleSubmit} className="space-y-4 px-4 py-2">
       <div className="flex justify-center">
         <h1 className="text-2xl">상품등록</h1>
@@ -106,7 +103,7 @@ export default function ProductForm() {
               setSelectedCategory(e.target.value);
               setSelectedSubCategory(""); // 카테고리 변경 시 서브카테고리 초기화
             }}
-            className="w-full appearance-none rounded-md border bg-white px-3 py-2 pr-8"
+            className="w-full appearance-none rounded-md border bg-white px-3 py-2 pr-8 text-sm text-gray-800"
           >
             <option value="">분류1</option>
             {categories.map((category) => (
@@ -208,7 +205,15 @@ export default function ProductForm() {
           onClick={handleImageClick}
           className="flex h-32 w-full cursor-pointer items-center justify-center rounded-md border px-3 py-2 text-gray-500"
         >
-          {selectedImage ? selectedImage.name : "이미지를 첨부해 주세요."}
+          {selectedImage ? (
+            <img
+              src={selectedImage}
+              alt="선택된 이미지"
+              className="size-full object-cover"
+            />
+          ) : (
+            "이미지를 첨부해 주세요."
+          )}
         </div>
         <input
           id="imageInput"

@@ -42,27 +42,27 @@ export function ProductCard({
             variant="secondary"
             className="absolute bottom-4 right-4 rounded-full opacity-90 hover:opacity-100"
           >
-            <ShoppingCart className="h-4 w-4" />
+            <ShoppingCart className="size-4" />
           </Button>
         </div>
         <div className="p-4">
-          <h3 className="text-sm text-muted-foreground mb-2">
+          <h3 className="text-muted-foreground mb-2 text-sm">
             뷰앤 굿몰 속 진한 매력! (양지 포함)
           </h3>
-          <h2 className="font-medium mb-2">{title}</h2>
+          <h2 className="mb-2 font-medium">{title}</h2>
           <div className="flex items-baseline gap-2">
-            <span className="text-red-500 font-bold">
+            <span className="font-bold text-red-500">
               {discountPercentage}%
             </span>
-            <span className="font-bold text-lg">
+            <span className="text-lg font-bold">
               {discountedPrice.toLocaleString()}원
             </span>
-            <span className="text-sm text-muted-foreground line-through">
+            <span className="text-muted-foreground text-sm line-through">
               {originalPrice.toLocaleString()}원
             </span>
           </div>
-          <div className="flex items-center gap-1 mt-2">
-            <span className="text-sm text-muted-foreground">후기</span>
+          <div className="mt-2 flex items-center gap-1">
+            <span className="text-muted-foreground text-sm">후기</span>
             <span className="text-sm">{reviewCount}</span>
           </div>
         </div>
@@ -70,4 +70,3 @@ export function ProductCard({
     </Card>
   );
 }
-
