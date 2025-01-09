@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import { v4 as uuidv4 } from "uuid";
-import { nanoid } from "nanoid";
 
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 const customerKey = uuidv4();
@@ -16,6 +15,8 @@ export function CheckoutPage() {
   const [ready, setReady] = useState(false);
   const [widgets, setWidgets] = useState(null);
 
+  const [orderId] = useState(() => generateRandomString());
+
   // 1) 결제 위젯 초기화
   useEffect(() => {
     async function fetchPaymentWidgets() {
@@ -23,6 +24,7 @@ export function CheckoutPage() {
       // 회원 결제 위젯 생성 (비회원 결제: { customerKey: ANONYMOUS })
       const w = tossPayments.widgets({ customerKey });
       setWidgets(w);
+      // console.log(w);
     }
     fetchPaymentWidgets();
   }, []);
@@ -62,31 +64,31 @@ export function CheckoutPage() {
   }, [amount, widgets]);
 
   // 쿠폰 체크박스 핸들러
-  const handleCouponChange = (event) => {
-    setAmount((prevAmount) => ({
-      ...prevAmount,
-      value: event.target.checked
-        ? prevAmount.value - 5000
-        : prevAmount.value + 5000,
-    }));
-  };
+  // const handleCouponChange = (event) => {
+  //   setAmount((prevAmount) => ({
+  //     ...prevAmount,
+  //     value: event.target.checked
+  //       ? prevAmount.value - 5000
+  //       : prevAmount.value + 5000,
+  //   }));
+  // };
 
   // 결제하기 버튼 클릭 핸들러
   const handlePayment = async () => {
     if (!widgets) return;
 
     try {
-      await fetch("http://localhost:8080/payment", {
+      await fetch("http://localhost:8080/payments/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          orderId: "NEncvfIdfWBXgHk80oMQh",
+          orderId,
           amount: 50000,
         }),
       });
 
       await widgets.requestPayment({
-        orderId: nanoid(10),
+        orderId,
         orderName: "토스 티셔츠 외 2건",
         successUrl: window.location.origin + "/success",
         failUrl: window.location.origin + "/fail",
@@ -143,4 +145,7 @@ export function CheckoutPage() {
     </div>
   );
 }
-// function generateRandomString() {}
+
+function generateRandomString() {
+  return window.btoa(Math.random().toString()).slice(0, 20);
+}
