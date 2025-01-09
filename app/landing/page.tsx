@@ -1,5 +1,4 @@
-import HeroSlider from "../../feature/landing/slider";
-
+import HeroSlider from "@/feature/landing/slider";
 import MarketHeader from "@/feature/landing/marketHeader";
 import NavBar from "@/feature/landing/navBar";
 import SaleSection from "@/feature/landing/saleSection";
@@ -19,7 +18,7 @@ export default function Page() {
 
   return (
     <div className="flex size-full justify-center bg-gray-100">
-      <div className="bg-wh ite w-[360px]">
+      <div className="w-[360px] bg-white">
         {/* 헤더 */}
         <MarketHeader />
 

@@ -9,6 +9,7 @@ import ProductInfo from "@/feature/productDetail/ProductInfo";
 import DeliveryInfo from "@/feature/productDetail/DeliveryInfo";
 import ProductImages from "@/feature/productDetail/ProductImages";
 import { Footer } from "@/components/layout/footer";
+import { baseURL } from "@/lib/axios";
 // 상품 데이터 타입 정의
 interface ProductData {
   name: string;
@@ -26,7 +27,7 @@ export default async function ProductPage({
   const { id } = params; // URL에서 id 추출
 
   // 서버 요청
-  const res = await fetch(`http://localhost:8080/product/getProduct/${id}`, {
+  const res = await fetch(baseURL + `/product/getProduct/${id}`, {
     method: "POST", // POST 요청
     headers: {
       "Content-Type": "application/json", // JSON 형식 전송
@@ -38,7 +39,7 @@ export default async function ProductPage({
   // 요청 실패 시 처리
   if (!res.ok) {
     return (
-      <div className="max-w-md mx-auto bg-white text-center py-8">
+      <div className="mx-auto max-w-md bg-white py-8 text-center">
         <p>상품 정보를 불러올 수 없습니다.</p>
       </div>
     );
@@ -48,7 +49,7 @@ export default async function ProductPage({
   const productData: ProductData = await res.json();
 
   return (
-    <div className="max-w-md mx-auto bg-white">
+    <div className="mx-auto max-w-md bg-white">
       <ProductHeader productName={productData.name} />
       <Home />
       <ProductImage imageUrl={productData.imageUrl} />

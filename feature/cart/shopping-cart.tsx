@@ -81,7 +81,7 @@ export const ShoppingCart = () => {
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8080",
     headers: {
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3MzYzMjg3NDgsImV4cCI6MTczNjMzMDU0OH0.JFBrcKhXiAf-csLs8z8S_1pq3YgeQW34Yp_lUOotb-E `,
+      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3MzYzODU1MjUsImV4cCI6MTczNjM4NzMyNX0.uTB7B9mph7_ngpDMLWEnxjK012mnWs-sAg8hAHUzKIU`,
     },
   });
 
@@ -251,7 +251,7 @@ export const ShoppingCart = () => {
                 type="checkbox"
                 checked={selectedItems.length === cartData.cartItems.length}
                 onChange={toggleSelectAll}
-                className="h-5 w-5 rounded border-gray-300 text-green-500 focus:ring-green-500"
+                className="size-5 rounded border-gray-300 text-green-500 focus:ring-green-500"
               />
               <span className="text-sm text-gray-600">
                 전체 선택 ({selectedItems.length}/{cartData.cartItems.length})
@@ -272,13 +272,13 @@ export const ShoppingCart = () => {
                   type="checkbox"
                   checked={selectedItems.includes(item.cartItemId)}
                   onChange={() => toggleItemSelection(item.cartItemId)}
-                  className="mt-2 h-5 w-5 rounded border-gray-300 text-green-500 focus:ring-green-500"
+                  className="mt-2 size-5 rounded border-gray-300 text-green-500 focus:ring-green-500"
                 />
                 <div className="flex-1 flex gap-4">
                   <img
                     src={item.imgURL}
                     alt={item.productName}
-                    className="h-20 w-20 rounded-md object-cover"
+                    className="size-20 rounded-md object-cover"
                   />
                   <div className="flex-1">
                     <h3 className="text-sm font-medium">{item.productName}</h3>
@@ -292,7 +292,7 @@ export const ShoppingCart = () => {
                         }
                         className="rounded-md border p-2"
                       >
-                        <Minus className="h-4 w-4" />
+                        <Minus className="size-4" />
                       </button>
                       <span className="w-8 text-center">{item.quantity}</span>
                       <button
@@ -301,7 +301,7 @@ export const ShoppingCart = () => {
                         }
                         className="rounded-md border p-2"
                       >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="size-4" />
                       </button>
                     </div>
                   </div>
