@@ -48,19 +48,21 @@ export default async function ProductPage({
   console.log(productData);
 
   return (
-    <div className="mx-auto max-w-[360px] bg-white">
-      <ProductHeader productName={productData.name} />
-      <Home />
-      <ProductImage imageUrl={productData.imageUrl} />
-      <ProductInfo
-        productName={productData.name}
-        productPrice={productData.price}
-      />
-      <DeliveryInfo />
-      <ProductDetails />
-      <ProductImages imageUrl={productData.imageUrl} />
-      <PurchaseButton />
-      <Footer />
+    <div className="flex h-screen w-full justify-center bg-gray-100">
+      <div className="mx-auto max-w-[360px] bg-white">
+        <ProductHeader productName={productData.name} />
+        <Home />
+        <ProductImage imageUrl={productData.imageUrl} />
+        <ProductInfo
+          productName={productData.name}
+          productPrice={productData.price}
+        />
+        <DeliveryInfo />
+        <ProductDetails />
+        <ProductImages imageUrl={productData.imageUrl} />
+        <PurchaseButton cartItemId={id} />
+        <Footer />
+      </div>
     </div>
   );
 }
