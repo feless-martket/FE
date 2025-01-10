@@ -49,13 +49,13 @@ export default function ProductForm() {
 
     // 상품명과 상품설명 추가
     const productName = (e.target as HTMLFormElement).elements.namedItem(
-      "productName",,
+      "productName",
     ) as HTMLInputElement;
     const productDescription = (e.target as HTMLFormElement).elements.namedItem(
-      "productDescription",,
+      "productDescription",
     ) as HTMLInputElement;
     const productPrice = (e.target as HTMLFormElement).elements.namedItem(
-      "productPrice",,
+      "productPrice",
     ) as HTMLInputElement;
 
     const formData = {
@@ -85,7 +85,6 @@ export default function ProductForm() {
   }
 
   return (
-  
     <form onSubmit={handleSubmit} className="space-y-4 px-4 py-2">
       <div className="flex justify-center">
         <h1 className="text-2xl">상품등록</h1>

@@ -5,7 +5,6 @@ import axios from "axios";
 import { Minus, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Header } from "@/components/layout/header";
-import { useAuth } from "@/hooks/useAuth";
 
 // 삭제 확인 모달 컴포넌트
 interface DeleteConfirmModalProps {
@@ -73,7 +72,6 @@ export const ShoppingCart = () => {
   const [itemsToDelete, setItemsToDelete] = useState<number[]>([]);
 
   const shippingFee = 3000; // 배송비 고정
-  const { isLoggedIn, userInfo } = useAuth(); // AuthContext에서 상태 가져오기
 
   useEffect(() => {
     fetchCartData();
@@ -82,19 +80,10 @@ export const ShoppingCart = () => {
   // 인증 구현 미 완성으로 헤더 직접 넣음
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8080",
-  });
-
-  // 요청 인터셉터로 Authorization 헤더 설정
-  axiosInstance.interceptors.request.use(
-    (config) => {
-      const token = localStorage.getItem("accessToken"); // AuthContext에서도 가능
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
+    headers: {
+      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InN0cmluZyIsInJvbGUiOiJST0xFX1VTRVIiLCJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3MzYzODU1MjUsImV4cCI6MTczNjM4NzMyNX0.uTB7B9mph7_ngpDMLWEnxjK012mnWs-sAg8hAHUzKIU`,
     },
-    (error) => Promise.reject(error)
-  );
+  });
 
   // 장바구니 데이터 가져오기
   const fetchCartData = async () => {
@@ -289,7 +278,12 @@ export const ShoppingCart = () => {
       <div className="p-4">
         <div className="min-h-screen bg-gray-50 p-4">
           <header className="relative flex items-center justify-center border-b pb-3">
-            <button className="absolute left-0 text-xl text-gray-500">✕</button>
+            <button
+              className="absolute left-0 text-xl text-gray-500"
+              // onClick={goToBack}
+            >
+              ✕
+            </button>
             <h1 className="text-lg font-bold">장바구니</h1>
           </header>
 
