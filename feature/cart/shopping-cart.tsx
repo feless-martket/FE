@@ -101,17 +101,49 @@ export const ShoppingCart = () => {
     try {
       setLoading(true);
       const response = await axiosInstance.get<CartData>("/cart");
-      setCartData(response.data);
-      // Initially select all items
-      setSelectedItems(response.data.cartItems.map((item) => item.cartItemId));
+
+      if (!response.data.cartItems || response.data.cartItems.length === 0) {
+        // 장바구니가 비어있을 경우에도 오류로 처리하지 않고 상태를 초기화
+        setCartData({
+          cartId: response.data.cartId,
+          cartItems: [],
+          totalPrice: 0,
+        });
+      } else {
+        setCartData(response.data);
+        setSelectedItems(
+          response.data.cartItems.map((item) => item.cartItemId)
+        );
+      }
+
       setError(null);
     } catch (err) {
-      setError("장바구니 데이터를 불러오는 중 오류가 발생했습니다.");
       console.error("Error fetching cart data:", err);
+      setCartData({
+        cartId: 0,
+        cartItems: [],
+        totalPrice: 0,
+      });
+      setError(null); // UI를 "장바구니가 비어있습니다"로 유지하기 위해 오류를 초기화
     } finally {
       setLoading(false);
     }
   };
+
+  // UI 렌더링 조건
+  if (loading) return <div>Loading...</div>;
+
+  // Error 상태를 제거하고 비어있는 경우에만 아래와 같은 UI를 렌더링
+  if (!cartData || cartData.cartItems.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header title="장바구니" />
+        <div className="flex h-[50vh] items-center justify-center text-2xl font-bold text-gray-500">
+          🛒 장바구니가 비어있습니다.
+        </div>
+      </div>
+    );
+  }
 
   // 수량 업데이트
   const updateQuantity = (cartItemId: number, newQuantity: number) => {
