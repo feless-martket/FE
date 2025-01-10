@@ -22,7 +22,7 @@ export function Header({
   const router = useRouter();
 
   const goToLanding = () => {
-    router.back();
+    router.push("/landing");
   };
   return (
     <div className={`relative mb-4 ${showDivider ? "pb-4" : ""} ${className}`}>
