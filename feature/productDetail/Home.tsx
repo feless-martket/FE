@@ -1,9 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+
 const Header = () => {
   return (
-    <header className="bg-white border-b">
-      <nav className="flex justify-between space-x-12 py-2 text-sm text-gray-700 border-t px-12">
+    <header className="border-b bg-white">
+      <nav className="flex justify-between space-x-12 border-t px-4 py-2 text-sm text-gray-700">
         <a href="" className="hover:text-green-500">
           상품설명
         </a>

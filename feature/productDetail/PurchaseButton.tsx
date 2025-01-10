@@ -1,7 +1,7 @@
 export default function PurchaseButton() {
   return (
-    <div className="p-4 border-t">
-      <button className="w-full bg-green-500 text-white py-4 rounded">
+    <div className="border-t p-4">
+      <button className="w-full rounded bg-green-500 py-4 text-white">
         구매하기
       </button>
     </div>

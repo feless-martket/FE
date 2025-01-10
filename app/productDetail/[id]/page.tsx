@@ -12,10 +12,15 @@ import { Footer } from "@/components/layout/footer";
 import { baseURL } from "@/lib/axios";
 // 상품 데이터 타입 정의
 interface ProductData {
+  id: number;
   name: string;
-  imageUrl: string;
   description: string;
   price: number;
+  quantity: number;
+  productStatus: string;
+  mainCategory: string;
+  subCategory: string;
+  imageUrl: string;
 }
 
 // Dynamic Route에서 id 가져오기
@@ -27,14 +32,7 @@ export default async function ProductPage({
   const { id } = params; // URL에서 id 추출
 
   // 서버 요청
-  const res = await fetch(baseURL + `/product/getProduct/${id}`, {
-    method: "POST", // POST 요청
-    headers: {
-      "Content-Type": "application/json", // JSON 형식 전송
-    },
-    body: JSON.stringify({ id: parseInt(id, 10) }), // id를 body에도 포함
-    cache: "no-store", // 캐시 비활성화
-  });
+  const res = await fetch(baseURL + `/product/${id}`);
 
   // 요청 실패 시 처리
   if (!res.ok) {
@@ -47,9 +45,10 @@ export default async function ProductPage({
 
   // 요청 성공 시 데이터 처리
   const productData: ProductData = await res.json();
+  console.log(productData);
 
   return (
-    <div className="mx-auto max-w-md bg-white">
+    <div className="mx-auto max-w-[360px] bg-white">
       <ProductHeader productName={productData.name} />
       <Home />
       <ProductImage imageUrl={productData.imageUrl} />
@@ -61,7 +60,7 @@ export default async function ProductPage({
       <ProductDetails />
       <ProductImages imageUrl={productData.imageUrl} />
       <PurchaseButton />
-      <Footer></Footer>
+      <Footer />
     </div>
   );
 }
