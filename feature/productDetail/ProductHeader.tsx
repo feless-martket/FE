@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import { IoArrowBack } from "react-icons/io5"; // 뒤로 가기 아이콘
-import { IoCart } from "react-icons/io5"; // 장바구니 아이콘
 import { useRouter } from "next/navigation";
+import { ShoppingCart } from "lucide-react";
 
 interface ProductHeader {
   productName: string; // imageUrl은 문자열 타입
@@ -24,7 +24,7 @@ export default function ProductHeader({ productName }: ProductHeader) {
 
         <div className="flex items-center ml-4">
           <Link href="/cart">
-            <IoCart className="text-lg text-gray-500 hover:text-green-500" />
+            <ShoppingCart className="text-lg text-gray-500 hover:text-green-500" />
           </Link>
         </div>
       </div>
