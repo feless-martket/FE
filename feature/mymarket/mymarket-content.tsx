@@ -2,6 +2,7 @@
 
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 
 interface MenuItem {
   id: string;
@@ -27,6 +28,7 @@ const menuItems: MenuItem[] = [
   { id: "notice", name: "공지사항", link: "/notice" },
   { id: "faq", name: "자주하는 질문", link: "/faq" },
   { id: "settings", name: "앱 설정", link: "/settings" },
+  { id: "logout", name: "로그아웃", link: "/logout" },
 ];
 
 interface MyMarketContentProps {
@@ -36,6 +38,8 @@ interface MyMarketContentProps {
 }
 
 export function MyMarketContent({ userInfo }: MyMarketContentProps) {
+  const { logout } = useAuth(); // useAuth에서 logout 함수 가져오기
+
   return (
     <div className="pb-16">
       <div className="px-4 pb-4 pt-5">
@@ -58,21 +62,46 @@ export function MyMarketContent({ userInfo }: MyMarketContentProps) {
         </div>
       </div>
       <div className="flex flex-col">
-        {menuItems.map((item) => (
-          <Link
-            key={item.id}
-            href={item.link}
-            className="flex items-center justify-between border-b border-gray-100 px-4 py-[14px]"
-          >
-            <span className="text-gray-900">{item.name}</span>
-            <div className="flex items-center">
-              {item.value && (
-                <span className="mr-1 text-emerald-500">{item.value}</span>
-              )}
-              <ChevronRight className="size-5 text-gray-300" />
-            </div>
-          </Link>
-        ))}
+        {menuItems.map((item) => {
+          if (item.id === "logout") {
+            // 로그아웃 항목은 버튼으로 처리
+            return (
+              <button
+                key={item.id}
+                onClick={(e) => {
+                  e.preventDefault();
+                  logout();
+                }}
+                className="flex items-center justify-between border-b border-gray-100 px-4 py-[14px] text-red-500"
+              >
+                <span>{item.name}</span>
+                <div className="flex items-center">
+                  {/* 로그아웃 아이콘은 생략 */}
+                </div>
+              </button>
+            );
+          }
+
+          return (
+            <Link
+              key={item.id}
+              href={item.link}
+              className={`flex items-center justify-between border-b border-gray-100 px-4 py-[14px] ${
+                item.id === "logout" ? "text-red-500" : "text-gray-900"
+              }`}
+            >
+              <span>{item.name}</span>
+              <div className="flex items-center">
+                {item.value && (
+                  <span className="mr-1 text-emerald-500">{item.value}</span>
+                )}
+                {item.id !== "logout" && (
+                  <ChevronRight className="size-5 text-gray-300" />
+                )}
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
