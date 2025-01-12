@@ -40,7 +40,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!token) {
           setIsLoggedIn(false);
           setIsLoading(false);
-          router.push("/login");
           return;
         }
 
