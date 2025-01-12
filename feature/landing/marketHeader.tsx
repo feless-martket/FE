@@ -19,7 +19,7 @@ export default function MarketHeader() {
         </span>
         <ShoppingCart
           className="absolute right-[calc(50%-35px-125px)] top-[18px]"
-          size={20}
+          size={24}
           color="white"
           onClick={handleCartClick}
         />

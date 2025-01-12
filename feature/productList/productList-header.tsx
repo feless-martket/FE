@@ -1,8 +1,9 @@
 "use client";
 
-import { ShoppingBag } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface ProductListHeaderProps {
   className?: string;
@@ -23,7 +24,9 @@ export function ProductListHeader({ className = "" }: ProductListHeaderProps) {
         </button>
         <h1 className="text-lg font-medium">채소</h1>
         <button className="p-1">
-          <ShoppingBag size={24} />
+          <Link href="/cart">
+            <ShoppingCart size={24} />
+          </Link>
         </button>
       </div>
     </header>
