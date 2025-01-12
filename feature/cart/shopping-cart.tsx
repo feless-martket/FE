@@ -41,7 +41,7 @@ export const ShoppingCart = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemsToDelete, setItemsToDelete] = useState<number[]>([]);
 
-  const shippingFee = 3000;
+  const shippingFee = 3000; // 배송비 고정
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -83,8 +83,6 @@ export const ShoppingCart = () => {
       console.error("Error fetching cart data:", err);
 
       if (err.response?.status === 401 || err.response?.status === 403) {
-        // setError("로그인이 필요합니다.");
-        // setCartData(null);
         setIsLoggedIn(false);
         setCartData(null);
         setError(null);
@@ -97,6 +95,7 @@ export const ShoppingCart = () => {
     }
   };
 
+  // 수량 업데이트
   const updateQuantity = (cartItemId: number, newQuantity: number) => {
     setCartData((prev) => {
       if (!prev) return prev;
@@ -119,6 +118,7 @@ export const ShoppingCart = () => {
     debounceSaveCart(cartItemId, newQuantity);
   };
 
+  // 수량 저장 디바운스
   let saveTimeout: NodeJS.Timeout;
   const debounceSaveCart = (cartItemId: number, quantity: number) => {
     if (saveTimeout) clearTimeout(saveTimeout);
@@ -127,6 +127,7 @@ export const ShoppingCart = () => {
     }, 1000);
   };
 
+  // 수량 저장 요청
   const saveCartItemToServer = async (cartItemId: number, quantity: number) => {
     try {
       setIsSaving(true);
@@ -149,6 +150,7 @@ export const ShoppingCart = () => {
     }
   };
 
+  // 결제 처리
   const handleCheckout = async () => {
     if (!cartData) return;
     const selectedItemsTotal = calculateSelectedItemsTotal();
@@ -156,6 +158,7 @@ export const ShoppingCart = () => {
     alert("결제 페이지로 이동합니다!");
   };
 
+  // 개별 항목 선택 토글
   const toggleItemSelection = (cartItemId: number) => {
     setSelectedItems((prev) =>
       prev.includes(cartItemId)
@@ -164,6 +167,7 @@ export const ShoppingCart = () => {
     );
   };
 
+  // 전체 선택 토글
   const toggleSelectAll = () => {
     if (!cartData) return;
 
@@ -174,27 +178,31 @@ export const ShoppingCart = () => {
     }
   };
 
+  // 삭제 모달
   const handleDeleteClick = (items: number[]) => {
     setItemsToDelete(items);
     setIsDeleteModalOpen(true);
   };
 
+  // 선택 항목 삭제
   const deleteSelectedItems = async () => {
     try {
+      // 선택된 cartItemId를 기반으로 삭제 요청
       await Promise.all(
         itemsToDelete.map((cartItemId) =>
           axiosInstance.delete(`/cart/item/${cartItemId}`)
         )
       );
 
-      setIsDeleteModalOpen(false);
-      fetchCartData();
+      setIsDeleteModalOpen(false); // 모달 닫기
+      fetchCartData(); // 데이터 새로고침
     } catch (err: any) {
       setError("선택한 상품 삭제 중 오류가 발생했습니다.");
       console.error("Error deleting items:", err);
     }
   };
 
+  // 선택된 항목 총 금액 계산
   const calculateSelectedItemsTotal = () => {
     if (!cartData) return 0;
     return cartData.cartItems
@@ -213,6 +221,7 @@ export const ShoppingCart = () => {
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gray-50">
+        {/* 공통 Header 사용 */}
         <Header title="장바구니" />
         <div className="flex flex-col h-[50vh] items-center justify-center text-center">
           <p className="text-2xl font-bold text-gray-700 mb-4">
@@ -253,6 +262,7 @@ export const ShoppingCart = () => {
       <div className="p-4">
         <div className="min-h-screen bg-gray-50 p-4">
           <div>
+            {/* 상품 정보 */}
             <div className="border-b pb-4">
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
