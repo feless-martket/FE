@@ -2,12 +2,15 @@
 import Link from "next/link";
 import { IoArrowBack } from "react-icons/io5"; // 뒤로 가기 아이콘
 import { IoCart } from "react-icons/io5"; // 장바구니 아이콘
+import { useRouter } from "next/navigation";
 
 interface ProductHeader {
   productName: string; // imageUrl은 문자열 타입
 }
 
 export default function ProductHeader({ productName }: ProductHeader) {
+  const router = useRouter();
+
   return (
     <header className="p-4 border-b">
       <div className="flex items-center justify-between">
@@ -20,7 +23,9 @@ export default function ProductHeader({ productName }: ProductHeader) {
         </h1>
 
         <div className="flex items-center ml-4">
-          <IoCart className="text-lg text-gray-500 hover:text-green-500" />
+          <Link href="/cart">
+            <IoCart className="text-lg text-gray-500 hover:text-green-500" />
+          </Link>
         </div>
       </div>
     </header>
