@@ -291,7 +291,7 @@ export const ShoppingCart = () => {
           <div>
             {/* 상품 정보 */}
             <div className="border-b pb-4">
-              <div className="flex items-center justify-between">
+              <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
