@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             router.push("/login");
             return;
           }
-          throw new Error("서버 오류 발생");
+          throw new Error("서버 오류 발생: 로그인 되지 않았습니다.");
         }
 
         const data = await res.json();
