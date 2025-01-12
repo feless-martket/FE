@@ -1,14 +1,10 @@
 import { ShoppingCart } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-
 interface MyMarketHeaderProps {
   className?: string;
 }
 
 export function MyMarketHeader({ className = " " }: MyMarketHeaderProps) {
-  const router = useRouter();
-
   return (
     <div className={`bg-emerald-500 px-4 py-3 text-white ${className}`}>
       <div className="relative">

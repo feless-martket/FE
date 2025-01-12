@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { IoArrowBack } from "react-icons/io5"; // 뒤로 가기 아이콘
-import { useRouter } from "next/navigation";
 import { ShoppingCart } from "lucide-react";
 
 interface ProductHeader {
@@ -9,8 +8,6 @@ interface ProductHeader {
 }
 
 export default function ProductHeader({ productName }: ProductHeader) {
-  const router = useRouter();
-
   return (
     <header className="p-4 border-b">
       <div className="flex items-center justify-between">
