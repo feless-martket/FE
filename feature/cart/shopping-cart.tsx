@@ -2,11 +2,11 @@
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { AuthContext } from "@/context/AuthContext";
 import Link from "next/link";
 import { DeleteConfirmModal } from "@/feature/cart/DeleteConfirmModal";
 import { CartItem } from "@/feature/cart/CartItem";
+import { Footer } from "@/components/layout/footer";
 
 // 장바구니 아이템 타입
 interface CartItem {
@@ -233,7 +233,7 @@ export const ShoppingCart = () => {
   // 로그인 인증이 되지 않은 사용자의 경우
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <Header title="장바구니" />
         <div className="flex flex-col h-[50vh] items-center justify-center text-center">
           <p className="text-2xl font-bold text-gray-700 mb-4">
@@ -270,10 +270,10 @@ export const ShoppingCart = () => {
   const finalTotal = selectedTotal + shippingFee;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-white">
       <Header title="장바구니" />
       <div className="p-4">
-        <div className="min-h-screen bg-gray-50 p-4">
+        <div className="min-h-screen bg-white p-4">
           <div>
             {/* 상품 정보 */}
             <div className="border-b pb-4">
@@ -342,7 +342,6 @@ export const ShoppingCart = () => {
           />
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { fetchProducts } from "@/feature/productList/productList-api";
 import ProductImage from "@/feature/productDetail/ProductImage"; // ProductImage 컴포넌트 불러오기
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 const CATEGORY_MAP: Record<string, string> = {
   전체보기: "VEGETABLE",
@@ -120,12 +121,13 @@ export default function ProductList() {
 
       {/* Product Grid */}
       <div className="grid grid-cols-2 gap-4 px-4">
-        {products.map((product) => {
-          return (
-            <div
-              key={product.id}
-              className="relative flex flex-col rounded-none bg-white p-2 shadow-sm"
-            >
+        {products.map((product) => (
+          <Link
+            key={product.id}
+            href={`/productDetail/${product.id}`}
+            className="block" // Link를 블록 요소로 만들어 전체 영역 클릭 가능하게 함
+          >
+            <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
               {/* 할인 쿠폰 라벨 */}
               {/* <div className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10">
                 +15% 카드쿠폰
@@ -166,8 +168,8 @@ export default function ProductList() {
                 {product.price.toLocaleString()}원
               </p>
             </div>
-          );
-        })}
+          </Link>
+        ))}
       </div>
     </div>
   );
