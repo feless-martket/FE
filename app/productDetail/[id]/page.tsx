@@ -20,7 +20,7 @@ interface ProductData {
   productStatus: string;
   mainCategory: string;
   subCategory: string;
-  imageUrl: string;
+  imageUrl: string[];
 }
 
 // Dynamic Route에서 id 가져오기
@@ -60,7 +60,6 @@ export default async function ProductPage({
         <DeliveryInfo />
         <ProductDetails />
         <ProductImages imageUrl={productData.imageUrl} />
-        <PurchaseButton cartItemId={id} />
         <Footer />
       </div>
     </div>

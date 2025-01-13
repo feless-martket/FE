@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import myApi from "@/lib/axios";
 
@@ -11,18 +11,19 @@ interface Option {
 
 const categories: Option[] = [
   { value: "meat", label: "고기" },
-  { value: "vegetables", label: "야채" },
+  { value: "VEGETABLE", label: "야채" },
 ];
 
 const meatSubCategories: Option[] = [
   { value: "pork", label: "돼지고기" },
-  { value: "beef", label: "electronicDevices" },
+  { value: "beef", label: "전자기기" },
 ];
 
 const vegetableSubCategories: Option[] = [
   { value: "onion", label: "양파" },
-  { value: "cucumber", label: "오이" },
+  { value: "ROOT_VEGETABLE", label: "오이" },
 ];
+
 const quantities: Option[] = Array.from({ length: 100 }, (_, i) => ({
   value: String(i + 1),
   label: String(i + 1),
@@ -32,60 +33,64 @@ export default function ProductForm() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
   const [selectedQuantity, setSelectedQuantity] = useState<string>("");
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const formRef = useRef<HTMLFormElement>(null); // 폼 리셋을 위해 ref 사용
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedImage(e.target.files[0]);
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      setSelectedImages((prevImages) => [...prevImages, ...filesArray]);
     }
   };
 
-  const handleImageClick = () => {
-    document.getElementById("imageInput")?.click();
-  };
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // 상품명과 상품설명 추가
     const productName = (e.target as HTMLFormElement).elements.namedItem(
-      "productName",
+      "productName"
     ) as HTMLInputElement;
     const productDescription = (e.target as HTMLFormElement).elements.namedItem(
-      "productDescription",
+      "productDescription"
     ) as HTMLInputElement;
     const productPrice = (e.target as HTMLFormElement).elements.namedItem(
-      "productPrice",
+      "productPrice"
     ) as HTMLInputElement;
 
-    const formData = {
-      name: productName.value,
-      description: productDescription.value,
-      price: productPrice.value,
-      quantity: selectedQuantity,
-      category: selectedSubCategory,
-      // 이미지 파일을 Base64로 인코딩하여 전송 (파일 크기가 크지 않은 경우)
-      image: selectedImage,
-    };
+    const formData = new FormData();
+    formData.append("name", productName.value);
+    formData.append("description", productDescription.value);
+    formData.append("price", productPrice.value);
+    formData.append("quantity", selectedQuantity);
+    formData.append("mainCategory", selectedCategory);
+    formData.append("subCategory", selectedSubCategory);
+
+    selectedImages.forEach((image) => {
+      formData.append("imgURL", image);
+    });
 
     try {
-      // 상품 등록 API 호출
-      const response = await myApi.post("/product/save", formData, {
+      const response = await myApi.post("/admin/saveProduct", formData, {
         headers: {
-          "Content-Type": "application/json", // JSON 형식으로 보내기
+          "Content-Type": "multipart/form-data",
         },
       });
 
       console.log("서버 응답:", response.data);
       alert("상품이 등록되었습니다.");
+
+      // 값 초기화
+      formRef.current?.reset(); // 폼 필드 초기화
+      setSelectedCategory("");
+      setSelectedSubCategory("");
+      setSelectedQuantity("");
+      setSelectedImages([]);
     } catch (error) {
       console.error("오류 발생:", error);
       alert("상품 등록에 실패했습니다. 다시 시도해 주세요.");
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 px-4 py-2">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-4 px-4 py-2">
       <div className="flex justify-center">
         <h1 className="text-2xl">상품등록</h1>
       </div>
@@ -94,13 +99,12 @@ export default function ProductForm() {
         <h2>카테고리</h2>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        {/* 카테고리 선택 */}
         <div className="relative">
           <select
             value={selectedCategory}
             onChange={(e) => {
               setSelectedCategory(e.target.value);
-              setSelectedSubCategory(""); // 카테고리 변경 시 서브카테고리 초기화
+              setSelectedSubCategory("");
             }}
             className="w-full appearance-none rounded-md border bg-white px-3 py-2 pr-8 text-sm text-gray-800"
           >
@@ -114,23 +118,21 @@ export default function ProductForm() {
           <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
         </div>
 
-        {/* 서브카테고리 선택 */}
         <div className="relative">
           <select
             value={selectedSubCategory}
             onChange={(e) => setSelectedSubCategory(e.target.value)}
             className="w-full appearance-none rounded-md border bg-white px-3 py-2 pr-8"
-            disabled={!selectedCategory} // 카테고리가 선택되지 않으면 서브카테고리 비활성화
+            disabled={!selectedCategory}
           >
             <option value="">분류2</option>
-            {/* 선택된 카테고리에 맞는 서브카테고리 표시 */}
             {selectedCategory === "meat"
               ? meatSubCategories.map((subCategory) => (
                   <option key={subCategory.value} value={subCategory.value}>
                     {subCategory.label}
                   </option>
                 ))
-              : selectedCategory === "vegetables"
+              : selectedCategory === "VEGETABLE"
                 ? vegetableSubCategories.map((subCategory) => (
                     <option key={subCategory.value} value={subCategory.value}>
                       {subCategory.label}
@@ -165,13 +167,14 @@ export default function ProductForm() {
           className="w-full rounded-md border px-3 py-2"
         />
       </div>
+
       <div>
         <h2>가격</h2>
       </div>
       <div>
         <input
           type="text"
-          name="productPrice" // 상품 가격 입력 필드 추가
+          name="productPrice"
           placeholder="₩"
           className="w-full rounded-md border px-3 py-2"
         />
@@ -201,18 +204,19 @@ export default function ProductForm() {
       </div>
       <div className="px-4 py-2">
         <div
-          onClick={handleImageClick}
+          onClick={() => document.getElementById("imageInput")?.click()}
           className="flex h-32 w-full cursor-pointer items-center justify-center rounded-md border px-3 py-2 text-gray-500"
         >
-          {selectedImage ? (
-            <img
-              src={selectedImage}
-              alt="선택된 이미지"
-              className="size-full object-cover"
-            />
-          ) : (
-            "이미지를 첨부해 주세요."
-          )}
+          {selectedImages.length > 0
+            ? selectedImages.map((image, index) => (
+                <img
+                  key={index}
+                  src={URL.createObjectURL(image)}
+                  alt={`선택된 이미지 ${index + 1}`}
+                  className="object-cover w-24 h-24 mr-2"
+                />
+              ))
+            : "이미지를 첨부해 주세요."}
         </div>
         <input
           id="imageInput"
@@ -220,6 +224,7 @@ export default function ProductForm() {
           accept="image/*"
           onChange={handleImageChange}
           className="hidden"
+          multiple
         />
       </div>
 
