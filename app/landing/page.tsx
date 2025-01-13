@@ -13,7 +13,6 @@ export default function Page() {
       <div className="w-[360px] bg-white">
         {/* 헤더 */}
         <MarketHeader />
-
         {/* 스크롤 가능한 콘텐츠 영역에 하단 여백 추가 */}
         <div className="grow overflow-y-auto pb-[52px]">
           <NavBar />

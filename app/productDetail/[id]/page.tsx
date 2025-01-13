@@ -49,7 +49,7 @@ export default async function ProductPage({
 
   return (
     <div className="flex size-full justify-center bg-gray-100">
-      <div className="mx-auto max-w-[360px] bg-white pb-36">
+      <div className="mx-auto max-w-[360px] bg-white pb-[52px]">
         <ProductHeader productName={productData.name} />
         <Home />
         <ProductImage imageUrl={productData.imageUrl} />
@@ -61,7 +61,6 @@ export default async function ProductPage({
         <ProductDetails />
         <ProductImages imageUrl={productData.imageUrl} />
         <PurchaseButton cartItemId={id} />
-
         <Footer />
       </div>
     </div>
