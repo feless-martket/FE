@@ -270,7 +270,7 @@ export const ShoppingCart = () => {
   const finalTotal = selectedTotal + shippingFee;
 
   return (
-    <div className="min-h-screen bg-gray-white">
+    <div className="min-h-screen bg-white">
       <Header title="장바구니" />
       <div className="p-4">
         <div className="min-h-screen bg-white p-4">
