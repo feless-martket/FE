@@ -1,5 +1,6 @@
 "use client";
 
+import myApi from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import { createContext, ReactNode, useEffect, useState } from "react";
 
@@ -12,10 +13,11 @@ interface AuthContextType {
   isLoading: boolean;
   isLoggedIn: boolean;
   userInfo: UserInfo | null;
+  logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined,
+  undefined
 );
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -65,8 +67,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, [router]);
 
+  // 로그아웃 함수 구현
+  const logout = async () => {
+    console.log("로그아웃 처리 중.");
+    try {
+      const token = localStorage.getItem("accessToken"); // 로컬 스토리지에서 토큰 가져오기
+      await myApi.post(
+        "/users/logout",
+        {}, // POST 요청의 body가 필요 없다면 빈 객체 전달
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Authorization 헤더에 토큰 포함
+          },
+        }
+      );
+    } catch (error) {
+      console.error("로그아웃 API 호출 실패: ", error);
+      // API 호출 실패 시에도 로컬 로그아웃 진행
+    }
+    // 클라이언트 측 토큰 및 인증 상태 초기화
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    setIsLoggedIn(false);
+    setUserInfo(null);
+    router.push("/login"); // 로그아웃 후 로그인 페이지로 이동
+  };
+
   return (
-    <AuthContext.Provider value={{ isLoading, isLoggedIn, userInfo }}>
+    <AuthContext.Provider value={{ isLoading, isLoggedIn, userInfo, logout }}>
       {children}
     </AuthContext.Provider>
   );

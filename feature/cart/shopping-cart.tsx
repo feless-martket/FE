@@ -1,49 +1,12 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { Minus, Plus } from "lucide-react";
-import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { useAuth } from "@/hooks/useAuth";
-
-// 삭제 확인 모달 컴포넌트
-interface DeleteConfirmModalProps {
-  isOpen: boolean; // 모달 열림
-  onClose: () => void; // 모달 닫기
-  onConfirm: () => void; // 삭제 확인 함수
-}
-
-function DeleteConfirmModal({
-  isOpen,
-  onClose,
-  onConfirm,
-}: DeleteConfirmModalProps) {
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="p-0 sm:max-w-[320px]">
-        <div className="p-6">
-          <p className="text-center text-base">삭제하시겠습니까?</p>
-        </div>
-        <DialogFooter className="flex border-t p-0">
-          <button
-            onClick={onClose}
-            className="flex-1 border-r p-4 text-sm hover:bg-gray-50"
-          >
-            취소
-          </button>
-          <button
-            onClick={onConfirm}
-            className="flex-1 p-4 text-sm text-green-600 hover:bg-gray-50"
-          >
-            확인
-          </button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
+import { AuthContext } from "@/context/AuthContext";
+import Link from "next/link";
+import { DeleteConfirmModal } from "@/feature/cart/DeleteConfirmModal";
+import { CartItem } from "@/feature/cart/CartItem";
 
 // 장바구니 아이템 타입
 interface CartItem {
@@ -65,21 +28,29 @@ interface CartData {
 
 // 장바구니 컴포넌트
 export const ShoppingCart = () => {
-  const [cartData, setCartData] = useState<CartData | null>(null); // 장바구니 데이터 상테
-  const [loading, setLoading] = useState(true); // 로딩 상태
-  const [error, setError] = useState<string | null>(null); // 오류 상태
-  const [isSaving, setIsSaving] = useState(false); // 저장 상태
-  const [selectedItems, setSelectedItems] = useState<number[]>([]); // 선택된 아이템
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // 삭제 모달
+  const { isLoading: authLoading, isLoggedIn } = useContext(AuthContext); // AuthContext에서 로그인 상태 가져오기
+
+  const [cartData, setCartData] = useState<CartData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemsToDelete, setItemsToDelete] = useState<number[]>([]);
 
-  const shippingFee = 3000; // 배송비 고정
+  // 배송비 3000원 고정
+  const shippingFee = 3000;
 
+  // useEffect로 로그인 상태에 따라 장바구니 데이터 가져오기
   useEffect(() => {
-    fetchCartData();
-  }, []);
+    if (isLoggedIn) {
+      // isLoggedIn === true → fetchCartData()를 호출하여 장바구니 정보를 서버에서 불러옴.
+      fetchCartData();
+    } else {
+      setLoading(false); // isLoggedIn === false → 로그인이 안 된 경우이므로 별도로 API를 부르지 않고 setLoading(false)로 로딩 완료로 처리.
+    }
+  }, [isLoggedIn]);
 
-  // 인증 구현 미 완성으로 헤더 직접 넣음
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8080",
   });
@@ -117,33 +88,24 @@ export const ShoppingCart = () => {
       }
 
       setError(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching cart data:", err);
-      setCartData({
-        cartId: 0,
-        cartItems: [],
-        totalPrice: 0,
-      });
-      setError(null); // UI를 "장바구니가 비어있습니다"로 유지하기 위해 오류를 초기화
+
+      // [변경] 401/403 오류 처리를 분기
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        setError("로그인이 필요합니다.");
+        // 필요 시 로그인 페이지로 강제 이동
+        // router.push("/login");
+        setCartData(null);
+      } else {
+        // 그 외 에러인 경우
+        setError("장바구니 데이터를 불러오는 중 오류가 발생했습니다.");
+        setCartData(null);
+      }
     } finally {
       setLoading(false);
     }
   };
-
-  // UI 렌더링 조건
-  if (loading) return <div>Loading...</div>;
-
-  // Error 상태를 제거하고 비어있는 경우에만 아래와 같은 UI를 렌더링
-  if (!cartData || cartData.cartItems.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header title="장바구니" />
-        <div className="flex h-[50vh] items-center justify-center text-2xl font-bold text-gray-500">
-          🛒 장바구니가 비어있습니다.
-        </div>
-      </div>
-    );
-  }
 
   // 수량 업데이트
   const updateQuantity = (cartItemId: number, newQuantity: number) => {
@@ -266,8 +228,31 @@ export const ShoppingCart = () => {
       .reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (authLoading || loading) return <div>Loading...</div>;
+
+  // 로그인 인증이 되지 않은 사용자의 경우
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header title="장바구니" />
+        <div className="flex flex-col h-[50vh] items-center justify-center text-center">
+          <p className="text-2xl font-bold text-gray-700 mb-4">
+            로그인 후 이용해주세요
+          </p>
+          <Link
+            href="/login"
+            className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition-colors"
+          >
+            로그인하기
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   if (error) return <div>{error}</div>;
+
+  // 로그인 인증이 된 사용자이지만, 장바구니에 담긴 상품이 없는 경우
   if (!cartData || !cartData.cartItems || cartData.cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -276,6 +261,7 @@ export const ShoppingCart = () => {
         <div className="flex h-[50vh] items-center justify-center text-2xl font-bold text-gray-500">
           🛒 장바구니가 비어있습니다.
         </div>
+        <Footer />
       </div>
     );
   }
@@ -314,50 +300,13 @@ export const ShoppingCart = () => {
 
               <div className="space-y-4">
                 {cartData.cartItems.map((item) => (
-                  <div key={item.cartItemId} className="flex items-start gap-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedItems.includes(item.cartItemId)}
-                      onChange={() => toggleItemSelection(item.cartItemId)}
-                      className="mt-2 size-5 rounded border-gray-300 text-green-500 focus:ring-green-500"
-                    />
-                    <div className="flex flex-1 gap-4">
-                      <img
-                        src={item.imgURL}
-                        alt={item.productName}
-                        className="size-20 rounded-md object-cover"
-                      />
-                      <div className="flex-1">
-                        <h3 className="text-sm font-medium">
-                          {item.productName}
-                        </h3>
-                        <p className="mt-1 text-sm text-gray-900">
-                          {item.price.toLocaleString()}원
-                        </p>
-                        <div className="mt-2 flex items-center gap-2">
-                          <button
-                            onClick={() =>
-                              updateQuantity(item.cartItemId, item.quantity - 1)
-                            }
-                            className="rounded-md border p-2"
-                          >
-                            <Minus className="size-4" />
-                          </button>
-                          <span className="w-8 text-center">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() =>
-                              updateQuantity(item.cartItemId, item.quantity + 1)
-                            }
-                            className="rounded-md border p-2"
-                          >
-                            <Plus className="size-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <CartItem
+                    key={item.cartItemId}
+                    item={item}
+                    isSelected={selectedItems.includes(item.cartItemId)}
+                    onSelect={toggleItemSelection}
+                    onUpdateQuantity={updateQuantity}
+                  />
                 ))}
               </div>
             </div>

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 
 // cartItemId를 prop으로 받아온다고 가정
-// 상품 상세 페이지에서 <PurchaseButton cartItemId={원하는아이디} /> 형태로 사용
+// 상품 상세 페이지에서 <PurchaseButton cartItemId={원하는아이디}/> 형태로 사용
 interface PurchaseButtonProps {
   cartItemId: number;
 }
