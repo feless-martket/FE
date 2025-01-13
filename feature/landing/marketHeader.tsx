@@ -12,7 +12,7 @@ export default function MarketHeader() {
         </span>
         <Link href="/cart">
           <ShoppingCart
-            className="absolute right-[calc(50%-35px-125px)] top-[18px]"
+            className="absolute right-[calc(50%-35px-125px)] top-[15px]"
             size={24}
             color="white"
           />
