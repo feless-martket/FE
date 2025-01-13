@@ -8,6 +8,8 @@ import { CustomerInfoSection } from "@/feature/payment/customerInfo";
 import { DeliveryAddressSection } from "@/feature/payment/deliveryAddress";
 import { DeliveryNotes } from "@/feature/payment/deliveryNote";
 import { PointsSection } from "@/feature/payment/pointSection";
+import { Footer } from "@/components/layout/footer";
+
 // import { PaymentMethod } from "@/feature/payment/paymentMethod";
 import type {
   CustomerInfo,
@@ -37,7 +39,7 @@ export default function OrderPage() {
   const subtotal =
     formData.items?.reduce(
       (sum, item) => sum + item.price * item.quantity,
-      0,
+      0
     ) || 0;
   const shippingFee = 3000;
   const discount = usedPoints;
@@ -45,8 +47,8 @@ export default function OrderPage() {
 
   return (
     <div className="bg-gray-100">
-      <div className="mx-auto max-w-[360px] space-y-6 bg-white p-4">
-        <div className="flex items-center gap-24 text-center">
+      <div className="mx-auto max-w-[360px] space-y-6 bg-white p-4 pb-[60px] ">
+        <div className="flex items-center gap-24 text-center ">
           <Button variant="ghost" size="icon">
             <ChevronLeft className="size-4" />
           </Button>
@@ -99,6 +101,7 @@ export default function OrderPage() {
           {total.toLocaleString()}원 결제하기
         </Button> */}
       </div>
+      <Footer />
     </div>
   );
 }

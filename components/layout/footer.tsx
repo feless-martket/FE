@@ -9,7 +9,7 @@ export function Footer({ className = "" }: FooterProps) {
   return (
     <footer className={`fixed inset-x-0 bottom-0 bg-gray-100 ${className}`}>
       <div className="mx-auto w-full max-w-[360px] bg-white">
-        <nav className="flex items-center py-3">
+        <nav className="flex items-center py-[14px]">
           <Link
             href="/landing"
             className="flex flex-1 flex-col items-center gap-1 text-xs text-gray-600 hover:text-emerald-500"

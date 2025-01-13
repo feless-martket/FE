@@ -48,8 +48,8 @@ export default async function ProductPage({
   console.log(productData);
 
   return (
-    <div className="flex h-screen w-full justify-center bg-gray-100">
-      <div className="mx-auto max-w-[360px] bg-white">
+    <div className="flex size-full justify-center bg-gray-100">
+      <div className="mx-auto max-w-[360px] bg-white pb-36">
         <ProductHeader productName={productData.name} />
         <Home />
         <ProductImage imageUrl={productData.imageUrl} />
@@ -61,6 +61,7 @@ export default async function ProductPage({
         <ProductDetails />
         <ProductImages imageUrl={productData.imageUrl} />
         <PurchaseButton cartItemId={id} />
+
         <Footer />
       </div>
     </div>
