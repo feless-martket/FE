@@ -29,13 +29,20 @@ export default function LoginForm() {
       // 이후 필요한 동작 구현 (페이지 이동 등)
       // 예) router.push("/"), window.location.href="/"
       window.location.href = "/landing";
-    } catch (error) {
+    } catch (error: any) {
       console.error("로그인 실패>>>", error);
-      alert(
-        `로그인 실패: ${
-          error instanceof Error ? error.message : "로그인 중 오류 발생"
-        }`
-      );
+
+      // 백엔드가 보낸 구체적 에러 메세지가 있는지 확인
+      const serverMessage = error.response?.data;
+      const alertMessage =
+        serverMessage ||
+        (error instanceof Error ? error.message : "로그인 중 오류 발생");
+      // alert(
+      //   `로그인 실패: ${
+      //     error instanceof Error ? error.message : "로그인 중 오류 발생"
+      //   }`
+      // );
+      alert(`로그인 실패: ${alertMessage}`);
     }
   };
   return (
