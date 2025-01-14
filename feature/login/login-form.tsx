@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Header } from "@/components/layout/header";
 import { loginApiCall } from "@/feature/login/api/login-api";
+import { PageLayout } from "@/components/layout/pagelayout";
 
 export default function LoginForm() {
   const [id, setId] = useState("");
@@ -33,17 +34,14 @@ export default function LoginForm() {
       alert(
         `로그인 실패: ${
           error instanceof Error ? error.message : "로그인 중 오류 발생"
-        }`,
+        }`
       );
     }
   };
   return (
-    <div className="w-[360px] rounded-lg bg-white px-4 py-6">
+    <PageLayout>
       {/* Header */}
-      <div className="w-full">
-        <Header title="로그인" />
-      </div>
-
+      <Header title="로그인" />
       {/* Input Fields */}
       <div className="mt-6 space-y-4">
         {/* ID Input */}
@@ -99,6 +97,6 @@ export default function LoginForm() {
           카카오로 시작하기
         </Button>
       </div>
-    </div>
+    </PageLayout>
   );
 }
