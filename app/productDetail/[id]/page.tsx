@@ -1,5 +1,3 @@
-// app/productDetail/[id]/page.tsx
-
 import ProductHeader from "@/feature/productDetail/ProductHeader";
 import ProductImage from "@/feature/productDetail/ProductImage";
 import PurchaseButton from "@/feature/productDetail/PurchaseButton";
@@ -20,7 +18,7 @@ interface ProductData {
   productStatus: string;
   mainCategory: string;
   subCategory: string;
-  imageUrl: string;
+  imageUrl: string[];
 }
 
 // Dynamic Route에서 id 가져오기
@@ -48,21 +46,23 @@ export default async function ProductPage({
   console.log(productData);
 
   return (
-    <div className="flex size-full justify-center bg-gray-100">
-      <div className="mx-auto max-w-[360px] bg-white pb-[52px]">
+    <div className="flex h-screen w-full justify-center bg-gray-100">
+      <div className="mx-auto max-w-[360px] bg-white">
         <ProductHeader productName={productData.name} />
         <Home />
         <ProductImage imageUrl={productData.imageUrl} />
         <ProductInfo
+description={productData.description}
           productName={productData.name}
           productPrice={productData.price}
         />
         <DeliveryInfo />
         <ProductDetails />
         <ProductImages imageUrl={productData.imageUrl} />
-        <PurchaseButton cartItemId={id} />
+        <PurchaseButton cartItemId={Number(id)} />
         <Footer />
       </div>
     </div>
   );
 }
+

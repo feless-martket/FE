@@ -3,17 +3,20 @@ import { FiArrowDown } from "react-icons/fi"; // Import the arrow-down icon
 interface ProductInfo {
   productName: string;
   productPrice: number; // imageUrl은 문자열 타입
+  description : string
 }
 
 export default function ProductInfo({
   productName,
   productPrice,
+  description
+  
 }: ProductInfo) {
   return (
     <div className="p-4">
       <p className="text-gray-500 ">샛벌배송</p>
       <h2 className="text-xl font-bold">{productName}</h2>
-      <p className="text-gray-400 ">뚝 떨어진 기저귀, 내일 아침 도착!</p>
+      <p className="text-gray-400 ">{description}</p>
       <p className="mt-2 text-lg font-bold">
         <span className="text-red-600">35%</span>
         <span className="text-black"> {productPrice}원</span>

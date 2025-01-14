@@ -1,12 +1,18 @@
 interface ProductImageProps {
-  imageUrl: string; // imageUrl은 문자열 타입
+  imageUrl: string[]; // imageUrl은 문자열 배열 타입
 }
 
 export default function ProductImage({ imageUrl }: ProductImageProps) {
   return (
-    <div className="flex items-center justify-center h-93 bg-white">
-      <div className="p-4">
-        <img src="/img/baseball2.jpg" alt="Product" className="rounded-lg" />
+    <div className="flex items-center justify-center bg-gray-50">
+      <div className="p-4 max-w-xs">
+        {" "}
+        {/* 최대 너비를 더 작게 설정 */}
+        <img
+          src={imageUrl[0]}
+          alt="Product"
+          className="rounded-lg w-full h-auto object-cover"
+        />
       </div>
     </div>
   );
