@@ -3,6 +3,8 @@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
+import { SecondModal } from "@/components/modal/secondmodal";
 
 interface MenuItem {
   id: string;
@@ -39,6 +41,7 @@ interface MyMarketContentProps {
 
 export function MyMarketContent({ userInfo }: MyMarketContentProps) {
   const { logout } = useAuth(); // useAuth에서 logout 함수 가져오기
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   return (
     <div className="pb-16">
@@ -70,7 +73,7 @@ export function MyMarketContent({ userInfo }: MyMarketContentProps) {
                 key={item.id}
                 onClick={(e) => {
                   e.preventDefault();
-                  logout();
+                  setShowLogoutModal(true); // 모달 열기
                 }}
                 className="flex items-center justify-between border-b border-gray-100 px-4 py-[14px] text-red-500"
               >
@@ -103,6 +106,19 @@ export function MyMarketContent({ userInfo }: MyMarketContentProps) {
           );
         })}
       </div>
+
+      <SecondModal
+        open={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        title="정말 로그아웃 하시겠어요?"
+        description=""
+        confirmText="로그아웃"
+        cancelText="취소"
+        onConfirm={() => {
+          setShowLogoutModal(false);
+          logout();
+        }}
+      />
     </div>
   );
 }

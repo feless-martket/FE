@@ -41,14 +41,17 @@ export function SecondModal({
   // console.log("SecondModal props", { open, title, description });
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[320px] overflow-hidden p-0">
+      <DialogContent className="w-[320px] overflow-hidden p-0 rounded-lg">
         <div className="px-4 py-6">
           <DialogTitle className="text-center text-lg font-medium">
             {title}
           </DialogTitle>
-          <DialogDescription className="mt-3 whitespace-pre-line text-center text-sm">
-            {description}
-          </DialogDescription>
+          {/* description이 존재할 경우에만 DialogDescription 렌더링 */}
+          {description && (
+            <DialogDescription className="mt-3 whitespace-pre-line text-center text-sm">
+              {description}
+            </DialogDescription>
+          )}
         </div>
         <div className="flex border-t border-gray-200">
           <button
