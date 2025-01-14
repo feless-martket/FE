@@ -16,7 +16,8 @@ export default function LoginForm() {
    * "로그인" 버튼 클릭 시 실행
    */
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     console.log("로그인 버튼 클릭 >>>", { id, password });
     try {
       // 백엔드로 로그인 요청
@@ -52,30 +53,31 @@ export default function LoginForm() {
       {/* Input Fields */}
       <div className="mt-6 space-y-4">
         {/* ID Input */}
-        <Input
-          type="text"
-          placeholder="아이디를 입력해주세요"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-          className="w-full rounded-md px-4 py-3"
-        />
-        {/* Password Input */}
-        <Input
-          type="password"
-          placeholder="비밀번호를 입력해주세요"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-md px-4 py-3"
-        />
+        <form onSubmit={handleLogin} className="mt-6 space-y-4">
+          <Input
+            type="text"
+            placeholder="아이디를 입력해주세요"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            className="w-full rounded-md px-4 py-3"
+          />
+          {/* Password Input */}
+          <Input
+            type="password"
+            placeholder="비밀번호를 입력해주세요"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-md px-4 py-3"
+          />
 
-        <Button
-          className="w-full bg-emerald-500 py-6 text-white hover:bg-emerald-600"
-          size="lg"
-          onClick={handleLogin}
-        >
-          로그인
-        </Button>
-
+          <Button
+            className="w-full bg-emerald-500 py-6 text-white hover:bg-emerald-600"
+            size="lg"
+            type="submit"
+          >
+            로그인
+          </Button>
+        </form>
         <Link href={"/signup"}>
           <Button variant="outline" className="w-full py-6" size="lg">
             회원가입
