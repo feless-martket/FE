@@ -6,7 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { Modal } from "@/components/modal/modal";
+import { SecondModal } from "@/components/modal/secondmodal";
+import { DeleteMemberRequest } from "@/feature/profile/types/api.type";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { deleteMember } from "@/feature/profile/api/user-api";
 
 export function ProfileEditForm() {
   const [name, setName] = useState("");
@@ -14,16 +18,55 @@ export function ProfileEditForm() {
   const [phone, setPhone] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  const router = useRouter();
+  const { userInfo } = useAuth();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // 여기에 제출 로직 추가
+    // 회원 수정 로직 등
     console.log("Form submitted:", { name, email, phone });
   };
 
-  const handleWithdraw = () => {
-    console.log("회원 탈퇴 처리");
-    setShowDeleteModal(false);
-  };
+  async function handleWithdraw() {
+    try {
+      setShowDeleteModal(false);
+
+      // 1) 로컬 스토리지에서 accessToken 가져오기
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("로그인 정보가 없습니다. 다시 로그인 해 주세요.");
+        return;
+      }
+
+      // 현재 로그인한 사용자 이름
+      const username = userInfo?.username;
+      if (!username) {
+        alert("사용자 정보를 가져올 수 없습니다.");
+        return;
+      }
+
+      // 2) 탈퇴 요청 바디 구성
+      const requestBody: DeleteMemberRequest = {
+        username: username,
+      };
+
+      const res = await deleteMember(token, requestBody);
+
+      if (res.success) {
+        alert(res.message || "회원 탈퇴가 완료되었습니다.");
+
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        router.push("/login");
+      } else {
+        alert(res.message || "회원 탈퇴 실패");
+      }
+    } catch (error: any) {
+      console.error("회원탈퇴 오류:", error.message);
+      alert(error.message || "회원 탈퇴 중 오류가 발생했습니다.");
+    }
+  }
 
   return (
     <div className="p-4">
@@ -76,29 +119,28 @@ export function ProfileEditForm() {
       </div>
 
       <div className="mt-8">
+        {/* 탈퇴하기 버튼 */}
         <Button
           variant="outline"
           className="w-full border-red-500 text-red-500 hover:bg-red-50"
           onClick={() => {
             console.log("회원탈퇴 요청");
-            setShowDeleteModal(true);
+            setShowDeleteModal(true); // 모달 열기
           }}
         >
           회원탈퇴
         </Button>
       </div>
-      <Modal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        message="탈퇴하면 현재 계정으로 작성한 글, 댓글 등을 수정하거나 삭제할 수 없어요. 정말 탈퇴하시겠어요?"
-      >
-        <Button
-          onClick={handleWithdraw}
-          className="w-full mt-4 bg-emerald-500 text-white hover:bg-emerald-600"
-        >
-          탈퇴하기
-        </Button>
-      </Modal>
+      {/* SecondModal 사용 */}
+      <SecondModal
+        open={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)} // 모달 닫기
+        title="정말 탈퇴 하시겠어요?"
+        description="탈퇴하면 현재 계정으로 작성한 글, 댓글 등을 수정하거나 삭제할 수 없어요."
+        confirmText="탈퇴하기"
+        cancelText="취소"
+        onConfirm={handleWithdraw} // 탈퇴 로직 실행
+      />
     </div>
   );
 }

@@ -29,7 +29,7 @@ interface ModalProps {
   onConfirm: () => void;
 }
 
-export function CheckedModal({
+export function SecondModal({
   open,
   onClose,
   title,
@@ -38,26 +38,27 @@ export function CheckedModal({
   cancelText = "취소",
   onConfirm,
 }: ModalProps) {
+  console.log("SecondModal props", { open, title, description });
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="p-0 overflow-hidden">
+      <DialogContent className="overflow-hidden p-0">
         <div className="p-6">
           <DialogTitle className="text-center text-lg font-medium">
             {title}
           </DialogTitle>
-          <DialogDescription className="text-center mt-2">
+          <DialogDescription className="mt-2 text-center">
             {description}
           </DialogDescription>
         </div>
         <div className="flex border-t">
           <button
-            className="flex-1 p-4 text-gray-500 hover:bg-gray-100 transition-colors"
+            className="flex-1 p-4 text-gray-500 transition-colors hover:bg-gray-100"
             onClick={onClose}
           >
             {cancelText}
           </button>
           <button
-            className="flex-1 p-4 text-white bg-emerald-500 hover:bg-emerald-600 transition-colors"
+            className="flex-1 bg-emerald-500 p-4 text-white transition-colors hover:bg-emerald-600"
             onClick={onConfirm}
           >
             {confirmText}
