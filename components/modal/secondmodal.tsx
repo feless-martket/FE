@@ -41,7 +41,7 @@ export function SecondModal({
   // console.log("SecondModal props", { open, title, description });
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[320px] overflow-hidden p-0 rounded-lg">
+      <DialogContent className="w-[320px] overflow-hidden rounded-lg p-0">
         <div className="px-4 py-6">
           <DialogTitle className="text-center text-lg font-medium">
             {title}
