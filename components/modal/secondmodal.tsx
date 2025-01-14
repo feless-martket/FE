@@ -38,27 +38,27 @@ export function SecondModal({
   cancelText = "취소",
   onConfirm,
 }: ModalProps) {
-  console.log("SecondModal props", { open, title, description });
+  // console.log("SecondModal props", { open, title, description });
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="overflow-hidden p-0">
-        <div className="p-6">
+      <DialogContent className="w-[320px] overflow-hidden p-0">
+        <div className="px-4 py-6">
           <DialogTitle className="text-center text-lg font-medium">
             {title}
           </DialogTitle>
-          <DialogDescription className="mt-2 text-center">
+          <DialogDescription className="mt-3 whitespace-pre-line text-center text-sm">
             {description}
           </DialogDescription>
         </div>
-        <div className="flex border-t">
+        <div className="flex border-t border-gray-200">
           <button
-            className="flex-1 p-4 text-gray-500 transition-colors hover:bg-gray-100"
+            className="flex-1 py-4 text-base text-gray-500 transition-colors hover:bg-gray-100"
             onClick={onClose}
           >
             {cancelText}
           </button>
           <button
-            className="flex-1 bg-emerald-500 p-4 text-white transition-colors hover:bg-emerald-600"
+            className="flex-1 bg-emerald-500 py-4 text-base text-white transition-colors hover:bg-emerald-600"
             onClick={onConfirm}
           >
             {confirmText}

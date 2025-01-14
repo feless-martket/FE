@@ -136,7 +136,9 @@ export function ProfileEditForm() {
         open={showDeleteModal}
         onClose={() => setShowDeleteModal(false)} // 모달 닫기
         title="정말 탈퇴 하시겠어요?"
-        description="탈퇴하면 현재 계정으로 작성한 글, 댓글 등을 수정하거나 삭제할 수 없어요."
+        description={
+          "탈퇴하면 현재 계정으로 작성한 글, \n댓글 등을 수정하거나 삭제할 수 없어요."
+        }
         confirmText="탈퇴하기"
         cancelText="취소"
         onConfirm={handleWithdraw} // 탈퇴 로직 실행
