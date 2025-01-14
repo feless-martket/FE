@@ -4,7 +4,7 @@ interface ProductImages {
 
 export default function ProductImages({ imageUrl }: ProductImages) {
   return (
-    <div className="flex flex-col items-center justify-start h-auto bg-gray-50 p-4 space-y-4">
+    <div className="flex flex-col items-center justify-start h-auto bg-white p-4 space-y-4">
       <img src="/img/baseball1.jpg" alt="Product" className="rounded-lg" />
 
       <img src="/img/baseball2.jpg" alt="Product" className="rounded-lg" />
