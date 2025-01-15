@@ -3,23 +3,40 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { findIdApi } from "@/feature/find-id/api/\bfind-id-api";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type VerificationType = "phone" | "email";
 
+/**
+ * 아이디 찾기 폼
+ * - 이름과 이메일을 입력받아 인증번호 전송/검증
+ * - 성공 시 /find-id/success 페이지로 이동 (쿼리 파라미터로 username 전달)
+ */
+
 export function FindIdForm() {
+  const router = useRouter();
+
+  // 인증 타입 : "phone" or "email"
   const [verificationType, setVerificationType] =
     useState<VerificationType>("phone");
+
+  // 입력 필드 상태
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationCode, setVerificationCode] = useState(""); // email or phone
+
+  // 인증번호 입력창 표시 여부
   const [showVerificationInput, setShowVerificationInput] = useState(false);
+
+  // 타이머
   const [timer, setTimer] = useState<number | null>(null);
+
+  // 모달 표시 여부 & 메세지
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
-  const [foundId, setFoundId] = useState("");
 
-  // 인증번호 발송 버튼
+  // 1) 인증번호 발송 버튼 핸들러
   const handleVerificationRequest = async () => {
     if (!name || !contact) {
       setModalMessage("모든 정보를 입력해주세요");
@@ -29,14 +46,19 @@ export function FindIdForm() {
 
     try {
       if (verificationType === "email") {
+        // 이메일 인증번호 발송 API 호출
         const res = await findIdApi.sendEmailCode(name, contact);
         // 예 : response.data = "인증번호가 발송되었습니다."
         console.log(res.data);
       } else {
         // 휴대폰 인증 (미구현)
       }
+
+      // 인증번호 입력창 표시, 타이버 3분 시작
       setShowVerificationInput(true);
       setTimer(180);
+
+      // 안내 모달
       setModalMessage("인증번호가 발송되었습니다.");
       setShowModal(true);
     } catch (error: any) {
@@ -47,7 +69,7 @@ export function FindIdForm() {
     }
   };
 
-  // 인증번호 확인 버튼
+  // 2) 인증번호 확인 버튼 핸들러
   const handleCodeVerify = async () => {
     if (!verificationCode) {
       setModalMessage("인증번호를 입력해주세요");
@@ -58,6 +80,7 @@ export function FindIdForm() {
     try {
       let response;
       if (verificationType === "email") {
+        // 이메일 인증번호 검증 API
         response = await findIdApi.verifyEmailCode(
           name,
           contact,
@@ -67,15 +90,10 @@ export function FindIdForm() {
         // 휴대폰 인증 (미구현)
       }
 
-      // 예 : response.data = "찾은 아이디" (문자열)
-      console.log("아이디 찾기 성공: ", response?.data);
-
-      // foundId에 저장
-      if (response?.data) {
-        setFoundId(response.data);
-      }
-      setModalMessage(`인증 성공, 아이디: ${response?.data}`);
-      setShowModal(true);
+      // 백엔드가 반환한 아이디
+      const username = response?.data;
+      // 인증 성공 시, /find-id/success?username===xxx 페이지로 이동
+      router.push(`/find-id/success?username=${encodeURIComponent(username)}`);
     } catch (error: any) {
       console.error(error);
       const errMsg =
@@ -85,10 +103,11 @@ export function FindIdForm() {
     }
   };
 
-  // 타이머 동작
+  // 3) 타이머 동작
   useEffect(() => {
-    if (timer === null) return;
+    if (timer === null) return; // 타이머 미작동
     if (timer <= 0) {
+      // 시간 만료
       setTimer(null);
       if (showVerificationInput) {
         setModalMessage("인증번호가 만료되었습니다. 다시 시도해주세요.");
@@ -103,7 +122,7 @@ export function FindIdForm() {
     return () => clearInterval(countdown);
   }, [timer, showVerificationInput]);
 
-  // 시/분 포맷
+  // 4) 시/분 포맷
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -112,6 +131,7 @@ export function FindIdForm() {
 
   return (
     <div className="px-4 pb-4">
+      {/* 인증 타입 탭 */}
       <div className="mb-6 flex border-b border-gray-200">
         <button
           className={`flex-1 py-3 text-base ${
@@ -124,7 +144,6 @@ export function FindIdForm() {
             setShowVerificationInput(false);
             setTimer(null);
             setVerificationCode("");
-            setFoundId("");
           }}
         >
           휴대폰 인증
@@ -140,7 +159,6 @@ export function FindIdForm() {
             setShowVerificationInput(false);
             setTimer(null);
             setVerificationCode("");
-            setFoundId("");
           }}
         >
           이메일 인증
@@ -216,12 +234,6 @@ export function FindIdForm() {
         )}
       </div>
 
-      {/* 아이디 찾기 결과 표시 */}
-      {foundId && (
-        <div className="mt-4 text-center text-blue-600">
-          <p>아이디: {foundId}</p>
-        </div>
-      )}
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
