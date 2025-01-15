@@ -1,9 +1,9 @@
 import { Modal } from "@/components/modal/modal";
-import { SecondModal } from "@/components/modal/secondmodal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { findIdApi } from "@/feature/find-id/api/\bfind-id-api";
+import { useEffect, useState } from "react";
 
 type VerificationType = "phone" | "email";
 
@@ -17,19 +17,93 @@ export function FindIdForm() {
   const [timer, setTimer] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+  const [foundId, setFoundId] = useState("");
 
-  const handleVerificationRequest = () => {
+  // 인증번호 발송 버튼
+  const handleVerificationRequest = async () => {
     if (!name || !contact) {
       setModalMessage("모든 정보를 입력해주세요");
       setShowModal(true);
       return;
     }
-    setShowVerificationInput(true);
-    setTimer(180);
-    setModalMessage("인증번호가 발송되었습니다.");
-    setShowModal(true);
+
+    try {
+      if (verificationType === "email") {
+        const res = await findIdApi.sendEmailCode(name, contact);
+        // 예 : response.data = "인증번호가 발송되었습니다."
+        console.log(res.data);
+      } else {
+        // 휴대폰 인증 (미구현)
+      }
+      setShowVerificationInput(true);
+      setTimer(180);
+      setModalMessage("인증번호가 발송되었습니다.");
+      setShowModal(true);
+    } catch (error: any) {
+      console.error(error);
+      const errMsg = error.res?.data || "인증번호 발송 중 오류가 발생했습니다";
+      setModalMessage(errMsg);
+      setShowModal(true);
+    }
   };
 
+  // 인증번호 확인 버튼
+  const handleCodeVerify = async () => {
+    if (!verificationCode) {
+      setModalMessage("인증번호를 입력해주세요");
+      setShowModal(true);
+      return;
+    }
+
+    try {
+      let response;
+      if (verificationType === "email") {
+        response = await findIdApi.verifyEmailCode(
+          name,
+          contact,
+          verificationCode
+        );
+      } else {
+        // 휴대폰 인증 (미구현)
+      }
+
+      // 예 : response.data = "찾은 아이디" (문자열)
+      console.log("아이디 찾기 성공: ", response?.data);
+
+      // foundId에 저장
+      if (response?.data) {
+        setFoundId(response.data);
+      }
+      setModalMessage(`인증 성공, 아이디: ${response?.data}`);
+      setShowModal(true);
+    } catch (error: any) {
+      console.error(error);
+      const errMsg =
+        error.response?.data || "인증번호 확인 중 오류가 발생했습니다.";
+      setModalMessage(errMsg);
+      setShowModal(true);
+    }
+  };
+
+  // 타이머 동작
+  useEffect(() => {
+    if (timer === null) return;
+    if (timer <= 0) {
+      setTimer(null);
+      if (showVerificationInput) {
+        setModalMessage("인증번호가 만료되었습니다. 다시 시도해주세요.");
+        setShowModal(true);
+      }
+      return;
+    }
+    const countdown = setInterval(() => {
+      setTimer((prev) => (prev !== null ? prev - 1 : prev));
+    }, 1000);
+
+    return () => clearInterval(countdown);
+  }, [timer, showVerificationInput]);
+
+  // 시/분 포맷
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -38,24 +112,36 @@ export function FindIdForm() {
 
   return (
     <div className="px-4 pb-4">
-      <div className="flex border-b border-gray-200 mb-6">
+      <div className="mb-6 flex border-b border-gray-200">
         <button
           className={`flex-1 py-3 text-base ${
             verificationType === "phone"
-              ? "text-emerald-500 border-b-2 border-emerald-500"
+              ? "border-b-2 border-emerald-500 text-emerald-500"
               : "text-gray-400"
           }`}
-          onClick={() => setVerificationType("phone")}
+          onClick={() => {
+            setVerificationType("phone");
+            setShowVerificationInput(false);
+            setTimer(null);
+            setVerificationCode("");
+            setFoundId("");
+          }}
         >
           휴대폰 인증
         </button>
         <button
           className={`flex-1 py-3 text-base ${
             verificationType === "email"
-              ? "text-emerald-500 border-b-2 border-emerald-500"
+              ? "border-b-2 border-emerald-500 text-emerald-500"
               : "text-gray-400"
           }`}
-          onClick={() => setVerificationType("email")}
+          onClick={() => {
+            setVerificationType("email");
+            setShowVerificationInput(false);
+            setTimer(null);
+            setVerificationCode("");
+            setFoundId("");
+          }}
         >
           이메일 인증
         </button>
@@ -89,6 +175,7 @@ export function FindIdForm() {
           />
         </div>
 
+        {/* 인증번호 입력창 */}
         {showVerificationInput && (
           <div>
             <Label htmlFor="verificationCode">인증번호</Label>
@@ -109,6 +196,7 @@ export function FindIdForm() {
               <Button
                 variant="outline"
                 className="border-emerald-500 text-emerald-500 hover:bg-emerald-50"
+                onClick={handleCodeVerify}
               >
                 인증번호 확인
               </Button>
@@ -116,27 +204,28 @@ export function FindIdForm() {
           </div>
         )}
 
-        <Button
-          className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={handleVerificationRequest}
-          disabled={showVerificationInput || !name || !contact}
-        >
-          {verificationType === "phone" ? "인증번호 받기" : "확인"}
-        </Button>
+        {/* 인증번호 받기 버튼(처음 상태에서만) */}
+        {!showVerificationInput && (
+          <Button
+            className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handleVerificationRequest}
+            disabled={showVerificationInput || !name || !contact}
+          >
+            인증번호 받기
+          </Button>
+        )}
       </div>
 
-      {/* <SecondModal
-        open={showModal}
-        onClose={() => setShowModal(false)}
-        title="알림"
-        description={modalMessage}
-        confirmText="확인"
-        onConfirm={() => setShowModal(false)}
-      /> */}
+      {/* 아이디 찾기 결과 표시 */}
+      {foundId && (
+        <div className="mt-4 text-center text-blue-600">
+          <p>아이디: {foundId}</p>
+        </div>
+      )}
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        message="인증번호가 발송되었습니다."
+        message={modalMessage}
       />
     </div>
   );

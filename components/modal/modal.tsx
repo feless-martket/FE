@@ -16,7 +16,7 @@ export function Modal({ isOpen, onClose, message }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       {/* 모달 콘텐츠 영역 */}
-      <DialogContent className="w-[320px] h-[150px] p-0 rounded-xl">
+      <DialogContent className="w-[320px] h-[160px] p-0 rounded-xl">
         <div className="p-6">
           {/* 메시지 표시 영역 */}
           <p className="text-center mb-4">{message}</p>
