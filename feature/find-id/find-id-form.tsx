@@ -36,6 +36,9 @@ export function FindIdForm() {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
 
+  // "인증번호 받기" 버튼이 로딩 중인지 여부
+  const [isLoadingSend, setIsLoadingSend] = useState(false);
+
   // 1) 인증번호 발송 버튼 핸들러
   const handleVerificationRequest = async () => {
     if (!name || !contact) {
@@ -43,6 +46,12 @@ export function FindIdForm() {
       setShowModal(true);
       return;
     }
+
+    // 이미 로딩 중이면(버튼 클릭 직후) 재요청 방지
+    if (isLoadingSend) return;
+
+    // 로딩 시작
+    setIsLoadingSend(true);
 
     try {
       if (verificationType === "email") {
@@ -71,6 +80,8 @@ export function FindIdForm() {
       }
       setModalMessage(errMsg);
       setShowModal(true);
+    } finally {
+      setIsLoadingSend(false);
     }
   };
 
@@ -232,9 +243,10 @@ export function FindIdForm() {
           <Button
             className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleVerificationRequest}
-            disabled={showVerificationInput || !name || !contact}
+            // 로딩 중이거나 입력이 비었으면 비활성화
+            disabled={isLoadingSend || !name || !contact}
           >
-            인증번호 받기
+            {isLoadingSend ? "요청 중..." : "인증번호 받기"}
           </Button>
         )}
       </div>
