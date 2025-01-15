@@ -47,9 +47,9 @@ export function FindIdForm() {
     try {
       if (verificationType === "email") {
         // 이메일 인증번호 발송 API 호출
-        const res = await findIdApi.sendEmailCode(name, contact);
-        // 예 : response.data = "인증번호가 발송되었습니다."
-        console.log(res.data);
+        const r = await findIdApi.sendEmailCode(name, contact);
+        // 예 : r.data = "인증번호가 발송되었습니다."
+        console.log(r.data);
       } else {
         // 휴대폰 인증 (미구현)
       }
@@ -63,7 +63,12 @@ export function FindIdForm() {
       setShowModal(true);
     } catch (error: any) {
       console.error(error);
-      const errMsg = error.res?.data || "인증번호 발송 중 오류가 발생했습니다";
+      // 기본 오류 메세지
+      let errMsg = "인증번호 발송 중 오류가 발생했습니다";
+      // 서버에서 보내준 메세지
+      if (error.rponse?.data) {
+        errMsg = error.rponse.data;
+      }
       setModalMessage(errMsg);
       setShowModal(true);
     }
