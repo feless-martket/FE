@@ -86,9 +86,13 @@ export default function LoginForm() {
 
         {/* 아이디/비밀번호 찾기 */}
         <div className="flex justify-center space-x-4 text-sm text-gray-600">
-          <button className="hover:underline">아이디찾기</button>
+          <Link href="/find-id" className="hover:underline">
+            아이디찾기
+          </Link>
           <div className="text-gray-300">|</div>
-          <button className="hover:underline">비밀번호찾기</button>
+          <Link href="/find-password" className="hover:underline">
+            비밀번호찾기
+          </Link>
         </div>
 
         {/* 카카오 로그인 */}
