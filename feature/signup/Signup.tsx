@@ -510,7 +510,7 @@ export default function SignupForm() {
           }
         }
       } else if (type === "phone") {
-        // 전화번호 처리
+        // 전화번호 중복 처리
         const isDuplicate = await checkPhoneDuplicate(value);
         if (isDuplicate) {
           setIsPhoneDuplicate(true);
