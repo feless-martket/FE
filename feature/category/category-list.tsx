@@ -4,19 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-interface Category {
+export interface Category {
   id: number;
   name: string;
   subCategories?: string[];
 }
 
-const categories: Category[] = [
+export const categories: Category[] = [
   {
     id: 1,
     name: "채소",
     subCategories: [
       "전체보기",
-      "친환경",
       "고구마·감자·당근",
       "시금치·쌈채소·나물",
       "브로콜리·파프리카·양배추",
@@ -24,8 +23,22 @@ const categories: Category[] = [
       "오이·호박·고추",
     ],
   },
-  { id: 2, name: "과일·견과·쌀" },
-  { id: 3, name: "수산·해산·건어물" },
+  {
+    id: 2,
+    name: "과일·견과·쌀",
+    subCategories: ["전체보기", "사과·배", "감귤류", "견과류", "쌀·잡곡"],
+  },
+  {
+    id: 3,
+    name: "수산·해산·건어물",
+    subCategories: [
+      "전체보기",
+      "생선류",
+      "조개류",
+      "오징어·낙지·문어",
+      "멸치·황태·다시팩",
+    ],
+  },
   { id: 4, name: "정육·계란" },
   { id: 5, name: "국반찬·메인요리" },
   { id: 6, name: "샐러드·간편식" },
@@ -41,8 +54,14 @@ export function CategoryList() {
   const router = useRouter();
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
-  const handleSubCategoryClick = (subCategory: string) => {
-    router.push(`/productList?category=${encodeURIComponent(subCategory)}`);
+  // 메인카테고리와 서브카테고리 모두 URL에 포함
+  const handleSubCategoryClick = (
+    mainCategory: string,
+    subCategory: string
+  ) => {
+    router.push(
+      `/productList?main=${encodeURIComponent(mainCategory)}&category=${encodeURIComponent(subCategory)}`
+    );
   };
 
   return (
@@ -69,7 +88,9 @@ export function CategoryList() {
                 <button
                   key={index}
                   className="w-full px-2 py-3 text-left text-gray-600 hover:text-emerald-500"
-                  onClick={() => handleSubCategoryClick(subCategory)}
+                  onClick={() =>
+                    handleSubCategoryClick(category.name, subCategory)
+                  }
                 >
                   {subCategory}
                 </button>

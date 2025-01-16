@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const Header = () => {
   return (
     <header className="border-b bg-white">
-      <nav className="flex justify-between space-x-12 border-t px-4 py-2 text-sm text-gray-700">
+      <nav className="flex justify-between space-x-15 border-t px-4 py-2 text-sm text-gray-700">
         <a href="" className="hover:text-green-500">
           상품설명
         </a>

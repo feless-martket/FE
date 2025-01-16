@@ -51,7 +51,7 @@ export default function PurchaseButton({ cartItemId }: PurchaseButtonProps) {
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-10 z-10 bg-gray-100 pb-[16px]">
+    <div className="fixed inset-x-0 bottom-10 bg-gray-100 pb-[16px]">
       <div className="mx-auto w-full max-w-[360px] bg-white flex items-center space-x-2">
         {/* 좋아요 버튼 (디자인 예시) */}
         <button className="w-12 h-12 border rounded flex items-center justify-center">

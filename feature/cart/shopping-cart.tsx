@@ -165,8 +165,8 @@ export const ShoppingCart = () => {
   // 결제 처리
   const handleCheckout = async () => {
     if (!cartData) return;
-    const selectedItemsTotal = calculateSelectedItemsTotal();
-    await saveCartItemToServer(cartData.cartId, selectedItemsTotal);
+    //const selectedItemsTotal = calculateSelectedItemsTotal();
+    //await saveCartItemToServer(cartData.cartId, selectedItemsTotal);
     alert("결제 페이지로 이동합니다!");
   };
 
@@ -255,7 +255,7 @@ export const ShoppingCart = () => {
   // 로그인 인증이 된 사용자이지만, 장바구니에 담긴 상품이 없는 경우
   if (!cartData || !cartData.cartItems || cartData.cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         {/* 공통 Header 사용 */}
         <Header title="장바구니" />
         <div className="flex h-[50vh] items-center justify-center text-2xl font-bold text-gray-500">
@@ -273,7 +273,7 @@ export const ShoppingCart = () => {
     <div className="min-h-screen bg-white">
       <Header title="장바구니" />
       <div className="p-4">
-        <div className="min-h-screen bg-white p-4">
+        <div className="max-w-[360px] w-full bg-white">
           <div>
             {/* 상품 정보 */}
             <div className="border-b pb-4">
