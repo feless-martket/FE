@@ -1,19 +1,10 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import { Noto_Sans_KR } from "next/font/google";
 import Script from "next/script"; // <-- 추가
 import "./globals.css";
 import Providers from "./providers";
 import { AuthProvider } from "@/context/AuthContext";
 import localFont from "next/font/local";
-
-const notoSansKr = Noto_Sans_KR({
-  display: "swap",
-  style: "normal",
-  subsets: ["latin"],
-  variable: "--noto-sans_KR",
-  fallback: ["system-ui"],
-});
 
 const pretendard = localFont({
   src: [
