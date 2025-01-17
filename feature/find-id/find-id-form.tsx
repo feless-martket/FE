@@ -2,7 +2,7 @@ import { Modal } from "@/components/modal/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { findIdApi } from "@/feature/find-id/api/\bfind-id-api";
+import { findIdApi } from "@/feature/find-id/api/find-id-api";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
