@@ -168,7 +168,7 @@ export default function SearchFeature() {
       {!showResults && suggestions.length === 0 && (
         <ScrollArea className="flex-grow">
           <div className="p-4">
-            <h2 className="font-medium mb-3">추천 검색어</h2>
+            <h2 className="font-medium mb-3">추천 상품</h2>
             <div className="flex flex-wrap gap-2">
               {recommendedProducts.length === 0 ? (
                 <div className="text-sm text-gray-500">
@@ -190,7 +190,7 @@ export default function SearchFeature() {
           </div>
 
           <div className="p-4">
-            <h2 className="font-medium mb-3">급상승 검색어</h2>
+            <h2 className="font-medium mb-3">급상승 상품</h2>
             <div className="space-y-2">
               {trendingProducts.length === 0 ? (
                 <div className="text-sm text-gray-500">

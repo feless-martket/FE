@@ -8,6 +8,7 @@ import { DeleteConfirmModal } from "@/feature/cart/DeleteConfirmModal";
 import { CartItem } from "@/feature/cart/CartItem";
 import { useRouter } from "next/navigation";
 import { Footer } from "@/components/layout/footer";
+import myApi from "@/lib/axios";
 
 // 장바구니 아이템 타입
 interface CartItem {
@@ -57,27 +58,16 @@ export const ShoppingCart = () => {
     }
   }, [isLoggedIn]);
 
-  const axiosInstance = axios.create({
-    baseURL: "http://localhost:8080",
-  });
-
-  // 요청 인터셉터로 Authorization 헤더 설정
-  axiosInstance.interceptors.request.use(
-    (config) => {
-      const token = localStorage.getItem("accessToken"); // AuthContext에서도 가능
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    },
-    (error) => Promise.reject(error),
-  );
-
   // 장바구니 데이터 가져오기
   const fetchCartData = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get<CartData>("/cart");
+      const token = localStorage.getItem("accessToken");
+      const response = await myApi.get<CartData>("/cart", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.data.cartItems || response.data.cartItems.length === 0) {
         // 장바구니가 비어있을 경우에도 오류로 처리하지 않고 상태를 초기화
@@ -149,7 +139,8 @@ export const ShoppingCart = () => {
   const saveCartItemToServer = async (cartItemId: number, quantity: number) => {
     try {
       setIsSaving(true);
-      const response = await axiosInstance.post("/cart/update", null, {
+      const token = localStorage.getItem("accessToken");
+      const response = await myApi.post("/cart/update", null, {
         params: {
           cartItemId: cartItemId,
           quantity: quantity,
@@ -203,18 +194,23 @@ export const ShoppingCart = () => {
     setIsDeleteModalOpen(true);
   };
 
-  // 선택 항목 상제
+  // 선택 항목 삭제
   const deleteSelectedItems = async () => {
     try {
       // 선택된 cartItemId를 기반으로 삭제 요청
+      const token = localStorage.getItem("accessToken");
       await Promise.all(
         itemsToDelete.map((cartItemId) =>
-          axiosInstance.delete(`/cart/item/${cartItemId}`),
+          myApi.delete(`/cart/item/${cartItemId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
         ),
       );
 
-      setIsDeleteModalOpen(false); // 모달 닫기
-      fetchCartData(); // 데이터 새로고침
+      setIsDeleteModalOpen(false);
+      fetchCartData();
     } catch (err: any) {
       setError("선택한 상품 삭제 중 오류가 발생했습니다.");
       console.error("Error deleting items:", err);

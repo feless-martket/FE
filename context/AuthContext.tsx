@@ -41,22 +41,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           throw new Error("토큰이 없습니다.");
         }
 
-        const res = await fetch("http://localhost:8080/users/me", {
-          method: "GET",
+        const res = await myApi.get("/users/me", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`, // 로컬스토리지에서 가져온 토큰을 헤더에 포함
           },
         });
 
-        if (!res.ok) {
-          throw new Error("로그인되지 않았습니다.");
-        }
+        // if (!res.ok) {
+        //   throw new Error("로그인되지 않았습니다.");
+        // }
 
-        const data = await res.json();
-        console.log("사용자 정보 불러오기 성공:", data);
+        // const data = await res.json();
+        console.log("사용자 정보 불러오기 성공:", res.data);
 
-        setUserInfo(data);
+        setUserInfo(res.data);
         setIsLoggedIn(true);
       } catch (error) {
         console.error("인증 확인 실패:", error);
