@@ -12,14 +12,27 @@ import { AuthContext } from "@/context/AuthContext";
 import { Footer } from "@/components/layout/footer";
 
 // import { PaymentMethod } from "@/feature/payment/paymentMethod";
-import type {
-  CustomerInfo,
-  //   DeliveryAddress,
-  OrderFormData,
-} from "@/feature/payment/types/orders";
+// import type {
+//   CustomerInfo,
+//   //   DeliveryAddress,
+//   OrderFormData,
+// } from "@/feature/payment/types/orders";
 import { CheckoutPage } from "@/feature/payment/checkoutPage";
 import { useRouter } from "next/navigation";
 import myApi from "@/lib/axios";
+
+interface FormData {
+  customerInfo: {
+    name: string;
+    phone: string;
+  };
+  items: {
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+  }[];
+}
 
 export default function OrderPage() {
   const router = useRouter();
@@ -31,7 +44,7 @@ export default function OrderPage() {
   const [itemsLoading, setItemsLoading] = useState(true);
   const [itemsError, setItemsError] = useState(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     customerInfo: {
       name: "",
       phone: "",
@@ -160,8 +173,6 @@ export default function OrderPage() {
             <span>결제예정금액</span> <span>{total.toLocaleString()}원</span>
           </div>
         </div>
-
-        {/* (5) CheckoutPage에 totalAmount를 props로 넘김 */}
         <CheckoutPage totalAmount={total} />
       </div>
       <Footer />

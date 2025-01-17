@@ -92,6 +92,7 @@ export function CheckoutPage({ totalAmount }) {
       >
         {ready ? `${totalAmount.toLocaleString()}원 결제하기` : "준비중..."}
       </button>
+      <div className="h-10"></div>
     </div>
   );
 }

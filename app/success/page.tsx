@@ -47,6 +47,7 @@ export default function SuccessPage() {
           paymentMethod: confirmJson.method,
           totalPrice: 50000,
           shipping: {
+            zipCode: "00000",
             address: "서울시 강남구 어딘가",
             detailAddress: "상세 주소",
             deliveryNote: "부재시 문앞에 놓아주세요",
