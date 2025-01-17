@@ -1,23 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ShoppingCart, X } from "lucide-react";
+import { ChevronDown, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
-import { FilterCategory, Product } from "@/feature/search/filter";
 import Link from "next/link";
 import Image from "next/image";
 
+// 🟢 새로 분리한 FilterTabs 임포트
+import { FilterTabs } from "@/feature/search/FilterTabs"; // 실제 경로에 맞게 조정
+
+import { FilterCategory, Product } from "@/feature/search/filter";
+
+// 필터 옵션 상수
 const FILTER_OPTIONS: FilterCategory = {
   카테고리: [
     { name: "기저귀, 물티슈관련", count: 170 },
@@ -43,9 +39,11 @@ export function ProductFilter({
   onFilterChange,
   results,
 }: ProductFilterProps) {
+  // 사용자가 선택한 카테고리 필터를 관리
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
 
-  // Update category counts dynamically
+  // (예시) 결과에 따라 카테고리 count를 업데이트 하는 로직
+  // 실제로는 백엔드 응답이나, 다른 방식으로 count 값을 갱신할 수도 있음
   results.forEach((product) => {
     const category = FILTER_OPTIONS.카테고리.find(
       (c) => c.name === product.category
@@ -55,9 +53,21 @@ export function ProductFilter({
     }
   });
 
+  const handleFilterChange = (filters: string[]) => {
+    console.log("필터가 변경되었습니다:", filters);
+
+    // 예: 로컬 상태에도 업데이트
+    setSelectedFilters(filters);
+
+    // 상위에서 받은 onFilterChange(있다면) 호출
+    onFilterChange(filters);
+
+    // 필요하다면, 여기서 백엔드 재조회(fetch)나 추가 로직 작성 가능
+  };
+
   return (
-    //<div className="space-y-2">
     <div className="flex flex-col">
+      {/* 상단부: 총 N개 / 정렬 버튼 등 */}
       <div className="flex items-center justify-between border-b p-4">
         <div className="text-sm text-muted-foreground">총 {totalItems}개</div>
         <Button variant="ghost" size="sm" className="text-sm font-normal">
@@ -65,100 +75,22 @@ export function ProductFilter({
         </Button>
       </div>
 
-      <div className="border-b ">
-        <div className="overflow-x-auto whitespace-nowrap pb-1">
-          <div className="inline-flex gap-2 p-3">
-            {Object.keys(FILTER_OPTIONS).map((filter) => (
-              <Sheet key={filter}>
-                <SheetTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 rounded-full text-sm font-normal"
-                  >
-                    {filter} <ChevronDown className="ml-1 h-4 w-4" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent
-                  side="bottom"
-                  className="mx-auto h-[60vh] w-full max-w-[360px] p-0 sm:max-w-[360px]"
-                >
-                  <div className="flex h-full flex-col">
-                    <SheetHeader className="border-b px-4 py-3">
-                      <SheetTitle className="text-lg font-medium">
-                        필터
-                      </SheetTitle>
-                    </SheetHeader>
+      {/* 필터 탭 컴포넌트로 분리 */}
+      <FilterTabs
+        filterOptions={FILTER_OPTIONS}
+        selectedFilters={selectedFilters}
+        setSelectedFilters={setSelectedFilters}
+        onFilterChange={handleFilterChange}
+        totalItems={totalItems}
+      />
 
-                    <Tabs defaultValue="카테고리" className="flex-1">
-                      <ScrollArea className="border-b">
-                        <TabsList className="h-auto w-full justify-start rounded-none border-0 bg-transparent p-0">
-                          {Object.keys(FILTER_OPTIONS).map((tab) => (
-                            <TabsTrigger
-                              key={tab}
-                              value={tab}
-                              className="flex-1 rounded-none border-b-2 border-transparent px-4 py-2 text-sm font-normal data-[state=active]:border-primary data-[state=active]:bg-transparent"
-                            >
-                              {tab}
-                            </TabsTrigger>
-                          ))}
-                        </TabsList>
-                      </ScrollArea>
-
-                      <ScrollArea className="flex-1 px-4">
-                        <TabsContent value="카테고리" className="m-0 py-4">
-                          <div className="space-y-4">
-                            {FILTER_OPTIONS.카테고리.map((item) => (
-                              <label
-                                key={item.name}
-                                className="flex cursor-pointer items-center gap-3"
-                              >
-                                <Checkbox
-                                  checked={selectedFilters.includes(item.name)}
-                                  onCheckedChange={(checked) => {
-                                    const newFilters = checked
-                                      ? [...selectedFilters, item.name]
-                                      : selectedFilters.filter(
-                                          (f) => f !== item.name
-                                        );
-                                    setSelectedFilters(newFilters);
-                                    onFilterChange(newFilters);
-                                  }}
-                                />
-                                <span className="flex-1 text-sm">
-                                  {item.name}
-                                </span>
-                                <span className="text-sm text-muted-foreground">
-                                  {item.count}
-                                </span>
-                              </label>
-                            ))}
-                          </div>
-                        </TabsContent>
-                      </ScrollArea>
-
-                      <div className="border-t p-4">
-                        <Button className="w-full" size="lg">
-                          {totalItems}개 상품 보기
-                        </Button>
-                      </div>
-                    </Tabs>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="flex-1 ">
+      {/* 실제 상품 리스트 */}
+      <div className="flex-1">
         <ScrollArea className="flex-1">
           <div className="grid grid-cols-2 gap-4 p-4">
             {results.map((product) => (
-              <Link
-                key={product.id} // Link 컴포넌트에 key 추가
-                href={`/productDetail/${product.id}`}
-              >
-                <div key={product.id} className="space-y-2">
+              <Link key={product.id} href={`/productDetail/${product.id}`}>
+                <div className="space-y-2">
                   <div className="relative aspect-square">
                     <Image
                       src={product.imgUrl || "/placeholder.svg"}
