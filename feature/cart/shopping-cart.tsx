@@ -134,7 +134,12 @@ export const ShoppingCart = () => {
     try {
       setIsSaving(true);
       const token = localStorage.getItem("accessToken");
+
+      // params로 요청
       const response = await myApi.post("/cart/update", null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         params: {
           cartItemId: cartItemId,
           quantity: quantity,
