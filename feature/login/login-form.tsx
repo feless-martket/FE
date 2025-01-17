@@ -7,10 +7,22 @@ import { Input } from "@/components/ui/input";
 import { Header } from "@/components/layout/header";
 import { loginApiCall } from "@/feature/login/api/login-api";
 import { PageLayout } from "@/components/layout/pagelayout";
+import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
+  const goToLanding = () => {
+    router.push("/landing");
+  };
+  const closeButton = (
+    <X
+      className="absolute left-0 top-1 flex size-6 items-center justify-center"
+      onClick={goToLanding}
+    />
+  );
 
   /**
    * "로그인" 버튼 클릭 시 실행
@@ -49,7 +61,7 @@ export default function LoginForm() {
   return (
     <PageLayout>
       {/* Header */}
-      <Header title="로그인" />
+      <Header title="로그인" closeButton={closeButton} />
       {/* Input Fields */}
       <div className="mt-6 space-y-4">
         {/* ID Input */}
