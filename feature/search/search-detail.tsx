@@ -7,33 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SearchResults } from "@/feature/search/search-result";
-import { searchProducts, getSuggestions, Product } from "./search-api";
-
-// 추천 검색어 (하드코딩)
-const ALL_KEYWORDS = [
-  "기저귀",
-  "아침식사",
-  "낫또",
-  "식빵",
-  "오리고기",
-  "곤약밥",
-  "핫도그",
-  "수박",
-];
-
-// 급상승 검색어 (하드코딩)
-const TRENDING_KEYWORDS = [
-  "설화수",
-  "다정옥",
-  "삼진어묵",
-  "조선호텔김치",
-  "오물리",
-  "드레싱",
-  "찜기",
-  "골드키위",
-  "잣",
-  "아메리카노",
-];
+import {
+  searchProducts,
+  getSuggestions,
+  getAllProducts,
+  Product,
+} from "./search-api";
 
 export default function SearchFeature() {
   const [searchValue, setSearchValue] = useState(""); // 검색어 입력
@@ -41,6 +20,15 @@ export default function SearchFeature() {
   const [showResults, setShowResults] = useState(false); // 검색 결과 화면
   const [searchResults, setSearchResults] = useState<Product[]>([]); // 검색 결과
   const [loadingSuggestions, setLoadingSuggestions] = useState(false); // 자동완성 로딩 상태
+
+  // 추천 검색어와 급상승 검색어
+  const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
+  const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
+
+  const getRandomItems = <T,>(array: T[], count: number): T[] => {
+    const shuffled = [...array].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
 
   // 자동완성 추천어 API 호출 : getSuggestions
   useEffect(() => {
@@ -67,6 +55,23 @@ export default function SearchFeature() {
 
     return () => clearTimeout(debounceTimer);
   }, [searchValue]);
+
+  // 추천 상품과 급상승 상품을 가져오는 useEffect
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const allProducts = await getAllProducts();
+        console.log("📦 전체 상품 데이터:", allProducts);
+
+        setRecommendedProducts(getRandomItems(allProducts, 5));
+        setTrendingProducts(getRandomItems(allProducts, 10));
+      } catch (error) {
+        console.error("❌ 상품 데이터 로드 오류:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // 검색: msearchProducts
   const handleSearch = async (e?: React.FormEvent) => {
@@ -165,41 +170,53 @@ export default function SearchFeature() {
           <div className="p-4">
             <h2 className="font-medium mb-3">추천 검색어</h2>
             <div className="flex flex-wrap gap-2">
-              {ALL_KEYWORDS.map((keyword) => (
-                <Badge
-                  key={keyword}
-                  variant="secondary"
-                  className="px-3 py-1 rounded-full cursor-pointer bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                  onClick={() => handleKeywordClick(keyword)}
-                >
-                  {keyword}
-                </Badge>
-              ))}
+              {recommendedProducts.length === 0 ? (
+                <div className="text-sm text-gray-500">
+                  추천 상품 로딩 중...
+                </div>
+              ) : (
+                recommendedProducts.map((product) => (
+                  <Badge
+                    key={product.id}
+                    variant="secondary"
+                    className="px-3 py-1 rounded-full cursor-pointer bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                    onClick={() => handleKeywordClick(product.name)}
+                  >
+                    {product.name}
+                  </Badge>
+                ))
+              )}
             </div>
           </div>
 
           <div className="p-4">
             <h2 className="font-medium mb-3">급상승 검색어</h2>
             <div className="space-y-2">
-              {TRENDING_KEYWORDS.map((keyword, index) => (
-                <div
-                  key={keyword}
-                  role="button"
-                  tabIndex={0}
-                  className="flex items-center gap-4 cursor-pointer p-2 rounded-md hover:bg-gray-100"
-                  onClick={() => handleKeywordClick(keyword)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      handleKeywordClick(keyword);
-                    }
-                  }}
-                >
-                  <span className="text-emerald-500 font-medium">
-                    {index + 1}
-                  </span>
-                  <span>{keyword}</span>
+              {trendingProducts.length === 0 ? (
+                <div className="text-sm text-gray-500">
+                  급상승 상품 로딩 중...
                 </div>
-              ))}
+              ) : (
+                trendingProducts.map((product, index) => (
+                  <div
+                    key={product.id}
+                    role="button"
+                    tabIndex={0}
+                    className="flex items-center gap-4 cursor-pointer p-2 rounded-md hover:bg-gray-100"
+                    onClick={() => handleKeywordClick(product.name)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        handleKeywordClick(product.name);
+                      }
+                    }}
+                  >
+                    <span className="text-emerald-500 font-medium">
+                      {index + 1}
+                    </span>
+                    <span>{product.name}</span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </ScrollArea>

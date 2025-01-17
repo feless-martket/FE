@@ -2,12 +2,12 @@
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { AuthContext } from "@/context/AuthContext";
 import Link from "next/link";
 import { DeleteConfirmModal } from "@/feature/cart/DeleteConfirmModal";
 import { CartItem } from "@/feature/cart/CartItem";
 import { useRouter } from "next/navigation";
+import { Footer } from "@/components/layout/footer";
 
 // 장바구니 아이템 타입
 interface CartItem {
@@ -171,8 +171,8 @@ export const ShoppingCart = () => {
   // 결제 처리
   const handleCheckout = async () => {
     if (!cartData) return;
-    const selectedItemsTotal = calculateSelectedItemsTotal();
-    await saveCartItemToServer(cartData.cartId, selectedItemsTotal);
+    //const selectedItemsTotal = calculateSelectedItemsTotal();
+    //await saveCartItemToServer(cartData.cartId, selectedItemsTotal);
     // alert("결제 페이지로 이동합니다!");
     goToPayment();
   };
@@ -240,7 +240,7 @@ export const ShoppingCart = () => {
   // 로그인 인증이 되지 않은 사용자의 경우
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <Header title="장바구니" />
         <div className="flex h-[50vh] flex-col items-center justify-center text-center">
           <p className="mb-4 text-2xl font-bold text-gray-700">
@@ -262,7 +262,7 @@ export const ShoppingCart = () => {
   // 로그인 인증이 된 사용자이지만, 장바구니에 담긴 상품이 없는 경우
   if (!cartData || !cartData.cartItems || cartData.cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         {/* 공통 Header 사용 */}
         <Header title="장바구니" />
         <div className="flex h-[50vh] items-center justify-center text-2xl font-bold text-gray-500">
@@ -277,10 +277,10 @@ export const ShoppingCart = () => {
   const finalTotal = selectedTotal + shippingFee;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Header title="장바구니" />
       <div className="p-4">
-        <div className="min-h-screen bg-gray-50 p-4">
+        <div className="w-full max-w-[360px] bg-white">
           <div>
             {/* 상품 정보 */}
             <div className="border-b pb-4">
@@ -351,7 +351,6 @@ export const ShoppingCart = () => {
           />
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -9,6 +9,14 @@ import { DeliveryAddressSection } from "@/feature/payment/deliveryAddress";
 import { DeliveryNotes } from "@/feature/payment/deliveryNote";
 import { PointsSection } from "@/feature/payment/pointSection";
 import { AuthContext } from "@/context/AuthContext";
+import { Footer } from "@/components/layout/footer";
+
+// import { PaymentMethod } from "@/feature/payment/paymentMethod";
+import type {
+  CustomerInfo,
+  //   DeliveryAddress,
+  OrderFormData,
+} from "@/feature/payment/types/orders";
 import { CheckoutPage } from "@/feature/payment/checkoutPage";
 import { useRouter } from "next/navigation";
 import myApi from "@/lib/axios";
@@ -156,6 +164,7 @@ export default function OrderPage() {
         {/* (5) CheckoutPage에 totalAmount를 props로 넘김 */}
         <CheckoutPage totalAmount={total} />
       </div>
+      <Footer />
     </div>
   );
 }

@@ -12,23 +12,23 @@ import { Button } from "@/components/ui/button";
  *
  * returns {JSX.Element} 모달 UI 컴포넌트를 반환
  */
-export function Modal({ isOpen, onClose, message }) {
+export function Modal({ isOpen, onClose, message, onConfirm }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      {/* 모달 콘텐츠 영역 */}
-      <DialogContent className="sm:max-w-[300px] p-0 rounded-xl">
-        <div className="p-6">
-          {/* 메시지 표시 영역 */}
-          <p className="text-center mb-4">{message}</p>
-
-          {/* 확인 버튼 */}
-          <Button
-            onClick={onClose}
-            variant="ghost"
-            className="w-full text-emerald-500 hover:bg-white hover:text-emerald-600"
-          >
-            확인
-          </Button>
+      <DialogContent className="w-[300px] h-[140px] p-0 rounded-xl shadow-lg">
+        <div className="p-4 flex flex-col justify-between h-full">
+          <p className="text-center text-base	 text-gray-800">{message}</p>
+          <div className="flex justify-center items-center mt-4">
+            <button
+              className="w-full text-emerald-500 hover:bg-white hover:text-emerald-600"
+              onClick={() => {
+                if (onConfirm) onConfirm();
+                onClose();
+              }}
+            >
+              확인
+            </button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

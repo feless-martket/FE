@@ -13,7 +13,6 @@ export default function ProductInfo({
     <div className="p-4">
       <p className="text-gray-500 ">샛벌배송</p>
       <h2 className="text-xl font-bold">{productName}</h2>
-      <p className="text-gray-400 ">뚝 떨어진 기저귀, 내일 아침 도착!</p>
       <p className="mt-2 text-lg font-bold">
         <span className="text-red-600">35%</span>
         <span className="text-black"> {productPrice}원</span>

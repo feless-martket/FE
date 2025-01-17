@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Header } from "@/components/layout/header";
 import { loginApiCall } from "@/feature/login/api/login-api";
+import { PageLayout } from "@/components/layout/pagelayout";
 
 export default function LoginForm() {
   const [id, setId] = useState("");
@@ -15,7 +16,8 @@ export default function LoginForm() {
    * "로그인" 버튼 클릭 시 실행
    */
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     console.log("로그인 버튼 클릭 >>>", { id, password });
     try {
       // 백엔드로 로그인 요청
@@ -28,49 +30,54 @@ export default function LoginForm() {
       // 이후 필요한 동작 구현 (페이지 이동 등)
       // 예) router.push("/"), window.location.href="/"
       window.location.href = "/landing";
-    } catch (error) {
+    } catch (error: any) {
       console.error("로그인 실패>>>", error);
-      alert(
-        `로그인 실패: ${
-          error instanceof Error ? error.message : "로그인 중 오류 발생"
-        }`,
-      );
+
+      // 백엔드가 보낸 구체적 에러 메세지가 있는지 확인
+      const serverMessage = error.response?.data;
+      const alertMessage =
+        serverMessage ||
+        (error instanceof Error ? error.message : "로그인 중 오류 발생");
+      // alert(
+      //   `로그인 실패: ${
+      //     error instanceof Error ? error.message : "로그인 중 오류 발생"
+      //   }`
+      // );
+      alert(`로그인 실패: ${alertMessage}`);
     }
   };
   return (
-    <div className="w-[360px] rounded-lg bg-white px-4 py-6">
+    <PageLayout>
       {/* Header */}
-      <div className="w-full">
-        <Header title="로그인" />
-      </div>
-
+      <Header title="로그인" />
       {/* Input Fields */}
       <div className="mt-6 space-y-4">
         {/* ID Input */}
-        <Input
-          type="text"
-          placeholder="아이디를 입력해주세요"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-          className="w-full rounded-md px-4 py-3"
-        />
-        {/* Password Input */}
-        <Input
-          type="password"
-          placeholder="비밀번호를 입력해주세요"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-md px-4 py-3"
-        />
+        <form onSubmit={handleLogin} className="mt-6 space-y-4">
+          <Input
+            type="text"
+            placeholder="아이디를 입력해주세요"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            className="w-full rounded-md px-4 py-3"
+          />
+          {/* Password Input */}
+          <Input
+            type="password"
+            placeholder="비밀번호를 입력해주세요"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-md px-4 py-3"
+          />
 
-        <Button
-          className="w-full bg-emerald-500 py-6 text-white hover:bg-emerald-600"
-          size="lg"
-          onClick={handleLogin}
-        >
-          로그인
-        </Button>
-
+          <Button
+            className="w-full bg-emerald-500 py-6 text-white hover:bg-emerald-600"
+            size="lg"
+            type="submit"
+          >
+            로그인
+          </Button>
+        </form>
         <Link href={"/signup"}>
           <Button variant="outline" className="w-full py-6" size="lg">
             회원가입
@@ -79,9 +86,13 @@ export default function LoginForm() {
 
         {/* 아이디/비밀번호 찾기 */}
         <div className="flex justify-center space-x-4 text-sm text-gray-600">
-          <button className="hover:underline">아이디찾기</button>
+          <Link href="/find-id" className="hover:underline">
+            아이디찾기
+          </Link>
           <div className="text-gray-300">|</div>
-          <button className="hover:underline">비밀번호찾기</button>
+          <Link href="/find-password" className="hover:underline">
+            비밀번호찾기
+          </Link>
         </div>
 
         {/* 카카오 로그인 */}
@@ -99,6 +110,6 @@ export default function LoginForm() {
           카카오로 시작하기
         </Button>
       </div>
-    </div>
+    </PageLayout>
   );
 }

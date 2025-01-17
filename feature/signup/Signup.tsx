@@ -12,6 +12,7 @@ import {
   signupUser,
   checkEmailDuplicate,
   checkIdDuplicate,
+  checkPhoneDuplicate,
   sendEmailVerificationCode,
   emailVerification,
 } from "@/feature/signup/authService";
@@ -81,18 +82,22 @@ function validateTerms(terms: { [key: string]: boolean }) {
 
 // 회원가입 폼 컴포넌트
 export default function SignupForm() {
+  const router = useRouter();
   // 로딩 상태 추가
   const [isLoading, setIsLoading] = useState(false);
 
   // 중복 상태
   const [isIdDuplicate, setIsIdDuplicate] = useState(false);
   const [isEmailDuplicate, setIsEmailDuplicate] = useState(false);
+  const [isPhoneDuplicate, setIsPhoneDuplicate] = useState(false);
+
   //이메일 인증 상태
   const [isEmailCodeChecked, setisEmailCodeChecked] = useState(false);
 
   // 중복 확인
   const [isIdChecked, setIsIdChecked] = useState(false);
   const [isEmailChecked, setIsEmailChecked] = useState(false);
+  const [isPhoneChecked, setIsPhoneChecked] = useState(false);
 
   const [formData, setFormData] = useState({
     userName: "",
@@ -109,7 +114,11 @@ export default function SignupForm() {
   const [showEmailVerificationInput, setEmailShowVerificationInput] =
     useState(false);
 
-  const [modal, setModal] = useState({
+  const [modal, setModal] = useState<{
+    isOpen: boolean;
+    message: string;
+    onConfirm: (() => void) | null;
+  }>({
     isOpen: false,
     message: "",
     onConfirm: null,
@@ -165,69 +174,69 @@ export default function SignupForm() {
     });
   };
 
-  const handleVerificationRequest = async () => {
-    if (!formData.phone) {
-      setModal({
-        isOpen: true,
-        message: "휴대폰 번호를 입력해주세요.",
-        onConfirm: null,
-      });
-      return;
-    }
+  // const handleVerificationRequest = async () => {
+  //   if (!formData.phone) {
+  //     setModal({
+  //       isOpen: true,
+  //       message: "휴대폰 번호를 입력해주세요.",
+  //       onConfirm: null,
+  //     });
+  //     return;
+  //   }
 
-    try {
-      setIsLoading(true);
-      // 실제 인증번호 발송 API 호출 로직 추가 필요
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 임시 지연
+  //   try {
+  //     setIsLoading(true);
+  //     // 실제 인증번호 발송 API 호출 로직 추가 필요
+  //     await new Promise((resolve) => setTimeout(resolve, 1000)); // 임시 지연
 
-      setShowVerificationInput(true);
-      setModal({
-        isOpen: true,
-        message: "인증번호가 발송되었습니다.",
-        onConfirm: null,
-      });
-    } catch (error) {
-      setModal({
-        isOpen: true,
-        message: "인증번호 발송 중 오류가 발생했습니다.",
-        onConfirm: null,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     setShowVerificationInput(true);
+  //     setModal({
+  //       isOpen: true,
+  //       message: "인증번호가 발송되었습니다.",
+  //       onConfirm: null,
+  //     });
+  //   } catch (error) {
+  //     setModal({
+  //       isOpen: true,
+  //       message: "인증번호 발송 중 오류가 발생했습니다.",
+  //       onConfirm: null,
+  //     });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
-  const handleVerificationConfirm = async () => {
-    if (!formData.verificationCode) {
-      setModal({
-        isOpen: true,
-        message: "인증번호를 입력해주세요.",
-        onConfirm: null,
-      });
-      return;
-    }
-    console.log(formData.verificationCode);
+  // const handleVerificationConfirm = async () => {
+  //   if (!formData.verificationCode) {
+  //     setModal({
+  //       isOpen: true,
+  //       message: "인증번호를 입력해주세요.",
+  //       onConfirm: null,
+  //     });
+  //     return;
+  //   }
+  //   console.log(formData.verificationCode);
 
-    try {
-      setIsLoading(true);
-      // 실제 인증번호 확인 API 호출 로직 추가 필요
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 임시 지연
+  //   try {
+  //     setIsLoading(true);
+  //     // 실제 인증번호 확인 API 호출 로직 추가 필요
+  //     await new Promise((resolve) => setTimeout(resolve, 1000)); // 임시 지연
 
-      setModal({
-        isOpen: true,
-        message: "인증이 완료되었습니다.",
-        onConfirm: null,
-      });
-    } catch (error) {
-      setModal({
-        isOpen: true,
-        message: "인증번호가 일치하지 않습니다.",
-        onConfirm: null,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     setModal({
+  //       isOpen: true,
+  //       message: "인증이 완료되었습니다.",
+  //       onConfirm: null,
+  //     });
+  //   } catch (error) {
+  //     setModal({
+  //       isOpen: true,
+  //       message: "인증번호가 일치하지 않습니다.",
+  //       onConfirm: null,
+  //     });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   // 이메일 인증번호 확인
   const handleEmailVerificationConfirm = async () => {
@@ -245,7 +254,7 @@ export default function SignupForm() {
       setIsLoading(true);
       const emailVerificationResult = await emailVerification(
         formData.email,
-        formData.emailVerificationCode,
+        formData.emailVerificationCode
       );
       console.log(emailVerificationResult.status);
       if (emailVerificationResult.status) {
@@ -303,7 +312,7 @@ export default function SignupForm() {
       if (!isIdChecked) {
         setModal({
           isOpen: true,
-          message: "중복되는 아이디를 입력하셨습니다. 다시 입력해주세요.",
+          message: "아이디 중복 확인을 해주세요.",
           onConfirm: null,
         });
         return;
@@ -321,7 +330,7 @@ export default function SignupForm() {
       if (!isEmailChecked) {
         setModal({
           isOpen: true,
-          message: "중복되는 이메일을 입력하셨습니다. 다시 입력해주세요.",
+          message: "이메일 중복 확인을 해주세요.",
           onConfirm: null,
         });
         return;
@@ -335,6 +344,25 @@ export default function SignupForm() {
         });
         return;
       }
+
+      if (!isPhoneChecked) {
+        setModal({
+          isOpen: true,
+          message: "전화번호 중복 확인을 해주세요.",
+          onConfirm: null,
+        });
+        return;
+      }
+
+      if (isPhoneDuplicate) {
+        setModal({
+          isOpen: true,
+          message: "중복된 전화번호입니다. 다른 전화번호를 사용해주세요.",
+          onConfirm: null,
+        });
+        return;
+      }
+
       if (!isEmailCodeChecked) {
         setModal({
           isOpen: true,
@@ -356,11 +384,10 @@ export default function SignupForm() {
       setModal({
         isOpen: true,
         message: result.message,
-        // onConfirm: () => {
-        //   // 모달의 확인 버튼을 누르면 로그인 페이지로 이동
-        //   router.push("/login");
-        // },
-        onConfirm: null,
+        onConfirm: () => {
+          // 모달의 확인 버튼을 누르면 로그인 페이지로 이동
+          router.push("/login");
+        },
       });
 
       // 성공 시 폼 초기화
@@ -388,9 +415,11 @@ export default function SignupForm() {
       // 인증번호 입력 필드 초기화
       setIsIdChecked(false);
       setIsEmailChecked(false);
+      setIsPhoneChecked(false);
       setShowVerificationInput(false);
       setIsIdDuplicate(false);
       setIsEmailDuplicate(false);
+      setIsPhoneDuplicate(false);
     } catch (error: any) {
       console.error("API 호출 중 에러:", error);
       setModal({
@@ -404,12 +433,19 @@ export default function SignupForm() {
   };
 
   const handleDuplicateCheck = async (type: string) => {
-    const value = type === "id" ? formData.userName : formData.email;
+    let value = "";
+    if (type === "id") {
+      value = formData.userName;
+    } else if (type === "email") {
+      value = formData.email;
+    } else if (type === "phone") {
+      value = formData.phone;
+    }
 
     if (!value) {
       setModal({
         isOpen: true,
-        message: `${type === "id" ? "아이디" : "이메일"}를 입력해주세요.`,
+        message: `${type === "id" ? "아이디" : type === "email" ? "이메일" : "전화번호"}를 입력해주세요.`,
         onConfirm: null,
       });
       return;
@@ -437,9 +473,8 @@ export default function SignupForm() {
             onConfirm: null,
           });
         }
-      } else {
-        // === 이메일 중복확인 로직 ===
-        const isDuplicate = await checkEmailDuplicate(value); // <-- 함수 호출
+      } else if (type === "email") {
+        const isDuplicate = await checkEmailDuplicate(value); // 이메일 중복 확인
         setIsEmailChecked(true);
         if (isDuplicate === true) {
           setIsEmailDuplicate(true);
@@ -474,12 +509,32 @@ export default function SignupForm() {
             });
           }
         }
+      } else if (type === "phone") {
+        // 전화번호 중복 처리
+        const isDuplicate = await checkPhoneDuplicate(value);
+        if (isDuplicate) {
+          setIsPhoneDuplicate(true);
+          setIsPhoneChecked(false);
+          setModal({
+            isOpen: true,
+            message: "중복된 전화번호가 있습니다.",
+            onConfirm: null,
+          });
+        } else {
+          setIsPhoneDuplicate(false);
+          setIsPhoneChecked(true);
+          setModal({
+            isOpen: true,
+            message: "사용 가능한 전화번호입니다.",
+            onConfirm: null,
+          });
+        }
       }
     } catch (error) {
       console.log(error);
       setModal({
         isOpen: true,
-        message: `중복 확인 중 오류가 발생했습니다.1`,
+        message: "중복 확인 중 오류가 발생했습니다.",
         onConfirm: null,
       });
     } finally {
@@ -493,10 +548,11 @@ export default function SignupForm() {
         isOpen={modal.isOpen}
         onClose={() => setModal({ ...modal, isOpen: false })}
         message={modal.message}
+        onConfirm={modal.onConfirm || undefined}
       />
       <div className="mx-auto w-[360px] bg-white">
         <Header title="회원가입" />
-        <div className="mx-auto w-[360px] rounded-lg bg-white px-4 pb-8">
+        <div className="mx-auto w-[360px] rounded-lg bg-white px-4 pb-[52px]">
           <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
             {/* 아이디 입력 */}
             <div className="space-y-2">
@@ -648,14 +704,23 @@ export default function SignupForm() {
                 <Button
                   variant="outline"
                   className="whitespace-nowrap border-emerald-500 text-emerald-500"
+                  onClick={() => handleDuplicateCheck("phone")}
+                  type="button"
+                  disabled={isLoading}
+                >
+                  중복확인
+                </Button>
+                {/* <Button
+                  variant="outline"
+                  className="whitespace-nowrap border-emerald-500 text-emerald-500"
                   onClick={handleVerificationRequest}
                   type="button"
                   disabled={isLoading || !formData.phone}
                 >
                   인증번호 받기
-                </Button>
+                </Button> */}
               </div>
-              {showVerificationInput && (
+              {/* {showVerificationInput && (
                 <div className="mt-2 flex gap-2">
                   <Input
                     placeholder="인증번호를 입력해주세요"
@@ -677,7 +742,7 @@ export default function SignupForm() {
                     인증번호 확인
                   </Button>
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* 약관 동의 */}

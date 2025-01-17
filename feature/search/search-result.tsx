@@ -39,7 +39,7 @@ export function SearchResults({ results }: SearchResultsProps) {
   // Update category counts
   results.forEach((product) => {
     const category = FILTER_OPTIONS.카테고리.find(
-      (c) => c.name === product.category,
+      (c) => c.name === product.category
     );
     if (category) {
       category.count++;
@@ -47,7 +47,7 @@ export function SearchResults({ results }: SearchResultsProps) {
   });
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex flex-col">
       <div className="flex items-center justify-between border-b p-2">
         <div className="text-sm">총 {results.length}개</div>
         <Button variant="ghost" size="sm" className="text-sm font-normal">
@@ -146,54 +146,55 @@ export function SearchResults({ results }: SearchResultsProps) {
           </div>
         </ScrollArea>
       </div>
-
-      <ScrollArea className="flex-1">
-        <div className="grid grid-cols-2 gap-4 p-4">
-          {results.map((product) => (
-            <Link
-              key={product.id} // Link 컴포넌트에 key 추가
-              href={`/productDetail/${product.id}`}
-            >
-              <div key={product.id} className="space-y-2">
-                <div className="relative aspect-square">
-                  <Image
-                    src={product.imgurl || "/placeholder.svg"}
-                    alt={product.name}
-                    fill
-                    className="rounded-lg object-cover"
-                  />
-                  <Button
-                    size="icon"
-                    variant="secondary"
-                    className="absolute bottom-2 right-2 size-8"
-                  >
-                    <ShoppingCart className="size-4" />
-                  </Button>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1">
-                    <Badge
+      <div className="flex-1 ">
+        <ScrollArea className="flex-1">
+          <div className="grid grid-cols-2 gap-4 p-4">
+            {results.map((product) => (
+              <Link
+                key={product.id} // Link 컴포넌트에 key 추가
+                href={`/productDetail/${product.id}`}
+              >
+                <div key={product.id} className="space-y-2">
+                  <div className="relative aspect-square">
+                    <Image
+                      src={product.imgurl || "/placeholder.svg"}
+                      alt={product.name}
+                      fill
+                      className="rounded-lg object-cover"
+                    />
+                    <Button
+                      size="icon"
                       variant="secondary"
-                      className="bg-emerald-100 text-emerald-700"
+                      className="absolute bottom-2 right-2 size-8"
                     >
-                      +10% 쿠폰
-                    </Badge>
+                      <ShoppingCart className="size-4" />
+                    </Button>
                   </div>
-                  <h3 className="line-clamp-2 text-sm font-medium">
-                    {product.name}
-                  </h3>
-                  <div className="flex items-baseline gap-1">
-                    <span className="font-medium text-red-500">35%</span>
-                    <span className="font-bold">
-                      {product.price.toLocaleString()}원
-                    </span>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1">
+                      <Badge
+                        variant="secondary"
+                        className="bg-emerald-100 text-emerald-700"
+                      >
+                        +10% 쿠폰
+                      </Badge>
+                    </div>
+                    <h3 className="line-clamp-2 text-sm font-medium">
+                      {product.name}
+                    </h3>
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-medium text-red-500">35%</span>
+                      <span className="font-bold">
+                        {product.price.toLocaleString()}원
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </ScrollArea>
+              </Link>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }
