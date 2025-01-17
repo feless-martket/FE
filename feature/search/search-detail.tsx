@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SearchResults } from "@/feature/search/search-result";
+import { ProductFilter } from "@/feature/search/search-result";
 import {
   searchProducts,
   getSuggestions,
@@ -18,7 +18,7 @@ export default function SearchFeature() {
   const [searchValue, setSearchValue] = useState(""); // 검색어 입력
   const [suggestions, setSuggestions] = useState<string[]>([]); // 자동완성 추천어
   const [showResults, setShowResults] = useState(false); // 검색 결과 화면
-  const [searchResults, setSearchResults] = useState<Product[]>([]); // 검색 결과
+  const [ProductFilters, setProductFilters] = useState<Product[]>([]); // 검색 결과
   const [loadingSuggestions, setLoadingSuggestions] = useState(false); // 자동완성 로딩 상태
 
   // 추천 검색어와 급상승 검색어
@@ -80,7 +80,7 @@ export default function SearchFeature() {
 
     try {
       const products = await searchProducts(searchValue);
-      setSearchResults(products);
+      setProductFilters(products);
       setShowResults(true);
     } catch (error) {
       console.error("❌ 검색 오류:", error);
@@ -92,7 +92,7 @@ export default function SearchFeature() {
     setSearchValue(keyword);
     try {
       const products = await searchProducts(keyword);
-      setSearchResults(products);
+      setProductFilters(products);
       setShowResults(true);
     } catch (error) {
       console.error("❌ 검색 오류:", error);
@@ -162,7 +162,7 @@ export default function SearchFeature() {
       )}
 
       {/* 검색 결과 */}
-      {showResults && <SearchResults results={searchResults} />}
+      {showResults && <ProductFilter results={ProductFilters} />}
 
       {/* 추천 및 급상승 검색어 */}
       {!showResults && suggestions.length === 0 && (
