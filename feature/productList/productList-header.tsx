@@ -2,7 +2,7 @@
 
 import { ShoppingCart } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 interface ProductListHeaderProps {
@@ -11,6 +11,9 @@ interface ProductListHeaderProps {
 
 export function ProductListHeader({ className = "" }: ProductListHeaderProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  // URL 파라미터에서 메인 카테고리 값을 가져오고, 없으면 기본값 설정
+  const mainParam = searchParams.get("main") || "카테고리";
 
   const handleBack = () => {
     router.back();
@@ -22,7 +25,7 @@ export function ProductListHeader({ className = "" }: ProductListHeaderProps) {
         <button className="p-1">
           <ChevronLeft size={24} onClick={handleBack} />
         </button>
-        <h1 className="text-lg font-medium">채소</h1>
+        <h1 className="text-lg font-medium">{mainParam}</h1>
         <button className="p-1">
           <Link href="/cart">
             <ShoppingCart size={24} />

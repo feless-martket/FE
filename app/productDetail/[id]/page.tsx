@@ -48,7 +48,7 @@ export default async function ProductPage({
   console.log(productData);
 
   return (
-    <div className="flex h-screen w-full justify-center bg-gray-100">
+    <div className="flex min-h-screen w-full justify-center bg-gray-100">
       <div className="mx-auto max-w-[360px] bg-white">
         <ProductHeader productName={productData.name} />
         <Home />

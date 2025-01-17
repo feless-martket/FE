@@ -12,7 +12,7 @@ export interface Product {
 // ✅ 검색 API (일반 검색)
 export async function searchProducts(keyword: string): Promise<Product[]> {
   const response = await fetch(
-    `http://localhost:8080/search/results?keyword=${encodeURIComponent(keyword)}`,
+    `http://localhost:8080/search/results?keyword=${encodeURIComponent(keyword)}`
   );
   if (!response.ok) {
     throw new Error("검색 API 호출 실패");
@@ -23,7 +23,7 @@ export async function searchProducts(keyword: string): Promise<Product[]> {
 // ✅ 추천 검색어 API
 export async function getSuggestions(keyword: string): Promise<string[]> {
   const response = await fetch(
-    `http://localhost:8080/search/suggestions?keyword=${encodeURIComponent(keyword)}`,
+    `http://localhost:8080/search/suggestions?keyword=${encodeURIComponent(keyword)}`
   );
   if (!response.ok) {
     throw new Error("추천 검색어 API 호출 실패");
@@ -31,11 +31,11 @@ export async function getSuggestions(keyword: string): Promise<string[]> {
   return await response.json();
 }
 
-// ✅ 추천 검색어 및 급상승 검색어 API
-export async function getRecommendations(): Promise<string[]> {
-  const response = await fetch(`http://localhost:8080/search`);
+// ✅ 모든 상품 가져오기 API
+export async function getAllProducts(): Promise<Product[]> {
+  const response = await fetch(`http://localhost:8080/product`);
   if (!response.ok) {
-    throw new Error("추천 검색어 API 호출 실패");
+    throw new Error("모든 상품 가져오기 API 호출 실패");
   }
   return await response.json();
 }

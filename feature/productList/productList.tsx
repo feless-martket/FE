@@ -1,23 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
-import { ChevronDown, ShoppingBag } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { fetchProducts } from "@/feature/productList/productList-api";
-import ProductImage from "@/feature/productDetail/ProductImage"; // ProductImage 컴포넌트 불러오기
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { ChevronDown, ShoppingBag } from "lucide-react";
 
-const CATEGORY_MAP: Record<string, string> = {
-  전체보기: "VEGETABLE",
-  친환경: "GREEN_VEGETABLE",
-  "고구마·감자·당근": "ROOT_VEGETABLE",
-  "시금치·쌈채소": "LEAF_VEGETABLE",
-};
-
-const TABS = ["전체보기", "친환경", "고구마·감자·당근", "시금치·쌈채소"];
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  fetchProducts,
+  fetchProductsByMainCategory,
+} from "@/feature/productList/productList-api";
+import ProductImage from "@/feature/productDetail/ProductImage";
+import { categories } from "@/feature/category/category-list";
+import { categoryMapping } from "@/feature/category/category-mapping";
+import { mainCategoryMapping } from "@/feature/category/category-mapping";
 
 interface Product {
   id: string;
@@ -30,33 +27,50 @@ interface Product {
 
 export default function ProductList() {
   const searchParams = useSearchParams();
-  const paramCategory = searchParams.get("category");
+  const mainParam = searchParams.get("main"); // 메인카테고리 파라미터
+  const paramCategory = searchParams.get("category"); // 서브카테고리 파라미터
 
-  const [selectedTab, setSelectedTab] = useState(() => {
-    if (paramCategory && TABS.includes(paramCategory)) {
+  // mainParam에 따른 서브카테고리 목록
+  const currentCategory = categories.find(
+    (category) => category.name === mainParam
+  );
+  const subcategories = currentCategory?.subCategories || [];
+
+  // URL 파라미터가 유효하면 이를 초기 선택된 탭으로 설정, 아니면 기본값 "전체보기" 사용
+  const [selectedTab, setSelectedTab] = useState<string>(() => {
+    if (paramCategory && subcategories.includes(paramCategory)) {
       return paramCategory;
     }
     return "전체보기";
   });
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // URL 파라미터 변경 시 selectedTab 업데이트
   useEffect(() => {
-    if (paramCategory && TABS.includes(paramCategory)) {
+    if (paramCategory && subcategories.includes(paramCategory)) {
       setSelectedTab(paramCategory);
     }
-  }, [paramCategory]);
+  }, [paramCategory, subcategories]);
 
-  // 카테고리 변경 시 상품 목록 불러오기
+  // 선택된 탭이 변경될 때마다 상품 목록 불러오기
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
       setError(null);
       try {
-        const category = CATEGORY_MAP[selectedTab];
-        console.log(category);
-        const data = await fetchProducts(category);
+        let data;
+        if (selectedTab === "전체보기" && mainParam) {
+          // "전체보기"일 경우 메인카테고리에 따른 상품 불러오기
+          const mainCategoryCode = mainCategoryMapping[mainParam] || mainParam;
+          data = await fetchProductsByMainCategory(mainCategoryCode);
+        } else {
+          // 일반 서브카테고리일 경우 영문 코드 변환 후 상품 불러오기
+          const apiCategory = categoryMapping[selectedTab] || selectedTab;
+          data = await fetchProducts(apiCategory);
+        }
         setProducts(data);
       } catch (err: any) {
         setError("상품을 불러오는 데 실패했습니다.");
@@ -64,15 +78,14 @@ export default function ProductList() {
         setLoading(false);
       }
     };
-
     loadProducts();
-  }, [selectedTab]);
+  }, [selectedTab, mainParam]);
 
   return (
     <div className="flex flex-col">
       {/* Navigation Tabs */}
       <div className="scrollbar-hide mb-4 flex overflow-x-auto whitespace-nowrap border-b">
-        {TABS.map((tab) => (
+        {subcategories.map((tab) => (
           <button
             key={tab}
             onClick={() => setSelectedTab(tab)}
@@ -125,18 +138,10 @@ export default function ProductList() {
           <Link
             key={product.id}
             href={`/productDetail/${product.id}`}
-            className="block" // Link를 블록 요소로 만들어 전체 영역 클릭 가능하게 함
+            className="block"
           >
             <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
-              {/* 할인 쿠폰 라벨 */}
-              {/* <div className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10">
-                +15% 카드쿠폰
-              </div> */}
-
-              {/* 상품 이미지 */}
               <ProductImage imageUrl={product.image || "/img/baseball2.jpg"} />
-
-              {/* 장바구니 버튼 */}
               <Button
                 size="icon"
                 variant="secondary"
@@ -144,16 +149,10 @@ export default function ProductList() {
               >
                 <ShoppingBag className="size-5 text-gray-600" />
               </Button>
-
-              {/* 상품 배송 타입 */}
-              <p className="mb-1 text-xs text-gray-500">샛별배송</p>
-
-              {/* 상품 이름 */}
+              <p className="mb-1 text-xs text-gray-500">{product.delivery}</p>
               <h3 className="mb-1 line-clamp-1 text-sm font-medium text-gray-800">
                 {product.name}
               </h3>
-
-              {/* 할인율 및 할인 가격 */}
               <div className="mb-1 flex items-center">
                 <span className="mr-1 text-base font-bold text-rose-500">
                   35%
@@ -162,8 +161,6 @@ export default function ProductList() {
                   {(product.price * 0.65).toLocaleString()}원
                 </span>
               </div>
-
-              {/* 정가 */}
               <p className="text-xs text-gray-400 line-through">
                 {product.price.toLocaleString()}원
               </p>
