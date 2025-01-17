@@ -254,7 +254,7 @@ export default function SignupForm() {
       setIsLoading(true);
       const emailVerificationResult = await emailVerification(
         formData.email,
-        formData.emailVerificationCode
+        formData.emailVerificationCode,
       );
       console.log(emailVerificationResult.status);
       if (emailVerificationResult.status) {
