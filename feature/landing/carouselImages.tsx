@@ -7,10 +7,8 @@ import {
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { baseURL } from "@/lib/axios";
+import myApi from "@/lib/axios";
 import Test1 from "/public/img/test1.jpeg";
-import Test2 from "/public/img/test2.jpeg";
-import Test3 from "/public/img/test3.jpeg";
 
 type Product = {
   id: number;
@@ -26,11 +24,11 @@ export default function CarouselImages() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(baseURL + "/product");
-        if (!response.ok) {
+        const response = await myApi("/product");
+        if (!response.status) {
           throw new Error("Failed to fetch products");
         }
-        const data = await response.json();
+        const data = await response.data;
         setProducts(data);
       } catch (error) {
         console.error(error);

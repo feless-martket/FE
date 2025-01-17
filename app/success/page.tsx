@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import myApi from "@/lib/axios";
 
 export default function SuccessPage() {
   const router = useRouter();
@@ -23,20 +24,15 @@ export default function SuccessPage() {
         };
 
         const token = localStorage.getItem("accessToken");
-        const confirmRes = await fetch(
-          "http://localhost:8080/payments/confirm",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(requestData),
+        const confirmRes = await myApi.post("/payments/confirm", requestData, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
-        const confirmJson = await confirmRes.json();
-        if (!confirmRes.ok) {
+        const confirmJson = await confirmRes.data;
+        if (!confirmRes.status) {
           throw { message: confirmJson.message, code: confirmJson.code };
         }
 
@@ -64,20 +60,19 @@ export default function SuccessPage() {
         console.log("결제 완료(complete) 요청 바디:", completeBody);
 
         // 3) /payments/complete 호출
-        const completeRes = await fetch(
-          "http://localhost:8080/payments/complete",
+        const completeRes = await myApi.post(
+          "/payments/complete",
+          completeBody,
           {
-            method: "POST",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify(completeBody),
           },
         );
 
-        const completeJson = await completeRes.json();
-        if (!completeRes.ok) {
+        const completeJson = await completeRes.data;
+        if (!completeRes.status) {
           throw {
             message: completeJson.message || "complete error",
             code: completeRes.status,
