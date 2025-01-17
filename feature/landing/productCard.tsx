@@ -23,9 +23,9 @@ export function ProductCard({
   isWeekendSale = false,
 }: ProductCardProps) {
   return (
-    <Card className="group relative mx-auto w-full max-w-[320px] overflow-hidden">
+    <Card className="group relative mx-auto w-full max-w-[320px] overflow-hidden rounded-none">
       {isWeekendSale && (
-        <div className="absolute left-1 top-1 z-10 rounded-md bg-emerald-500 px-3 py-1 text-sm font-medium text-white">
+        <div className="absolute z-10 flex h-[24px] w-[60px] items-center justify-center bg-[#0DBD88] text-[13px] font-medium text-white">
           주말특가
         </div>
       )}
