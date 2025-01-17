@@ -5,6 +5,7 @@ import Script from "next/script"; // <-- 추가
 import "./globals.css";
 import Providers from "./providers";
 import { AuthProvider } from "@/context/AuthContext";
+import localFont from "next/font/local";
 
 const notoSansKr = Noto_Sans_KR({
   display: "swap",
@@ -12,6 +13,15 @@ const notoSansKr = Noto_Sans_KR({
   subsets: ["latin"],
   variable: "--noto-sans_KR",
   fallback: ["system-ui"],
+});
+
+const pretendard = localFont({
+  src: [
+    {
+      path: "../public/PretendardVariable.woff2",
+    },
+  ],
+  variable: "--font-pretendard",
 });
 
 export const metadata: Metadata = {
@@ -32,7 +42,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
       </head>
-      <body className={`${notoSansKr.className} antialiased`}>
+      <body className={`${pretendard.className} antialiased`}>
         <Providers>
           <AuthProvider>{children}</AuthProvider>
         </Providers>
