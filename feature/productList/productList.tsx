@@ -118,6 +118,19 @@ export default function ProductList() {
       )}
       {error && <div className="text-center text-red-500">{error}</div>}
 
+  {/* Product Count and Filters */}
+  <div className="mb-4 flex items-center justify-between px-4">
+        <span className="text-sm text-gray-600">총 {products.length}개</span>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="text-sm">
+            추천순 <ChevronDown className="ml-1 size-4" />
+          </Button>
+          <Button variant="outline" size="sm" className="text-sm">
+            필터
+          </Button>
+        </div>
+      </div>
+
       {/* Product Grid */}
       <div className="grid grid-cols-2 gap-4 px-4">
         {products.map((product) => (
