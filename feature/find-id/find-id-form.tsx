@@ -131,6 +131,7 @@ export function FindIdForm() {
       }
       return;
     }
+
     const countdown = setInterval(() => {
       setTimer((prev) => (prev !== null ? prev - 1 : prev));
     }, 1000);
