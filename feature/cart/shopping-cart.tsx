@@ -52,22 +52,6 @@ export const ShoppingCart = () => {
     }
   }, [isLoggedIn]);
 
-  // const axiosInstance = axios.create({
-  //   baseURL: "http://localhost:8080",
-  // });
-
-  // // 요청 인터셉터로 Authorization 헤더 설정
-  // axiosInstance.interceptors.request.use(
-  //   (config) => {
-  //     const token = localStorage.getItem("accessToken"); // AuthContext에서도 가능
-  //     if (token) {
-  //       config.headers.Authorization = `Bearer ${token}`;
-  //     }
-  //     return config;
-  //   },
-  //   (error) => Promise.reject(error)
-  // );
-
   // 장바구니 데이터 가져오기
   const fetchCartData = async () => {
     try {
