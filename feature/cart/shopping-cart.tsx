@@ -7,6 +7,7 @@ import { AuthContext } from "@/context/AuthContext";
 import Link from "next/link";
 import { DeleteConfirmModal } from "@/feature/cart/DeleteConfirmModal";
 import { CartItem } from "@/feature/cart/CartItem";
+import { useRouter } from "next/navigation";
 
 // 장바구니 아이템 타입
 interface CartItem {
@@ -38,6 +39,11 @@ export const ShoppingCart = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemsToDelete, setItemsToDelete] = useState<number[]>([]);
 
+  const router = useRouter();
+  const goToPayment = () => {
+    router.push("/payment");
+  };
+
   // 배송비 3000원 고정
   const shippingFee = 3000;
 
@@ -64,7 +70,7 @@ export const ShoppingCart = () => {
       }
       return config;
     },
-    (error) => Promise.reject(error)
+    (error) => Promise.reject(error),
   );
 
   // 장바구니 데이터 가져오기
@@ -83,7 +89,7 @@ export const ShoppingCart = () => {
       } else {
         setCartData(response.data);
         setSelectedItems(
-          response.data.cartItems.map((item) => item.cartItemId)
+          response.data.cartItems.map((item) => item.cartItemId),
         );
       }
 
@@ -115,7 +121,7 @@ export const ShoppingCart = () => {
       const updatedCartItems = prev.cartItems.map((item) =>
         item.cartItemId === cartItemId
           ? { ...item, quantity: Math.max(newQuantity, 1) }
-          : item
+          : item,
       );
 
       const updatedTotalPrice = calculateTotalPrice(updatedCartItems);
@@ -167,7 +173,8 @@ export const ShoppingCart = () => {
     if (!cartData) return;
     const selectedItemsTotal = calculateSelectedItemsTotal();
     await saveCartItemToServer(cartData.cartId, selectedItemsTotal);
-    alert("결제 페이지로 이동합니다!");
+    // alert("결제 페이지로 이동합니다!");
+    goToPayment();
   };
 
   // 개별 항목 선택 토글
@@ -175,7 +182,7 @@ export const ShoppingCart = () => {
     setSelectedItems((prev) =>
       prev.includes(cartItemId)
         ? prev.filter((id) => id !== cartItemId)
-        : [...prev, cartItemId]
+        : [...prev, cartItemId],
     );
   };
 
@@ -202,8 +209,8 @@ export const ShoppingCart = () => {
       // 선택된 cartItemId를 기반으로 삭제 요청
       await Promise.all(
         itemsToDelete.map((cartItemId) =>
-          axiosInstance.delete(`/cart/item/${cartItemId}`)
-        )
+          axiosInstance.delete(`/cart/item/${cartItemId}`),
+        ),
       );
 
       setIsDeleteModalOpen(false); // 모달 닫기
@@ -235,13 +242,13 @@ export const ShoppingCart = () => {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header title="장바구니" />
-        <div className="flex flex-col h-[50vh] items-center justify-center text-center">
-          <p className="text-2xl font-bold text-gray-700 mb-4">
+        <div className="flex h-[50vh] flex-col items-center justify-center text-center">
+          <p className="mb-4 text-2xl font-bold text-gray-700">
             로그인 후 이용해주세요
           </p>
           <Link
             href="/login"
-            className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition-colors"
+            className="rounded-md bg-green-500 px-6 py-2 text-white transition-colors hover:bg-green-600"
           >
             로그인하기
           </Link>
@@ -328,12 +335,14 @@ export const ShoppingCart = () => {
           </div>
 
           <div className="mt-6">
+            {/* <Link href={"/payment"}> */}
             <button
               onClick={handleCheckout}
               className="w-full rounded-md bg-green-500 py-3 text-lg font-bold text-white"
             >
               {finalTotal.toLocaleString()}원 결제하기
             </button>
+            {/* </Link> */}
           </div>
           <DeleteConfirmModal
             isOpen={isDeleteModalOpen}
