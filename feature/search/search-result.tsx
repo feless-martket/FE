@@ -157,7 +157,7 @@ export function SearchResults({ results }: SearchResultsProps) {
                 <div key={product.id} className="space-y-2">
                   <div className="relative aspect-square">
                     <Image
-                      src={product.imgurl || "/placeholder.svg"}
+                      src={product.imageUrls[0] || "/placeholder.svg"}
                       alt={product.name}
                       fill
                       className="rounded-lg object-cover"

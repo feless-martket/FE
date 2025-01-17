@@ -5,7 +5,7 @@ export interface Product {
   description: string;
   quantity: number;
   category: string;
-  imgurl: string;
+  imageUrl: string[];
   product_status: string | null;
 }
 

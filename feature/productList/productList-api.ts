@@ -2,11 +2,11 @@
 import myApi from "@/lib/axios";
 import { baseURL } from "@/lib/axios";
 
-// 상품 목록 조회 API
-export const fetchProducts = async (category: string) => {
+
+export const fetchProducts = async (subCategory: string, page: number, size :number) => {
   try {
     const response = await myApi.get(
-      baseURL + `/product/category/${encodeURIComponent(category)}`
+      baseURL + `/product/category/${encodeURIComponent(subCategory)}?page=${page}&size=${size}`
     );
     return response.data;
   } catch (error: any) {
@@ -16,11 +16,11 @@ export const fetchProducts = async (category: string) => {
     );
     throw error;
   }
-};
-export const fetchProductsByMainCategory = async (mainCategory: string) => {
+};  
+export const fetchProductsByMainCategory = async (mainCategory: string,page: number, size :number) => {
   try {
     const response = await myApi.get(
-      baseURL + `/product/main-category/${encodeURIComponent(mainCategory)}`
+      baseURL + `/product/main-category/${encodeURIComponent(mainCategory)}?page=${page}&size=${size}`
     );
     return response.data;
   } catch (error: any) {
