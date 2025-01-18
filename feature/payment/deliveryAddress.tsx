@@ -36,8 +36,6 @@ export function DeliveryAddressSection({
 
   // 주소 검색 완료 핸들러
   const handleComplete = (data: any) => {
-    // daum-postcode의 반환값 중, 도로명 주소: data.roadAddress
-    // 우편번호: data.zonecode
     setZipCode(data.zonecode);
     setAddress(data.roadAddress);
     setShowPostcode(false);

@@ -11,28 +11,20 @@ import Test3 from "/public/img/test3.jpeg";
 interface HeroSlide {
   id: number;
   image: StaticImageData;
-  title: string;
-  subtitle: string;
 }
 
 const slides: HeroSlide[] = [
   {
     id: 1,
     image: Test1,
-    title: "test1",
-    subtitle: "",
   },
   {
     id: 2,
     image: Test2,
-    title: "test2",
-    subtitle: "",
   },
   {
     id: 3,
     image: Test3,
-    title: "test3",
-    subtitle: "",
   },
 ];
 
