@@ -6,7 +6,7 @@ import { baseURL } from "@/lib/axios";
 export const fetchProducts = async (category: string) => {
   try {
     const response = await myApi.get(
-      baseURL + `/product/category/${encodeURIComponent(category)}`
+      `/product/category/${encodeURIComponent(category)}`
     );
     return response.data;
   } catch (error: any) {
@@ -20,7 +20,7 @@ export const fetchProducts = async (category: string) => {
 export const fetchProductsByMainCategory = async (mainCategory: string) => {
   try {
     const response = await myApi.get(
-      baseURL + `/product/main-category/${encodeURIComponent(mainCategory)}`
+      `/product/main-category/${encodeURIComponent(mainCategory)}`
     );
     return response.data;
   } catch (error: any) {
