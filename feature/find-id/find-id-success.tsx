@@ -13,16 +13,16 @@ export function FindIdSuccess({ username = "examId" }: FindIdSuccessProps) {
     <div className="px-4 py-6">
       <div className="mb-12 space-y-2 text-center">
         <h2 className="text-lg font-medium">고객님의 계정을 찾았습니다.</h2>
-        <p className="text-gray-600 text-sm">아이디 확인 후 로그인 해주세요.</p>
+        <p className="text-sm text-gray-600">아이디 확인 후 로그인 해주세요.</p>
       </div>
 
-      <div className="flex flex-col items-center mb-12">
-        <UserCircle2 className="w-16 h-16 text-gray-300 mb-4" />
+      <div className="mb-12 flex flex-col items-center">
+        <UserCircle2 className="mb-4 size-16 text-gray-300" />
         <span className="text-lg">{username}</span>
       </div>
 
       <div className="space-y-2">
-        <Link href="/find-password" className="block">
+        <Link href="/reset-password" className="block">
           <Button
             variant="outline"
             className="w-full border-emerald-500 text-emerald-500 hover:bg-emerald-50"

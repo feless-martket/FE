@@ -102,7 +102,7 @@ export default function LoginForm() {
             아이디찾기
           </Link>
           <div className="text-gray-300">|</div>
-          <Link href="/find-password" className="hover:underline">
+          <Link href="/reset-password" className="hover:underline">
             비밀번호찾기
           </Link>
         </div>
