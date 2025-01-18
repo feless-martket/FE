@@ -17,6 +17,8 @@ import {
   emailVerification,
 } from "@/feature/signup/authService";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 
 // 폼 유효성 검사 함수
 function validateForm(formData: {
@@ -551,7 +553,16 @@ export default function SignupForm() {
         onConfirm={modal.onConfirm || undefined}
       />
       <div className="mx-auto w-[360px] bg-white">
-        <Header title="회원가입" />
+        <div className={`relative flex h-[40px] items-center justify-center`}>
+          <button
+            className="absolute left-5 flex h-full items-center justify-center"
+            onClick={() => router.back()}
+          >
+            <X size={24} />
+          </button>
+          <div className="text-center text-lg font-medium">회원가입</div>
+        </div>
+        <div className={`mb-4 w-full border-b pt-4`}></div>
         <div className="mx-auto w-[360px] rounded-lg bg-white px-4 pb-[52px]">
           <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
             {/* 아이디 입력 */}
@@ -559,7 +570,7 @@ export default function SignupForm() {
               <Label htmlFor="id">
                 아이디<span className="text-red-500">*</span>
               </Label>
-              <div className="flex gap-2">
+              <div className="flex h-[46px] gap-2">
                 <Input
                   id="id"
                   placeholder="아이디를 입력해주세요"
@@ -567,11 +578,15 @@ export default function SignupForm() {
                   onChange={(e) =>
                     setFormData({ ...formData, userName: e.target.value })
                   }
+                  className={cn(
+                    `w-full rounded-md text-sm h-full`,
+                    `placeholder:text-[#CCCCCC]`,
+                  )}
                   required
                 />
                 <Button
                   variant="outline"
-                  className="whitespace-nowrap border-emerald-500 text-emerald-500"
+                  className="h-full whitespace-nowrap border-emerald-500 text-emerald-500"
                   onClick={() => handleDuplicateCheck("id")}
                   type="button"
                   disabled={isLoading}
@@ -582,10 +597,11 @@ export default function SignupForm() {
             </div>
 
             {/* 비밀번호 입력 */}
-            <div className="space-y-2">
+            <div className="space-y-2 ">
               <Label htmlFor="password">
                 비밀번호<span className="text-red-500">*</span>
               </Label>
+
               <Input
                 id="password"
                 type="password"
@@ -594,6 +610,10 @@ export default function SignupForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
+                className={cn(
+                  `w-full rounded-md text-sm h-[46px]`,
+                  `placeholder:text-[#CCCCCC]`,
+                )}
                 required
               />
             </div>
@@ -614,6 +634,10 @@ export default function SignupForm() {
                     confirmPassword: e.target.value,
                   })
                 }
+                className={cn(
+                  `w-full rounded-md text-sm h-[46px]`,
+                  `placeholder:text-[#CCCCCC]`,
+                )}
                 required
               />
             </div>
@@ -630,6 +654,10 @@ export default function SignupForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
+                className={cn(
+                  `w-full rounded-md text-sm h-[46px]`,
+                  `placeholder:text-[#CCCCCC]`,
+                )}
                 required
               />
             </div>
@@ -639,7 +667,7 @@ export default function SignupForm() {
               <Label htmlFor="email">
                 이메일<span className="text-red-500">*</span>
               </Label>
-              <div className="flex gap-2">
+              <div className="flex h-[46px] gap-2">
                 <Input
                   id="email"
                   type="email"
@@ -649,10 +677,14 @@ export default function SignupForm() {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   required
+                  className={cn(
+                    `w-full rounded-md text-sm h-full`,
+                    `placeholder:text-[#CCCCCC]`,
+                  )}
                 />
                 <Button
                   variant="outline"
-                  className="whitespace-nowrap border-emerald-500 text-emerald-500"
+                  className="h-full whitespace-nowrap border-emerald-500 text-emerald-500"
                   onClick={() => handleDuplicateCheck("email")}
                   type="button"
                   disabled={isLoading}
@@ -661,7 +693,7 @@ export default function SignupForm() {
                 </Button>
               </div>
               {showEmailVerificationInput && (
-                <div className="mt-2 flex gap-2">
+                <div className="mt-2 flex h-[46px] gap-2">
                   <Input
                     placeholder="인증번호를 입력해주세요"
                     value={formData.emailVerificationCode}
@@ -672,10 +704,14 @@ export default function SignupForm() {
                       })
                     }
                     disabled={isLoading || !formData.email}
+                    className={cn(
+                      `w-full rounded-md text-sm h-full`,
+                      `placeholder:text-[#CCCCCC]`,
+                    )}
                   />
                   <Button
                     variant="outline"
-                    className="whitespace-nowrap border-emerald-500 text-emerald-500"
+                    className="h-full whitespace-nowrap border-emerald-500 text-emerald-500"
                     type="button"
                     onClick={handleEmailVerificationConfirm}
                     disabled={isLoading}
@@ -691,7 +727,7 @@ export default function SignupForm() {
               <Label htmlFor="phone">
                 휴대폰<span className="text-red-500">*</span>
               </Label>
-              <div className="flex gap-2">
+              <div className="flex h-[46px] gap-2">
                 <Input
                   id="phone"
                   placeholder="숫자만 입력해주세요"
@@ -699,11 +735,15 @@ export default function SignupForm() {
                   onChange={(e) =>
                     setFormData({ ...formData, phone: e.target.value })
                   }
+                  className={cn(
+                    `w-full rounded-md text-sm h-full`,
+                    `placeholder:text-[#CCCCCC]`,
+                  )}
                   required
                 />
                 <Button
                   variant="outline"
-                  className="whitespace-nowrap border-emerald-500 text-emerald-500"
+                  className="h-full whitespace-nowrap border-emerald-500 text-emerald-500"
                   onClick={() => handleDuplicateCheck("phone")}
                   type="button"
                   disabled={isLoading}
@@ -797,7 +837,7 @@ export default function SignupForm() {
 
             {/* 가입하기 버튼 */}
             <Button
-              className="mt-6 w-full bg-emerald-500 text-white hover:bg-emerald-600"
+              className="mt-6 h-[46px] w-full bg-emerald-500 text-white hover:bg-emerald-600"
               onClick={handleSignup}
               disabled={isLoading}
             >

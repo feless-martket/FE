@@ -120,7 +120,7 @@ export default function HeroSlider() {
       </AnimatePresence>
 
       {/* Slide Indicator */}
-      <div className="absolute right-2 top-[280px] z-10 rounded-full bg-black/50 px-2 py-1">
+      <div className="absolute right-2 top-[280px] z-10 flex h-[20px] w-[52px] items-center justify-center rounded-full bg-black/50">
         <span className="text-xs text-white">
           {page + 1}/{slides.length}
         </span>
