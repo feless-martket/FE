@@ -6,49 +6,48 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+
+// ✅ 검색 결과를 필터링하는 컴포넌트
 import { ProductFilter } from "@/feature/search/search-result";
+
 import {
   searchProducts,
   getSuggestions,
   getAllProducts,
   Product,
+  fetchFilteredProducts,
 } from "./search-api";
 
 export default function SearchFeature() {
-  const [searchValue, setSearchValue] = useState(""); // 검색어 입력
+  const [searchValue, setSearchValue] = useState(""); // 검색어
   const [suggestions, setSuggestions] = useState<string[]>([]); // 자동완성 추천어
-  const [showResults, setShowResults] = useState(false); // 검색 결과 화면
-  const [ProductFilters, setProductFilters] = useState<Product[]>([]); // 검색 결과
-  const [loadingSuggestions, setLoadingSuggestions] = useState(false); // 자동완성 로딩 상태
+  const [showResults, setShowResults] = useState(false); // 결과 화면 표시 여부
+  const [productFilters, setProductFilters] = useState<Product[]>([]); // 검색 결과 (→ ProductFilter에 넘김)
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
-  // 추천 검색어와 급상승 검색어
+  // 추천 검색어 & 급상승 검색어를 위한 state
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
   const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
 
-  const getRandomItems = <T,>(array: T[], count: number): T[] => {
-    const shuffled = [...array].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-  };
-
-  // 자동완성 추천어 API 호출 : getSuggestions
+  // 자동완성
   useEffect(() => {
     const fetchSuggestions = async () => {
       if (searchValue.trim() === "") {
         setSuggestions([]);
         return;
       }
-
       setLoadingSuggestions(true);
       try {
         const suggestionsData = await getSuggestions(searchValue);
-        setSuggestions(suggestionsData); // 추천어 목록 업데이트
+        setSuggestions(suggestionsData);
       } catch (error) {
-        console.error("❌ 자동완성 오류:", error);
+        console.error("자동완성 오류:", error);
       } finally {
         setLoadingSuggestions(false);
       }
     };
 
+    // 디바운싱
     const debounceTimer = setTimeout(() => {
       fetchSuggestions();
     }, 300);
@@ -56,38 +55,42 @@ export default function SearchFeature() {
     return () => clearTimeout(debounceTimer);
   }, [searchValue]);
 
-  // 추천 상품과 급상승 상품을 가져오는 useEffect
+  // 추천 상품 & 급상승 상품 로딩
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const allProducts = await getAllProducts();
-        console.log("📦 전체 상품 데이터:", allProducts);
-
+        // 랜덤 5개, 10개 등 뽑아서 저장
         setRecommendedProducts(getRandomItems(allProducts, 5));
         setTrendingProducts(getRandomItems(allProducts, 10));
       } catch (error) {
-        console.error("❌ 상품 데이터 로드 오류:", error);
+        console.error("상품 데이터 로드 오류:", error);
       }
     };
 
     fetchProducts();
   }, []);
 
-  // 검색: msearchProducts
+  const getRandomItems = <T,>(array: T[], count: number): T[] => {
+    const shuffled = [...array].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
+
+  // 검색 버튼 or 추천어 클릭 시 호출
   const handleSearch = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (searchValue.trim() === "") return;
 
     try {
       const products = await searchProducts(searchValue);
+      console.log("검색 API 응답:", products);
       setProductFilters(products);
-      setShowResults(true);
+      setShowResults(true); // 검색 결과 화면으로 전환
     } catch (error) {
-      console.error("❌ 검색 오류:", error);
+      console.error("검색 오류:", error);
     }
   };
 
-  // 추천어 클릭 이벤트
   const handleKeywordClick = async (keyword: string) => {
     setSearchValue(keyword);
     try {
@@ -95,15 +98,31 @@ export default function SearchFeature() {
       setProductFilters(products);
       setShowResults(true);
     } catch (error) {
-      console.error("❌ 검색 오류:", error);
+      console.error(" 검색 오류:", error);
     }
   };
 
-  // 검색 초기화
+  // 검색어 초기화
   const clearSearch = () => {
     setSearchValue("");
     setSuggestions([]);
     setShowResults(false);
+  };
+
+  // 필터 변경 시
+  const handleFilterChange = async (filterParams: Record<string, any>) => {
+    // keyword도 포함해서 보내야 함
+    const params = {
+      keyword: searchValue, // 현재 검색 키워드
+      ...filterParams, // 체크박스 등에서 넘어온 필드
+    };
+
+    try {
+      const filtered = await fetchFilteredProducts(params);
+      setProductFilters(filtered);
+    } catch (error) {
+      console.error("필터 검색 오류:", error);
+    }
   };
 
   return (
@@ -161,10 +180,24 @@ export default function SearchFeature() {
         </ScrollArea>
       )}
 
-      {/* 검색 결과 */}
-      {showResults && <ProductFilter results={ProductFilters} />}
+      {/* 검색 결과가 있을 때 → 필터 컴포넌트 렌더 */}
+      {showResults && (
+        <>
+          {console.log(
+            "부모가 ProductFilter에 넘겨주는 productFilters:",
+            productFilters
+          )}
 
-      {/* 추천 및 급상승 검색어 */}
+          <ProductFilter
+            // 반드시 넘겨줘야 하는 props
+            results={productFilters}
+            totalItems={productFilters.length}
+            onFilterChange={handleFilterChange}
+          />
+        </>
+      )}
+
+      {/* 검색 전 or 자동완성 이외 상태 - 추천/급상승  */}
       {!showResults && suggestions.length === 0 && (
         <ScrollArea className="flex-grow">
           <div className="p-4">

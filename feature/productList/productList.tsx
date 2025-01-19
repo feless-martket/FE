@@ -15,6 +15,7 @@ import ProductImage from "@/feature/productDetail/ProductImage";
 import { categories } from "@/feature/category/category-list";
 import { categoryMapping } from "@/feature/category/category-mapping";
 import { mainCategoryMapping } from "@/feature/category/category-mapping";
+import { FilterTabs } from "@/feature/search/FilterTabs";
 
 interface Product {
   id: string;
