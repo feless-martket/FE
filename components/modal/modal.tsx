@@ -3,6 +3,13 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
+interface ModalProps {
+  isOpen: boolean; // 모달 열림 상태
+  onClose: () => void; // 모달 닫기 함수
+  message: string; // 모달에 표시할 메시지
+  onConfirm?: () => void; // 확인 버튼 클릭 시 호출되는 함수
+}
+
 /**
  * Modal 컴포넌트
  *
@@ -12,13 +19,13 @@ import { Button } from "@/components/ui/button";
  *
  * returns {JSX.Element} 모달 UI 컴포넌트를 반환
  */
-export function Modal({ isOpen, onClose, message, onConfirm }) {
+export function Modal({ isOpen, onClose, message, onConfirm }: ModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[300px] h-[140px] p-0 rounded-xl shadow-lg">
-        <div className="p-4 flex flex-col justify-between h-full">
+      <DialogContent className="h-[140px] w-[300px] rounded-xl p-0 shadow-lg">
+        <div className="flex h-full flex-col justify-between p-4">
           <p className="text-center text-base	 text-gray-800">{message}</p>
-          <div className="flex justify-center items-center mt-4">
+          <div className="mt-4 flex items-center justify-center">
             <button
               className="w-full text-emerald-500 hover:bg-white hover:text-emerald-600"
               onClick={() => {
