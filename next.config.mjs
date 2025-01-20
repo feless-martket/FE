@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-
-export default nextConfig;
+const nextConfig = {
+    images: {
+      domains: ['marketkurry-bucket.s3.ap-northeast-2.amazonaws.com'],
+    },
+  };
+  
+  export default nextConfig;
+  
+  
