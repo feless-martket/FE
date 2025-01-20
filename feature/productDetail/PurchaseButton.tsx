@@ -16,7 +16,6 @@ export default function PurchaseButton({ cartItemId }: PurchaseButtonProps) {
   const auth = useContext(AuthContext);
   const [isLiked, setIsLiked] = useState<boolean>(false);
 
-  
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8080",
   });
@@ -62,45 +61,46 @@ export default function PurchaseButton({ cartItemId }: PurchaseButtonProps) {
       alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.");
       router.push("/login"); // 로그인 페이지로 이동
       return;
-  }
+    }
 
-  return (
-    <div className="fixed inset-x-0 bottom-10 bg-gray-100 pb-[16px]">
-      <div className="mx-auto w-full max-w-[360px] bg-white flex items-center space-x-2">
-        {/* 좋아요 버튼 (디자인 예시) */}
-        <button className="w-12 h-12 border rounded flex items-center justify-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="green"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364l-7.07 7.07a.75.75 0 01-1.06 0l-7.07-7.07a4.5 4.5 0 010-6.364z"
-            />
-          </svg>
-        </button>
+    return (
+      <div className="fixed inset-x-0 bottom-10 bg-gray-100 pb-[16px]">
+        <div className="mx-auto w-full max-w-[360px] bg-white flex items-center space-x-2">
+          {/* 좋아요 버튼 (디자인 예시) */}
+          <button className="w-12 h-12 border rounded flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="green"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364l-7.07 7.07a.75.75 0 01-1.06 0l-7.07-7.07a4.5 4.5 0 010-6.364z"
+              />
+            </svg>
+          </button>
 
-        {/* 장바구니 담기 & 구매하기 버튼 */}
-        <div className="flex flex-1 space-x-2">
-          <button
-            onClick={handleAddToCartAndNavigate}
-            className="flex-1 bg-gray-500 text-white py-4 rounded"
-          >
-            장바구니 담기
-          </button>
-          <button
-            onClick={handleBuyNow}
-            className="flex-1 bg-green-500 text-white py-4 rounded"
-          >
-            구매하기
-          </button>
+          {/* 장바구니 담기 & 구매하기 버튼 */}
+          <div className="flex flex-1 space-x-2">
+            <button
+              onClick={handleAddToCartAndNavigate}
+              className="flex-1 bg-gray-500 text-white py-4 rounded"
+            >
+              장바구니 담기
+            </button>
+            <button
+              onClick={handleBuyNow}
+              className="flex-1 bg-green-500 text-white py-4 rounded"
+            >
+              구매하기
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 }

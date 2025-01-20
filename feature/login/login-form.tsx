@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { loginApiCall } from "@/feature/login/api/login-api";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, X } from "lucide-react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function LoginForm() {
@@ -53,9 +53,9 @@ export default function LoginForm() {
       <div className={`relative flex h-[64px] items-center justify-center`}>
         <button
           className="absolute left-5 flex h-full items-center justify-center"
-          onClick={() => router.back()}
+          onClick={() => router.push("/landing")}
         >
-          <ChevronLeft size={24} />
+          <X size={24} />
         </button>
 
         <div className="text-center text-lg font-medium">로그인</div>
