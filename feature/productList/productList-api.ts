@@ -2,10 +2,14 @@
 import myApi from "@/lib/axios";
 
 // 상품 목록 조회 API
-export const fetchProducts = async (category: string) => {
+export const fetchProducts = async (
+  subCategory: string,
+  page: number,
+  size: number
+) => {
   try {
     const response = await myApi.get(
-      `/product/category/${encodeURIComponent(category)}`
+      `/product/category/${encodeURIComponent(subCategory)}?page=${page}&size=${size}`
     );
     return response.data;
   } catch (error: any) {
@@ -16,10 +20,14 @@ export const fetchProducts = async (category: string) => {
     throw error;
   }
 };
-export const fetchProductsByMainCategory = async (mainCategory: string) => {
+export const fetchProductsByMainCategory = async (
+  mainCategory: string,
+  page: number,
+  size: number
+) => {
   try {
     const response = await myApi.get(
-      `/product/main-category/${encodeURIComponent(mainCategory)}`
+      `/product/main-category/${encodeURIComponent(mainCategory)}?page=${page}&size=${size}`
     );
     return response.data;
   } catch (error: any) {
