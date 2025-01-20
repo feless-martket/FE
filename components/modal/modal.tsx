@@ -22,10 +22,10 @@ interface ModalProps {
 export function Modal({ isOpen, onClose, message, onConfirm }: ModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[300px] h-[140px] p-0 rounded-xl shadow-lg">
-        <div className="p-4 flex flex-col justify-between h-full">
+      <DialogContent className="h-[140px] w-[300px] rounded-xl p-0 shadow-lg">
+        <div className="flex h-full flex-col justify-between p-4">
           <p className="text-center text-base	 text-gray-800">{message}</p>
-          <div className="flex justify-center items-center mt-4">
+          <div className="mt-4 flex items-center justify-center">
             <button
               className="w-full text-emerald-500 hover:bg-white hover:text-emerald-600"
               onClick={() => {
