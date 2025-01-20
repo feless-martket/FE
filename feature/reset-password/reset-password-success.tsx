@@ -82,7 +82,7 @@ export function ResetPasswordSuccess() {
               onMouseUp={() => setShowNewPassword(false)} // 버튼에서 손 뗄 때 숨기기
               onMouseLeave={() => setShowNewPassword(false)} // 마우스가 버튼 밖으로 나갔을 때 숨기기
             >
-              <Eye className="w-5 h-5 text-gray-500 text-opacity-50" />
+              <Eye className="size-5 text-gray-500 text-opacity-50" />
             </button>
           </div>
         </div>
@@ -106,7 +106,7 @@ export function ResetPasswordSuccess() {
               onMouseUp={() => setShowConfirmPassword(false)} // 버튼에서 손 뗄 때 숨기기
               onMouseLeave={() => setShowConfirmPassword(false)} // 마우스가 버튼 밖으로 나갔을 때 숨기기
             >
-              <Eye className="w-5 h-5 text-gray-500 text-opacity-50" />
+              <Eye className="size-5 text-gray-500 text-opacity-50" />
             </button>
           </div>
         </div>
