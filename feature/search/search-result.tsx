@@ -18,7 +18,7 @@ import { filterMapping } from "@/feature/search/filter-mapping";
 
 // 필터 옵션 상수
 const FILTER_OPTIONS: FilterCategory = {
-  카테고리: [], // 여긴 서버나 고정값으로 채움
+  카테고리: [],
   가격: ["1만원 이하", "1-3만원", "3-5만원", "5만원 이상"],
   할인율: ["20% 이하", "20-50%", "50-80%", "80% 이상"],
   배송: ["새벽배송", "일반배송", "판매자직접배송"],
@@ -36,15 +36,11 @@ interface ProductFilterProps {
  * 키워드로 검색된 결과(props.results)를 기본으로 보여주고,
  * 필터Tabs에서 "적용" 버튼 클릭 시 -> 다중 필터 API 호출
  */
-export function ProductFilter({
-  results,
-  totalItems,
-  onFilterChange,
-}: ProductFilterProps) {
-  // 1) 현재 화면에 표시할 상품들 (검색 결과)
+export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
+  // 현재 화면에 표시할 상품들 (검색 결과)
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(results);
 
-  // 2) 여러 배열 상태: mainCategories, subCategories, deliveries
+  // 여러 배열 상태: mainCategories, subCategories, deliveries
   const [selectedMainCategories, setSelectedMainCategories] = useState<
     string[]
   >([]);
@@ -53,12 +49,44 @@ export function ProductFilter({
   );
   const [selectedDeliveries, setSelectedDeliveries] = useState<string[]>([]);
 
+  // const [selectedPrices, setSelectedPrices] = useState<string[]>([]);
+  // const [selectedDiscounts, setSelectedDiscounts] = useState<string[]>([]);
+
   // (생략) priceMin, priceMax, discount 등도 추가 가능
 
   useEffect(() => {
     // 검색 결과(results)가 바뀌면 화면도 바뀜
     setFilteredProducts(results);
   }, [results]);
+
+  // 체크박스 선택 변경 시 즉시 필터 적용하여 개수 업데이트
+  useEffect(() => {
+    const applyFiltersOnChange = async () => {
+      const params: FilterParams = {
+        mainCategory: selectedMainCategories.map(
+          (cat) => filterMapping[cat]?.value.toString() ?? cat
+        ),
+        subCategory: selectedSubCategories.map(
+          (sub) => filterMapping[sub]?.value.toString() ?? sub
+        ),
+        delivery: selectedDeliveries.map(
+          (del) => filterMapping[del]?.value.toString() ?? del
+        ),
+        // 가격 및 할인율 필터 추가 가능
+      };
+
+      try {
+        const serverData = await fetchFilteredProducts(params);
+        setFilteredProducts(serverData);
+        onFilterChange?.(params);
+      } catch (err) {
+        console.error("필터 검색 오류:", err);
+      }
+    };
+
+    applyFiltersOnChange();
+    // 필터 관련 상태 변화 감지
+  }, [selectedMainCategories, selectedSubCategories, selectedDeliveries]);
 
   /**
    * "필터 적용" 버튼 클릭 시
@@ -77,7 +105,6 @@ export function ProductFilter({
 
     // 2) 최종 FilterParams
     const params: FilterParams = {
-      // keyword는 부모가 주거나, 여기서 별도 입력받을 수도 있음
       mainCategory: selectedMainCategories.map(
         (cat) => filterMapping[cat]?.value.toString() ?? cat
       ),
@@ -87,7 +114,8 @@ export function ProductFilter({
       delivery: selectedDeliveries.map(
         (del) => filterMapping[del]?.value.toString() ?? del
       ),
-      // priceMin, priceMax 등도 필요시 추가
+      // priceRanges: selectedPrices, // 가격 필터
+      // discountRanges: selectedDiscounts, // 할인율 필터
     };
 
     try {
@@ -96,6 +124,32 @@ export function ProductFilter({
       onFilterChange?.(params);
     } catch (err) {
       console.error("필터 검색 오류:", err);
+    }
+  };
+
+  /**
+   * 초기화 버튼 클릭 시
+   */
+  const handleResetFilters = async () => {
+    // 모든 필터 상태 초기화
+    setSelectedMainCategories([]);
+    setSelectedSubCategories([]);
+    setSelectedDeliveries([]);
+    // setSelectedPrices([]);
+    // setSelectedDiscounts([]);
+
+    // 초기화된 필터로 상품 재조회
+    const params: FilterParams = {
+      // keyword가 필요하다면 여기에 추가
+      // keyword: '현재 검색어', // 필요 시 추가
+    };
+
+    try {
+      const serverData = await fetchFilteredProducts(params);
+      setFilteredProducts(serverData);
+      onFilterChange?.(params);
+    } catch (err) {
+      console.error("필터 초기화 검색 오류:", err);
     }
   };
 
@@ -120,7 +174,13 @@ export function ProductFilter({
         setSelectedSubCategories={setSelectedSubCategories}
         selectedDeliveries={selectedDeliveries}
         setSelectedDeliveries={setSelectedDeliveries}
+        // selectedPrices={selectedPrices}
+        // setSelectedPrices={setSelectedPrices}
+        // selectedDiscounts={selectedDiscounts}
+        // setSelectedDiscounts={setSelectedDiscounts}
         onApplyFilters={handleApplyFilters}
+        onResetFilters={handleResetFilters}
+        totalFilteredCount={filteredProducts.length} // 추가: 필터링된 상품 개수 전달s
       />
 
       {/* 상품 리스트 */}

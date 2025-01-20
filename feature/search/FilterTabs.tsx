@@ -9,10 +9,11 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FilterCategory } from "@/feature/search/filter";
+import type { FilterCategory } from "@/feature/search/filter";
 import { categories } from "@/feature/category/category-list";
 import { useState } from "react";
 
@@ -41,18 +42,22 @@ interface FilterTabsProps {
   selectedDeliveries: string[];
   setSelectedDeliveries: (vals: string[]) => void;
 
-  // 추가로 "가격", "할인율" 등을 배열/수치로 관리하려면 여기에 props 추가
-  // selectedPrices: string[]; setSelectedPrices: ...
-  // selectedDiscounts: string[]; setSelectedDiscounts: ...
-  // ...
+  //   // "가격" 체크된 항목들
+  //   selectedPrices: string[];
+  //   setSelectedPrices: (vals: string[]) => void;
+
+  //   // "할인율" 체크된 항목들
+  //   selectedDiscounts: string[];
+  //   setSelectedDiscounts: (vals: string[]) => void;
 
   onApplyFilters: () => void; // "적용" 버튼 클릭 시 호출
+  onResetFilters: () => void; // "초기화" 버튼 클릭 시 호출
+  totalFilteredCount: number; // 필터링된 상품 개수
 }
 
 /**
  * 기존 UI(탭/시트/체크박스 레이아웃)는 변경 없이,
- * 체크박스 클릭 시 'handleCheckMainCategory', 'handleCheckSubCategory', 'handleCheckDelivery' 등으로
- * 배열을 업데이트하는 로직만 보강합니다.
+ * 체크박스 클릭 시 'handleCheckMainCategory', 'handleCheckSubCategory', 'handleCheckDelivery' 등으로 배열 업데이트
  */
 export function FilterTabs({
   filterOptions,
@@ -62,7 +67,13 @@ export function FilterTabs({
   setSelectedSubCategories,
   selectedDeliveries,
   setSelectedDeliveries,
+  //   selectedPrices,
+  //   setSelectedPrices,
+  //   selectedDiscounts,
+  //   setSelectedDiscounts,
   onApplyFilters,
+  onResetFilters,
+  totalFilteredCount,
 }: FilterTabsProps) {
   const [activeTab, setActiveTab] = useState<keyof FilterCategory | "카테고리">(
     "카테고리"
@@ -92,6 +103,35 @@ export function FilterTabs({
       : selectedDeliveries.filter((d) => d !== del);
     setSelectedDeliveries(newArr);
   };
+
+  //   // 가격 체크
+  //   const handleCheckPrice = (price: string, checked: boolean) => {
+  //     const newArr = checked
+  //       ? [...selectedPrices, price]
+  //       : selectedPrices.filter((p) => p !== price);
+  //     setSelectedPrices(newArr);
+  //   };
+
+  //   // 할인율 체크
+  //   const handleCheckDiscount = (discount: string, checked: boolean) => {
+  //     const newArr = checked
+  //       ? [...selectedDiscounts, discount]
+  //       : selectedDiscounts.filter((d) => d !== discount);
+  //     setSelectedDiscounts(newArr);
+  //   };
+  //   const totalSelectedFilters =
+  //     selectedMainCategories.length +
+  //     selectedSubCategories.length +
+  //     selectedDeliveries.length;
+
+  //   // 총 선택된 필터 개수 (카테고리, 서브카테고리, 배송, 가격, 할인율)
+  //   const totalSelectedFilters =
+  //     selectedMainCategories.length +
+  //     selectedSubCategories.length +
+  //     selectedDeliveries.length +
+  //     selectedPrices.length +
+  //     selectedDiscounts.length;
+
   return (
     <div className="border-b">
       <div className="overflow-x-auto whitespace-nowrap pb-1">
@@ -154,24 +194,9 @@ export function FilterTabs({
                             <div key={cat.id} className="border-b pb-2">
                               {/* 메인 카테고리 라벨 + 펼침/접힘 아이콘 */}
                               <div className="flex items-center justify-between">
-                                <label className="flex cursor-pointer items-center gap-3">
-                                  <Checkbox
-                                    // (1) 메인카테고리 체크 여부
-                                    checked={selectedMainCategories.includes(
-                                      cat.name
-                                    )}
-                                    onCheckedChange={(checked) =>
-                                      handleCheckMainCat(
-                                        cat.name,
-                                        Boolean(checked)
-                                      )
-                                    }
-                                  />
-                                  <span className="flex-1 text-sm">
-                                    {cat.name}
-                                  </span>
-                                </label>
-
+                                <span className="flex-1 text-sm">
+                                  {cat.name}
+                                </span>
                                 {/* 펼침/접힘 토글 버튼 */}
                                 {cat.subCategories &&
                                   cat.subCategories.length > 0 && (
@@ -200,17 +225,64 @@ export function FilterTabs({
                                       className="flex cursor-pointer items-center gap-3"
                                     >
                                       <Checkbox
-                                        // (2) 서브카테고리 체크 여부
                                         checked={selectedSubCategories.includes(
                                           sub
                                         )}
-                                        onCheckedChange={(checked) =>
-                                          handleCheckSubCat(
-                                            sub,
-                                            Boolean(checked)
-                                          )
-                                        }
+                                        onCheckedChange={(checked) => {
+                                          if (sub === "전체보기") {
+                                            if (checked) {
+                                              // "전체보기" 선택 시 해당 메인카테고리의 모든 서브카테고리 선택
+                                              const newSubs = Array.from(
+                                                new Set([
+                                                  ...selectedSubCategories,
+                                                  ...cat.subCategories,
+                                                ])
+                                              );
+                                              setSelectedSubCategories(newSubs);
+                                            } else {
+                                              // "전체보기" 선택 해제 시 해당 메인카테고리의 모든 서브카테고리 제거
+                                              const newSubs =
+                                                selectedSubCategories.filter(
+                                                  (s) =>
+                                                    !cat.subCategories.includes(
+                                                      s
+                                                    )
+                                                );
+                                              setSelectedSubCategories(newSubs);
+                                            }
+                                          } else {
+                                            // "전체보기" 체크박스 해제 및 현재 서브카테고리 상태 업데이트 통합
+                                            setSelectedSubCategories(
+                                              (prevSubs) => {
+                                                let newSubs = [...prevSubs]; // 이전 상태 복사
+
+                                                // 현재 체크 해제 시 "전체보기" 포함 여부 확인 후 해제
+                                                if (
+                                                  !checked &&
+                                                  newSubs.includes("전체보기")
+                                                ) {
+                                                  newSubs = newSubs.filter(
+                                                    (s) => s !== "전체보기"
+                                                  );
+                                                }
+
+                                                // 현재 서브카테고리 업데이트
+                                                if (checked) {
+                                                  if (!newSubs.includes(sub)) {
+                                                    newSubs.push(sub);
+                                                  }
+                                                } else {
+                                                  newSubs = newSubs.filter(
+                                                    (s) => s !== sub
+                                                  );
+                                                }
+                                                return newSubs;
+                                              }
+                                            );
+                                          }
+                                        }}
                                       />
+
                                       <span className="flex-1 text-sm">
                                         {sub}
                                       </span>
@@ -223,9 +295,7 @@ export function FilterTabs({
                         </div>
                       </TabsContent>
 
-                      {/* ======================
-                          2) 가격 탭
-                         ====================== */}
+                      {/* 가격 탭 */}
                       <TabsContent value="가격" className="m-0 py-4">
                         <div className="space-y-4">
                           {filterOptions.가격?.map((item) => (
@@ -233,11 +303,12 @@ export function FilterTabs({
                               key={item}
                               className="flex cursor-pointer items-center gap-3"
                             >
-                              {/* 
-                                가격도 배열로 관리하거나,
-                                혹은 단일값으로 처리 가능.
-                                여기서는 단순 'item' 문자열 체크라 가정. 
-                              */}
+                              {/* <Checkbox
+                                checked={selectedPrices.includes(item)}
+                                onCheckedChange={(checked) =>
+                                  handleCheckPrice(item, Boolean(checked))
+                                }
+                              /> */}
                               <Checkbox
                                 checked={false /* TODO: handleCheckPrice */}
                                 onCheckedChange={(checked) => {
@@ -252,9 +323,7 @@ export function FilterTabs({
                         </div>
                       </TabsContent>
 
-                      {/* ======================
-                          3) 할인율 탭
-                         ====================== */}
+                      {/* 할인율 탭 */}
                       <TabsContent value="할인율" className="m-0 py-4">
                         <div className="space-y-4">
                           {filterOptions.할인율?.map((item) => (
@@ -262,7 +331,12 @@ export function FilterTabs({
                               key={item}
                               className="flex cursor-pointer items-center gap-3"
                             >
-                              {/* 비슷하게 배열로 관리 가능 */}
+                              {/* <Checkbox
+                                checked={selectedDiscounts.includes(item)}
+                                onCheckedChange={(checked) =>
+                                  handleCheckDiscount(item, Boolean(checked))
+                                }
+                              /> */}
                               <Checkbox
                                 checked={false /* TODO: handleCheckDiscount */}
                                 onCheckedChange={(checked) => {
@@ -299,15 +373,27 @@ export function FilterTabs({
                       </TabsContent>
                     </ScrollArea>
 
-                    {/* 하단 "적용" 버튼 */}
-                    <div className="border-t p-4 sticky bottom-0 bg-white">
+                    {/* 하단 "초기화" 및 "적용" 버튼 */}
+                    <div className="border-t p-4 sticky bottom-0 bg-white flex gap-2">
                       <Button
-                        className="w-full"
+                        variant="outline"
+                        className="flex-1"
                         size="lg"
-                        onClick={onApplyFilters}
+                        onClick={() => {
+                          onResetFilters();
+                        }}
                       >
-                        필터 적용
+                        초기화
                       </Button>
+                      <SheetClose asChild>
+                        <Button
+                          className="flex-1 whitespace-nowrap"
+                          size="lg"
+                          onClick={onApplyFilters}
+                        >
+                          {`${totalFilteredCount}개의 상품 보기`}
+                        </Button>
+                      </SheetClose>
                     </div>
                   </Tabs>
                 </div>

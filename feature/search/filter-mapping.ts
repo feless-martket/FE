@@ -22,3 +22,16 @@ export const filterMapping: Record<
   새벽배송: { param: "delivery", value: "EARLY_DELIVERY" },
   판매자직접배송: { param: "delivery", value: "SELLER_DELIVERY" },
 };
+
+//   // 가격 매핑 (필요 시 추가)
+//   "1만원 이하": { param: "priceRanges", value: "1만원 이하" },
+//   "1-3만원": { param: "priceRanges", value: "1-3만원" },
+//   "3-5만원": { param: "priceRanges", value: "3-5만원" },
+//   "5만원 이상": { param: "priceRanges", value: "5만원 이상" },
+
+//   // 할인율 매핑 (필요 시 추가)
+//   "20% 이하": { param: "discountRanges", value: "20% 이하" },
+//   "20-50%": { param: "discountRanges", value: "20-50%" },
+//   "50-80%": { param: "discountRanges", value: "50-80%" },
+//   "80% 이상": { param: "discountRanges", value: "80% 이상" },
+// };

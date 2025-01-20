@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-// ✅ 검색 결과를 필터링하는 컴포넌트
+// 검색 결과를 필터링하는 컴포넌트
 import { ProductFilter } from "@/feature/search/search-result";
 
 import {
