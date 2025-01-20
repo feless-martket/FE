@@ -4,14 +4,13 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ChevronDown, ShoppingBag } from "lucide-react";
-
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   fetchProducts,
   fetchProductsByMainCategory,
 } from "@/feature/productList/productList-api";
-import ProductImage from "@/feature/productDetail/ProductImage";
 import { categories } from "@/feature/category/category-list";
 import { categoryMapping } from "@/feature/category/category-mapping";
 import { mainCategoryMapping } from "@/feature/category/category-mapping";
@@ -20,7 +19,7 @@ interface Product {
   id: string;
   name: string;
   price: number; // 정가
-  image: string;
+  imageUrl: string[];
   delivery: string;
   category: string;
 }
@@ -29,6 +28,12 @@ export default function ProductList() {
   const searchParams = useSearchParams();
   const mainParam = searchParams.get("main"); // 메인카테고리 파라미터
   const paramCategory = searchParams.get("category"); // 서브카테고리 파라미터
+  const [currentPage, setCurrentPage] = useState(0); // 페이지 상태 추가
+  const pageSize = 6; // 페이지당 항목 수
+  const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // mainParam에 따른 서브카테고리 목록
   const currentCategory = categories.find(
@@ -44,10 +49,6 @@ export default function ProductList() {
     return "전체보기";
   });
 
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   // URL 파라미터 변경 시 selectedTab 업데이트
   useEffect(() => {
     if (paramCategory && subcategories.includes(paramCategory)) {
@@ -55,23 +56,27 @@ export default function ProductList() {
     }
   }, [paramCategory, subcategories]);
 
-  // 선택된 탭이 변경될 때마다 상품 목록 불러오기
+  // 상품 목록 불러오기
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
       setError(null);
       try {
         let data;
+        let totalCount;
         if (selectedTab === "전체보기" && mainParam) {
-          // "전체보기"일 경우 메인카테고리에 따른 상품 불러오기
           const mainCategoryCode = mainCategoryMapping[mainParam] || mainParam;
-          data = await fetchProductsByMainCategory(mainCategoryCode);
+          const response = await fetchProductsByMainCategory(mainCategoryCode, currentPage, pageSize);
+          data = response.content; // 상품 데이터
+          totalCount = response.totalElements; // 총 상품 개수
         } else {
-          // 일반 서브카테고리일 경우 영문 코드 변환 후 상품 불러오기
           const apiCategory = categoryMapping[selectedTab] || selectedTab;
-          data = await fetchProducts(apiCategory);
+          const response = await fetchProducts(apiCategory, currentPage, pageSize);
+          data = response.content;
+          totalCount = response.totalElements;
         }
         setProducts(data);
+        setTotalPages(Math.ceil(totalCount / pageSize)); // 전체 페이지 수 계산
       } catch (err: any) {
         setError("상품을 불러오는 데 실패했습니다.");
       } finally {
@@ -79,7 +84,14 @@ export default function ProductList() {
       }
     };
     loadProducts();
-  }, [selectedTab, mainParam]);
+  }, [selectedTab, currentPage]);
+
+  // 페이지 버튼 클릭 시 페이지 변경 함수
+  const handlePageChange = (page: number) => {
+    if (page >= 0 && page < totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div className="flex flex-col">
@@ -100,26 +112,13 @@ export default function ProductList() {
         ))}
       </div>
 
-      {/* Promotion Banner */}
-      <div className="relative mb-4 h-[120px] bg-gray-100">
-        <div className="p-4">
-          <h2 className="text-xl font-medium">
-            농식품부와 함께하는
-            <br />
-            20% 쿠폰 할인행사
-          </h2>
-          <p className="mt-1 text-sm text-gray-500">~6월 14일(수) 24시</p>
-        </div>
-        <Badge className="absolute right-4 top-4 bg-purple-500">COUPON</Badge>
-      </div>
-
       {/* Loading & Error State */}
       {loading && (
         <div className="text-center text-gray-500">상품을 불러오는 중...</div>
       )}
       {error && <div className="text-center text-red-500">{error}</div>}
 
-      {/* Product Count and Filters */}
+  {/* Product Count and Filters */}
       <div className="mb-4 flex items-center justify-between px-4">
         <span className="text-sm text-gray-600">총 {products.length}개</span>
         <div className="flex gap-2">
@@ -141,7 +140,13 @@ export default function ProductList() {
             className="block"
           >
             <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
-              <ProductImage imageUrl={product.image || "/img/baseball2.jpg"} />
+              <Image
+                src={product.imageUrl[0] || "/placeholder.svg"}
+                alt={product.name}
+                width={500}
+                height={500}
+                className="rounded-lg object-cover"
+              />
               <Button
                 size="icon"
                 variant="secondary"
@@ -168,6 +173,31 @@ export default function ProductList() {
           </Link>
         ))}
       </div>
+
+      {/* Pagination */}
+    {/* Pagination */}
+<div className="mt-4 flex justify-center gap-4 items-center">
+  <Button
+    onClick={() => handlePageChange(currentPage - 1)}
+    disabled={currentPage === 0}
+    variant="outline"
+    size="sm"
+  >
+    이전
+  </Button>
+  <span className="text-sm text-gray-600">
+    <span className="font-bold text-black">{currentPage + 1}</span> / {totalPages}
+  </span>
+  <Button
+    onClick={() => handlePageChange(currentPage + 1)}
+    disabled={currentPage === totalPages - 1}
+    variant="outline"
+    size="sm"
+  >
+    다음
+  </Button>
+</div>
+
     </div>
   );
 }
