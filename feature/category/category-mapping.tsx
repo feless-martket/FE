@@ -12,5 +12,4 @@ export const mainCategoryMapping: Record<string, string> = {
   채소: "VEGETABLE",
   "과일·견과·쌀": "FRUIT",
   "수산·해산·건어물": "SEAFOOD",
-  // 필요 시 다른 메인카테고리들도 추가
 };

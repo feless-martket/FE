@@ -52,8 +52,6 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
   // const [selectedPrices, setSelectedPrices] = useState<string[]>([]);
   // const [selectedDiscounts, setSelectedDiscounts] = useState<string[]>([]);
 
-  // (생략) priceMin, priceMax, discount 등도 추가 가능
-
   useEffect(() => {
     // 검색 결과(results)가 바뀌면 화면도 바뀜
     setFilteredProducts(results);
@@ -89,21 +87,12 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
   }, [selectedMainCategories, selectedSubCategories, selectedDeliveries]);
 
   /**
-   * "필터 적용" 버튼 클릭 시
+   * 버튼 클릭 시
    */
   const handleApplyFilters = async () => {
     console.log("필터 적용합니다.");
 
-    // 1) filterMapping은 "한글 -> {param, value}" 구조.
-    //   하지만 우리는 이미 mainCategories, subCategories 등 배열로 관리 중이므로,
-    //   굳이 filterMapping 없이 => "백엔드가 인식하는 값"을 이미 setState 했다고 가정해도 됩니다.
-    //   *단, UI에서 "채소" 라고 들어온다면, handleCheckMainCat()에서 곧바로 "VEGETABLE"로 바꿔야 함.
-
-    // 여기서는 "그대로" 문자열 저장이라면,
-    // "채소" -> "VEGETABLE" 변환을 handleCheckMainCat에서 해주면 되겠죠.
-    // (아래는 예시로 'selectedMainCategories'가 이미 "VEGETABLE" 같은 영문이 들어있다고 가정)
-
-    // 2) 최종 FilterParams
+    // 최종 FilterParams
     const params: FilterParams = {
       mainCategory: selectedMainCategories.map(
         (cat) => filterMapping[cat]?.value.toString() ?? cat

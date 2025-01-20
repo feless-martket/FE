@@ -25,7 +25,7 @@ import { useState } from "react";
  *  - 그 외 가격, 할인율 등
  *
  * 필터 UI는 "카테고리/가격/할인율/배송" 4개 탭으로 구성.
- * 필요한 props로 위 배열들을 주고받는다.
+ * 필요한 props로 위 배열들을 주고받음.
  */
 interface FilterTabsProps {
   filterOptions: FilterCategory; // { 카테고리, 가격, 할인율, 배송 등 }
@@ -349,9 +349,7 @@ export function FilterTabs({
                         </div>
                       </TabsContent>
 
-                      {/* ======================
-                          4) 배송 탭
-                         ====================== */}
+                      {/* 배송 탭 */}
                       <TabsContent value="배송" className="m-0 py-4">
                         <div className="space-y-4">
                           {filterOptions.배송?.map((item) => (
@@ -360,7 +358,7 @@ export function FilterTabs({
                               className="flex cursor-pointer items-center gap-3"
                             >
                               <Checkbox
-                                // (3) 배송배열 체크
+                                // 배송배열 체크
                                 checked={selectedDeliveries.includes(item)}
                                 onCheckedChange={(checked) =>
                                   handleCheckDelivery(item, Boolean(checked))
