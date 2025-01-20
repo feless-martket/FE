@@ -14,6 +14,15 @@ export default function LoginForm() {
   const router = useRouter();
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
+  const goToLanding = () => {
+    router.push("/landing");
+  };
+  const closeButton = (
+    <X
+      className="absolute left-0 top-1 flex size-6 items-center justify-center"
+      onClick={goToLanding}
+    />
+  );
 
   /**
    * "로그인" 버튼 클릭 시 실행
@@ -73,7 +82,7 @@ export default function LoginForm() {
             onChange={(e) => setId(e.target.value)}
             className={cn(
               `w-full rounded-md h-[46px] text-sm tracking-tighter`,
-              `placeholder:text-[#CCCCCC]`,
+              `placeholder:text-[#CCCCCC]`
             )}
           />
           {/* Password Input */}
@@ -84,7 +93,7 @@ export default function LoginForm() {
             onChange={(e) => setPassword(e.target.value)}
             className={cn(
               `w-full rounded-md h-[46px] text-sm`,
-              `placeholder:text-[#CCCCCC]`,
+              `placeholder:text-[#CCCCCC]`
             )}
           />
 
@@ -115,7 +124,7 @@ export default function LoginForm() {
             아이디 찾기
           </Link>
           <div className="text-gray-300">|</div>
-          <Link href="/find-password" className="hover:underline">
+          <Link href="/reset-password" className="hover:underline">
             비밀번호 찾기
           </Link>
         </div>
