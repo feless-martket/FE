@@ -73,11 +73,8 @@ export function FindIdForm() {
     } catch (error: any) {
       console.error(error);
       // 기본 오류 메세지
-      let errMsg = "인증번호 발송 중 오류가 발생했습니다";
-      // 서버에서 보내준 메세지
-      if (error.response?.data) {
-        errMsg = error.response.data;
-      }
+      const errMsg =
+        error.response?.data || "인증번호 발송 중 오류가 발생했습니다";
       setModalMessage(errMsg);
       setShowModal(true);
     } finally {
@@ -94,22 +91,24 @@ export function FindIdForm() {
     }
 
     try {
-      let response;
       if (verificationType === "email") {
-        // 이메일 인증번호 검증 API
-        response = await findIdApi.verifyEmailCode(
+        // 이메일 인증번호 검증 API 호출 및 결과 처리
+        const response = await findIdApi.verifyEmailCode(
           name,
           contact,
           verificationCode
         );
-      } else {
-        // 휴대폰 인증 (미구현)
-      }
 
-      // 백엔드가 반환한 아이디
-      const username = response?.data;
-      // 인증 성공 시, /find-id/success?username===xxx 페이지로 이동
-      router.push(`/find-id/success?username=${encodeURIComponent(username)}`);
+        // 백엔드가 반환한 아이디
+        const username = response.data;
+        // 인증 성공 시, /find-id/success?username=xxx 페이지로 이동
+        router.push(
+          `/find-id/success?username=${encodeURIComponent(username)}`
+        );
+      } else {
+        // 휴대폰 인증 (미구현): 향후 구현 시 else 블록 내에서 처리
+        // 필요한 경우 여기에 로직 추가
+      }
     } catch (error: any) {
       console.error(error);
       const errMsg =
