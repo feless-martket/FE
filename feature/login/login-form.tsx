@@ -4,25 +4,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { Header } from "@/components/layout/header";
 import { loginApiCall } from "@/feature/login/api/login-api";
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
+import { ChevronLeft, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function LoginForm() {
   const router = useRouter();
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
-  const goToLanding = () => {
-    router.push("/landing");
-  };
-  const closeButton = (
-    <X
-      className="absolute left-0 top-1 flex size-6 items-center justify-center"
-      onClick={goToLanding}
-    />
-  );
 
   /**
    * "로그인" 버튼 클릭 시 실행
@@ -65,7 +55,7 @@ export default function LoginForm() {
           className="absolute left-5 flex h-full items-center justify-center"
           onClick={() => router.back()}
         >
-          <X size={24} />
+          <ChevronLeft size={24} />
         </button>
 
         <div className="text-center text-lg font-medium">로그인</div>

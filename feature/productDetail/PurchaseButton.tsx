@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useContext, useState } from "react";
+import { AuthContext } from "@/context/AuthContext";
 
 // cartItemId를 prop으로 받아온다고 가정
 // 상품 상세 페이지에서 <PurchaseButton cartItemId={원하는아이디}/> 형태로 사용
@@ -11,6 +13,10 @@ interface PurchaseButtonProps {
 
 export default function PurchaseButton({ cartItemId }: PurchaseButtonProps) {
   const router = useRouter();
+  const auth = useContext(AuthContext);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+
+  
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8080",
   });
@@ -49,6 +55,14 @@ export default function PurchaseButton({ cartItemId }: PurchaseButtonProps) {
     alert("구매하기 로직을 구현하세요!");
     // 예) 바로 결제 페이지로 이동하는 등
   };
+
+  const handleLike = async () => {
+    // 로그인이 되어있지 않은 경우
+    if (!auth?.isLoggedIn) {
+      alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.");
+      router.push("/login"); // 로그인 페이지로 이동
+      return;
+  }
 
   return (
     <div className="fixed inset-x-0 bottom-10 bg-gray-100 pb-[16px]">
