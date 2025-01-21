@@ -13,9 +13,20 @@ import Test1 from "/public/img/test1.jpeg";
 type Product = {
   id: number;
   name: string;
-  imageUrl: string;
+  imageUrl: string[];
   description: string;
+  price : number;
+  discount :number;
 };
+
+const Price = (price: number): string => {
+  return new Intl.NumberFormat().format(price); 
+};
+
+  const calculateFinalPrice = (price: number, discount:number) => {
+    const finalPrice = price - (price * (discount / 100));
+    return new Intl.NumberFormat().format(finalPrice); // 천 단위로 콤마 추가
+  };
 
 export default function CarouselImages() {
   const router = useRouter();
@@ -24,7 +35,7 @@ export default function CarouselImages() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await myApi("/product");
+        const response = await myApi("/product/discount/FINAL_SALE");
         if (!response.status) {
           throw new Error("Failed to fetch products");
         }
@@ -40,34 +51,47 @@ export default function CarouselImages() {
   const goToDetailPage = (id: number) => {
     router.push(`/productDetail/${id}`);
   };
-
   return (
-    <Carousel>
-      <CarouselContent className="h-[271px] gap-2">
-        {products.map((product) => (
-          <CarouselItem
-            key={product.id}
-            className="ml-2 basis-1/3 cursor-pointer"
-            onClick={() => goToDetailPage(product.id)}
-          >
-            {/* TODO: 비율에 맞는 사진을 찾아서 넣어주세요 */}
-            <Image
-              className="h-44 w-[126px]"
-              src={Test1}
-              alt={product.name}
-              style={{
-                objectFit: "cover",
-              }}
-              width={126}
-              height={176}
-            />
-            <ul>
-              <li className="text-[13px] font-medium">{product.name}</li>
-              <li className="text-xs text-[#a6a6a6]">{product.description}</li>
-            </ul>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-    </Carousel>
+ <Carousel>
+  <CarouselContent className="h-[271px] gap-2">
+    {products.map((product) => (
+      <CarouselItem
+        key={product.id}
+        className="ml-2 basis-1/3 cursor-pointer"
+        onClick={() => goToDetailPage(product.id)}
+      >
+        {/* 상품 이미지 */}
+        <Image
+          className="h-44 w-[126px]"
+          src={product.imageUrl[0]}
+          alt={product.name}
+          style={{
+            objectFit: "cover",
+          }}
+          width={126}
+          height={176}
+        />
+  
+        {/* 상품 이름 */}
+        <span className="text-[15px] font-medium block w-[120px] overflow-hidden whitespace-nowrap text-ellipsis mb-2">
+          {product.name}
+        </span>
+
+        {/* 가격 및 할인 정보 */}
+        <div>
+          <ul>
+            <li className="text-xs flex items-center">
+              <span className="text-red-500 text-sm font-bold mr-2">{product.discount}%</span>
+              <span className="text-sm font-bold">{calculateFinalPrice(product.price, product.discount)}원</span>
+            </li>
+            <li>
+              <span className="mr-2 text-sm font-bold text-gray-500 line-through">{Price(product.price)}원</span>
+            </li>
+          </ul>
+        </div>
+      </CarouselItem>
+    ))}
+  </CarouselContent>
+</Carousel>
   );
 }
