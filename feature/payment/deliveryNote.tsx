@@ -1,14 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function DeliveryNotes() {
+interface DeliveryNotesProps {
+  deliveryNote: string;
+  onSave: (note: string) => void;
+}
+
+export function DeliveryNotes({ deliveryNote, onSave }: DeliveryNotesProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [notes, setNotes] = useState("");
-  const [savedNotes, setSavedNotes] = useState("");
+
+  useEffect(() => {
+    setNotes(deliveryNote);
+  }, [deliveryNote]);
 
   if (!isEditing) {
     return (
@@ -17,7 +25,7 @@ export function DeliveryNotes() {
         className="text-muted-foreground w-full justify-between"
         onClick={() => setIsEditing(true)}
       >
-        {savedNotes || "배송 요청사항을 입력해주세요"}
+        {notes || "배송 요청사항을 입력해주세요"}
         <ChevronRight className="size-4" />
       </Button>
     );
@@ -34,7 +42,7 @@ export function DeliveryNotes() {
         variant="outline"
         size="sm"
         onClick={() => {
-          setSavedNotes(notes);
+          onSave(notes);
           setIsEditing(false);
         }}
       >
