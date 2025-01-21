@@ -92,7 +92,6 @@ export const fetchProductsByMainCategory = async (
 /**
  * (필터 적용) 키워드 + 여러 카테고리 등을 GET 쿼리 파라미터로 전송
  * /search/results/filter 엔드포인트
- * 백엔드의 SearchResponseDto[]를 받아 Product[]로 매핑
  */
 export async function fetchFilteredProducts(
   params: FilterParams
@@ -104,7 +103,7 @@ export async function fetchFilteredProducts(
         qs.stringify(params, { arrayFormat: "repeat" }),
     });
 
-    console.log("Fetched Products:", response.data);
+    console.log("Raw DTO response:", JSON.stringify(response.data, null, 2));
     return response.data; // Product 배열 그대로 반환
   } catch (error: any) {
     console.error(

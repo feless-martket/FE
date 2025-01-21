@@ -184,7 +184,7 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
               >
                 <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
                   <Image
-                    src={product.imageUrls[0] || "/placeholder.svg"}
+                    src={product.imageUrl[0] || "/placeholder.svg"}
                     alt={product.name}
                     width={500}
                     height={500}
