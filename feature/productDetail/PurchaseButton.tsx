@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useContext, useState } from "react";
 import { AuthContext } from "@/context/AuthContext";
+import { Heart } from "lucide-react";
 
 // cartItemId를 prop으로 받아온다고 가정
 // 상품 상세 페이지에서 <PurchaseButton cartItemId={원하는아이디}/> 형태로 사용
@@ -63,44 +64,42 @@ export default function PurchaseButton({ cartItemId }: PurchaseButtonProps) {
       return;
     }
 
-    return (
-      <div className="fixed inset-x-0 bottom-10 bg-gray-100 pb-[16px]">
-        <div className="mx-auto w-full max-w-[360px] bg-white flex items-center space-x-2">
-          {/* 좋아요 버튼 (디자인 예시) */}
-          <button className="w-12 h-12 border rounded flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="green"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364l-7.07 7.07a.75.75 0 01-1.06 0l-7.07-7.07a4.5 4.5 0 010-6.364z"
-              />
-            </svg>
-          </button>
+    // 로그인 상태라면 좋아요 상태 토글
+    const nextLikedState = !isLiked;
+    setIsLiked(nextLikedState);
+  };
 
-          {/* 장바구니 담기 & 구매하기 버튼 */}
-          <div className="flex flex-1 space-x-2">
-            <button
-              onClick={handleAddToCartAndNavigate}
-              className="flex-1 bg-gray-500 text-white py-4 rounded"
-            >
-              장바구니 담기
-            </button>
-            <button
-              onClick={handleBuyNow}
-              className="flex-1 bg-green-500 text-white py-4 rounded"
-            >
-              구매하기
-            </button>
-          </div>
+  return (
+    <div className="fixed inset-x-0 bottom-10 bg-gray-100 pb-[16px]">
+      <div className="mx-auto flex w-full max-w-[360px] items-center space-x-2 bg-white">
+        {/* 좋아요 버튼 (디자인 예시) */}
+        <button
+          onClick={handleLike}
+          className="flex size-12 items-center justify-center rounded border"
+        >
+          <Heart
+            className="size-6"
+            fill={isLiked ? "green" : "none"}
+            stroke="green"
+          />
+        </button>
+
+        {/* 장바구니 담기 & 구매하기 버튼 */}
+        <div className="flex flex-1 space-x-2">
+          <button
+            onClick={handleAddToCartAndNavigate}
+            className="flex-1 rounded bg-gray-500 py-4 text-white"
+          >
+            장바구니 담기
+          </button>
+          <button
+            onClick={handleBuyNow}
+            className="flex-1 rounded bg-green-500 py-4 text-white"
+          >
+            구매하기
+          </button>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
 }
