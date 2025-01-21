@@ -142,6 +142,12 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
     }
   };
 
+  const deliveryMapping: { [key: string]: string } = {
+    GENERAL_DELIVERY: "일반배송",
+    EARLY_DELIVERY: "새벽배송",
+    SELLER_DELIVERY: "판매자직접배송",
+  };
+
   return (
     <div className="flex flex-col">
       {/* 상단 영역 */}
@@ -178,43 +184,38 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
           <div className="grid grid-cols-2 gap-4 p-4">
             {filteredProducts.map((product) => (
               <Link key={product.id} href={`/productDetail/${product.id}`}>
-                <div className="space-y-2">
-                  <div className="relative aspect-square">
-                    <Image
-                      src={product.imgurl || "/placeholder.svg"}
-                      alt={product.name}
-                      fill
-                      className="rounded-lg object-cover"
-                    />
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      className="absolute bottom-2 right-2 size-8"
-                    >
-                      <ShoppingCart className="size-4" />
-                    </Button>
+                <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
+                  <Image
+                    src={product.imageUrl || "/placeholder.svg"}
+                    alt={product.name}
+                    width={500}
+                    height={500}
+                    className="rounded-lg object-cover"
+                  />
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    className="absolute bottom-2 right-2 z-10 rounded-full bg-gray-200 p-1"
+                  >
+                    <ShoppingCart className="size-5 text-gray-600" />
+                  </Button>
+                  <p className="mb-1 text-xs text-gray-500">
+                    {deliveryMapping[product.delivery] || product.delivery}
+                  </p>
+                  <h3 className="mb-1 line-clamp-1 text-sm font-medium text-gray-800">
+                    {product.name}
+                  </h3>
+                  <div className="mb-1 flex items-center">
+                    <span className="mr-1 text-base font-bold text-rose-500">
+                      35%
+                    </span>
+                    <span className="text-base font-bold">
+                      {(product.price * 0.65).toLocaleString()}원
+                    </span>
                   </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1">
-                      <Badge
-                        variant="secondary"
-                        className="bg-emerald-100 text-emerald-700"
-                      >
-                        +10% 쿠폰
-                      </Badge>
-                    </div>
-                    <h3 className="line-clamp-2 text-sm font-medium">
-                      {product.name}
-                    </h3>
-                    <div className="flex items-baseline gap-1">
-                      <span className="font-medium text-red-500">
-                        {product.discount ? `${product.discount}%` : `0%`}
-                      </span>
-                      <span className="font-bold">
-                        {product.price.toLocaleString()}원
-                      </span>
-                    </div>
-                  </div>
+                  <p className="text-xs text-gray-400 line-through">
+                    {product.price.toLocaleString()}원
+                  </p>
                 </div>
               </Link>
             ))}
