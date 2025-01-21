@@ -1,5 +1,5 @@
 import CarouselImages from "@/feature/landing/carouselImages";
-import { ProductCard } from "@/feature/landing/productCard";
+import  ProductCard  from "@/feature/landing/productCard";
 import SaleSection from "@/feature/landing/saleSection";
 import HeroSlider from "@/feature/landing/slider";
 import WeekendSaleSection from "@/feature/landing/weekendSaleSection";
@@ -22,11 +22,9 @@ export default function RecommendedSection() {
         <WeekendSaleSection />
 
         {/* 상품 리스트 렌더링 */}
-        <div className="flex flex-col gap-4">
-          {products.map((product, index) => (
-            <ProductCard key={index} {...product} />
-          ))}
-        </div>
+       
+         <ProductCard></ProductCard>
+       
       </div>
     </div>
   );
