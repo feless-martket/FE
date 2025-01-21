@@ -14,9 +14,9 @@ import {
   searchProducts,
   getSuggestions,
   getAllProducts,
-  Product,
   fetchFilteredProducts,
 } from "./search-api";
+import { Product } from "@/feature/search/filter";
 
 export default function SearchFeature() {
   const [searchValue, setSearchValue] = useState(""); // 검색어

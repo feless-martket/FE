@@ -6,7 +6,6 @@ import Link from "next/link";
 import { ChevronDown, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   fetchProducts,
   fetchProductsByMainCategory,
@@ -65,12 +64,20 @@ export default function ProductList() {
         let totalCount;
         if (selectedTab === "전체보기" && mainParam) {
           const mainCategoryCode = mainCategoryMapping[mainParam] || mainParam;
-          const response = await fetchProductsByMainCategory(mainCategoryCode, currentPage, pageSize);
+          const response = await fetchProductsByMainCategory(
+            mainCategoryCode,
+            currentPage,
+            pageSize
+          );
           data = response.content; // 상품 데이터
           totalCount = response.totalElements; // 총 상품 개수
         } else {
           const apiCategory = categoryMapping[selectedTab] || selectedTab;
-          const response = await fetchProducts(apiCategory, currentPage, pageSize);
+          const response = await fetchProducts(
+            apiCategory,
+            currentPage,
+            pageSize
+          );
           data = response.content;
           totalCount = response.totalElements;
         }
@@ -117,7 +124,7 @@ export default function ProductList() {
       )}
       {error && <div className="text-center text-red-500">{error}</div>}
 
-  {/* Product Count and Filters */}
+      {/* Product Count and Filters */}
       <div className="mb-4 flex items-center justify-between px-4">
         <span className="text-sm text-gray-600">총 {products.length}개</span>
         <div className="flex gap-2">
@@ -174,29 +181,29 @@ export default function ProductList() {
       </div>
 
       {/* Pagination */}
-    {/* Pagination */}
-<div className="mt-4 flex justify-center gap-4 items-center">
-  <Button
-    onClick={() => handlePageChange(currentPage - 1)}
-    disabled={currentPage === 0}
-    variant="outline"
-    size="sm"
-  >
-    이전
-  </Button>
-  <span className="text-sm text-gray-600">
-    <span className="font-bold text-black">{currentPage + 1}</span> / {totalPages}
-  </span>
-  <Button
-    onClick={() => handlePageChange(currentPage + 1)}
-    disabled={currentPage === totalPages - 1}
-    variant="outline"
-    size="sm"
-  >
-    다음
-  </Button>
-</div>
-
+      {/* Pagination */}
+      <div className="mt-4 flex justify-center gap-4 items-center">
+        <Button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 0}
+          variant="outline"
+          size="sm"
+        >
+          이전
+        </Button>
+        <span className="text-sm text-gray-600">
+          <span className="font-bold text-black">{currentPage + 1}</span> /{" "}
+          {totalPages}
+        </span>
+        <Button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages - 1}
+          variant="outline"
+          size="sm"
+        >
+          다음
+        </Button>
+      </div>
     </div>
   );
 }

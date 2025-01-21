@@ -1,18 +1,16 @@
-//  npm install qs
+// npm install qs
 import myApi from "@/lib/axios";
 import qs from "qs";
+import { Product } from "@/feature/search/filter";
+// SearchResponseDto는 백엔드의 응답 구조와 일치하도록 정의된 TypeScript 인터페이스여야 함
 
-export interface Product {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  quantity: number;
-  category: string;
-  imgurl: string;
-  product_status: string | null;
-  discount?: number; // 할인
-  delivery?: string[]; // 배송
+export interface FilterParams {
+  keyword?: string;
+  mainCategory?: string[];
+  subCategory?: string[];
+  delivery?: string[];
+  priceMin?: number;
+  priceMax?: number;
 }
 
 // 검색 API (일반 검색)
@@ -59,10 +57,10 @@ export async function getAllProducts(): Promise<Product[]> {
 }
 
 // 상품 목록 조회 API
-export const fetchProducts = async (category: string) => {
+export const fetchProducts = async (category: string): Promise<Product[]> => {
   try {
-    const response = await myApi.get(
-      `/product/category/${encodeURIComponent(category)}`
+    const response = await myApi.get<Product[]>(
+      `/product/category/${encodeURIComponent(category)}?page=${page}&size=${size}`
     );
     return response.data;
   } catch (error: any) {
@@ -74,10 +72,12 @@ export const fetchProducts = async (category: string) => {
   }
 };
 
-export const fetchProductsByMainCategory = async (mainCategory: string) => {
+export const fetchProductsByMainCategory = async (
+  mainCategory: string
+): Promise<Product[]> => {
   try {
-    const response = await myApi.get(
-      `/product/main-category/${encodeURIComponent(mainCategory)}`
+    const response = await myApi.get<Product[]>(
+      `/product/main-category/${encodeURIComponent(mainCategory)}?page=${page}&size=${size}`
     );
     return response.data;
   } catch (error: any) {
@@ -89,19 +89,10 @@ export const fetchProductsByMainCategory = async (mainCategory: string) => {
   }
 };
 
-// 백엔드의 SearchRequestDto와 매핑됨
-export interface FilterParams {
-  keyword?: string;
-  mainCategory?: string[];
-  subCategory?: string[];
-  delivery?: string[];
-  priceMin?: number;
-  priceMax?: number;
-}
-
 /**
  * (필터 적용) 키워드 + 여러 카테고리 등을 GET 쿼리 파라미터로 전송
  * /search/results/filter 엔드포인트
+ * 백엔드의 SearchResponseDto[]를 받아 Product[]로 매핑
  */
 export async function fetchFilteredProducts(
   params: FilterParams
@@ -112,7 +103,9 @@ export async function fetchFilteredProducts(
       paramsSerializer: (params) =>
         qs.stringify(params, { arrayFormat: "repeat" }),
     });
-    return response.data;
+
+    console.log("Fetched Products:", response.data);
+    return response.data; // Product 배열 그대로 반환
   } catch (error: any) {
     console.error(
       "필터 검색 API 호출 실패",
