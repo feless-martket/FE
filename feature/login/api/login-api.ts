@@ -11,7 +11,7 @@ import myApi from "@/lib/axios";
 
 export async function loginApiCall(
   username: string,
-  password: string,
+  password: string
 ): Promise<LoginResponseDto> {
   console.log("로그인 API 호출 >>>", { username, password });
 
@@ -33,8 +33,13 @@ export async function loginApiCall(
   console.log("로그인 API 성공 >>>", data);
 
   // 응답 헤더에서 토큰 추출
-  const accessToken = res.headers.get("Authorization")?.replace("Bearer ", "");
-  const refreshToken = res.headers.get("Refresh-Token")?.replace("Bearer ", "");
+  // const accessToken = res.headers.get("Authorization")?.replace("Bearer ", "");
+  // const refreshToken = res.headers.get("Refresh-Token")?.replace("Bearer ", "");
+  const accessTokenHeader = res.headers["authorization"];
+  const refreshTokenHeader = res.headers["refresh-token"];
+
+  const accessToken = accessTokenHeader?.replace("Bearer ", "");
+  const refreshToken = refreshTokenHeader?.replace("Bearer ", "");
 
   // 토큰이 존재하면 LocalStorage에 저장(현재는 개발단계니 localStorage저장, 추후에 보안대책 변경 시 수정 예정 아마 HttpOnly Cookie에 저장할 듯함.)
   if (accessToken && refreshToken) {

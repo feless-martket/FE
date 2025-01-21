@@ -19,7 +19,7 @@ interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined,
+  undefined
 );
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -38,6 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // 토큰이 없으면 로그인 페이지로 리다이렉트
         if (!token) {
+          console.warn("토큰이 없습니다. 로그인 페이지로 이동합니다.");
+          router.push("/login");
           throw new Error("토큰이 없습니다.");
         }
 
@@ -80,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           headers: {
             Authorization: `Bearer ${token}`, // Authorization 헤더에 토큰 포함
           },
-        },
+        }
       );
     } catch (error) {
       console.error("로그아웃 API 호출 실패: ", error);
