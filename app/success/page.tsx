@@ -5,6 +5,35 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import myApi from "@/lib/axios";
 
+interface DeliveryAddress {
+  zipCode?: string;
+  address: string;
+  detailAddress: string;
+  deliveryNote?: string;
+}
+
+interface OrderItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+interface CustomerInfo {
+  name: string;
+  phone: string;
+}
+
+interface OrderData {
+  customerInfo: CustomerInfo;
+  deliveryAddress: DeliveryAddress;
+  items: OrderItem[];
+  usedPoints: number;
+  totalPrice: number;
+}
+
+const ORDER_DATA_KEY = "orderData";
+
 export default function SuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -13,7 +42,39 @@ export default function SuccessPage() {
   // 중복 호출 방지
   const hasConfirmedRef = useRef(false);
 
+  const [orderData, setOrderData] = useState<OrderData | null>(null);
+
+  const handleClearLocalStorage = () => {
+    localStorage.removeItem(ORDER_DATA_KEY);
+    setOrderData(null);
+  };
+
   useEffect(() => {
+    const savedString = localStorage.getItem(ORDER_DATA_KEY);
+    if (savedString) {
+      const parsed: OrderData = JSON.parse(savedString);
+      console.log("[SuccessPage] loaded orderData from localStorage:", parsed);
+      setOrderData(parsed);
+    } else {
+      console.warn("[SuccessPage] no orderData in localStorage!");
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("[SuccessPage] updated orderData:", orderData);
+  }, [orderData]);
+
+  useEffect(() => {
+    if (!orderData) {
+      return;
+    }
+
+    // 중복 실행 방지
+    if (hasConfirmedRef.current) {
+      return;
+    }
+    hasConfirmedRef.current = true;
+
     async function confirmAndComplete() {
       try {
         // 1) 토스 결제 승인 과정
@@ -45,17 +106,18 @@ export default function SuccessPage() {
           paymentKey: confirmJson.paymentKey,
           balanceAmount: confirmJson.balanceAmount,
           paymentMethod: confirmJson.method,
-          totalPrice: 50000,
+          totalPrice: orderData.totalPrice,
+          usedPoint: orderData?.usedPoints,
           shipping: {
-            zipCode: "00000",
-            address: "서울시 강남구 어딘가",
-            detailAddress: "상세 주소",
-            deliveryNote: "부재시 문앞에 놓아주세요",
+            zipCode: orderData.deliveryAddress.zipCode,
+            address: orderData.deliveryAddress.address,
+            detailAddress: orderData.deliveryAddress.detailAddress,
+            deliveryNote: orderData?.deliveryAddress.deliveryNote,
           },
-          orderItems: [
-            { productId: 1, quantity: 2 },
-            { productId: 3, quantity: 1 },
-          ],
+          orderItems: orderData.items.map((it) => ({
+            productId: it.id,
+            quantity: it.quantity,
+          })),
         };
 
         console.log("결제 완료(complete) 요청 바디:", completeBody);
@@ -81,6 +143,7 @@ export default function SuccessPage() {
         }
 
         console.log("결제 완료 후 저장 응답:", completeJson);
+        handleClearLocalStorage();
 
         // state에 저장
         setResponseData(confirmJson);
@@ -90,12 +153,8 @@ export default function SuccessPage() {
         router.push(`/fail?code=${error.code}&message=${error.message}`);
       }
     }
-
-    if (hasConfirmedRef.current) return;
-    hasConfirmedRef.current = true;
-
     confirmAndComplete();
-  }, [router, searchParams]);
+  }, [router, searchParams, orderData]);
 
   // UI 렌더
   const amount = searchParams.get("amount") || 0;

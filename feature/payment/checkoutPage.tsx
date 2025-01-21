@@ -9,7 +9,15 @@ import Router from "next/router";
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 const customerKey = uuidv4();
 
-export function CheckoutPage({ totalAmount }) {
+interface CheckoutPageProps {
+  totalAmount: number;
+  onSaveOrderData: () => void; // ★ 부모로부터 받은 콜백
+}
+
+export function CheckoutPage({
+  totalAmount,
+  onSaveOrderData,
+}: CheckoutPageProps) {
   const [widgets, setWidgets] = useState(null);
   const [ready, setReady] = useState(false);
 
@@ -61,6 +69,7 @@ export function CheckoutPage({ totalAmount }) {
     if (!widgets) return;
 
     try {
+      onSaveOrderData();
       await widgets.requestPayment({
         orderId,
         orderName: "테스트 상품",
