@@ -9,7 +9,7 @@ export interface Product {
   description: string;
   quantity: number;
   category: string;
-  imgurl: string;
+  imageUrls: string[];
   product_status: string | null;
   discount?: number; // 할인
   delivery?: string[]; // 배송

@@ -19,7 +19,7 @@ interface Product {
   id: string;
   name: string;
   price: number; // 정가
-  imageUrl: string[];
+  imageUrls: string[];
   delivery: string;
   category: string;
 }
@@ -149,7 +149,7 @@ export default function ProductList() {
           >
             <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
               <Image
-                src={product.imageUrl[0] || "/placeholder.svg"}
+                src={product.imageUrls[0] || "/placeholder.svg"}
                 alt={product.name}
                 width={500}
                 height={500}
