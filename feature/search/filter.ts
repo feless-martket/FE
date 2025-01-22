@@ -15,7 +15,7 @@ export interface Product {
   name: string;
   category: string;
   price: number;
-  discount?: number;
-  imgUrl: string[];
+  discount: number;
+  imageUrls: string[];
   delievery: string[];
 }

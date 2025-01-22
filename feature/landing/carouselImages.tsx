@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import myApi from "@/lib/axios";
-import Test1 from "/public/img/test1.jpeg";
+
 
 type Product = {
   id: number;
