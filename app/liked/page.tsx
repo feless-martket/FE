@@ -1,6 +1,6 @@
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
-import { LikedProducts } from "@/feature/liked/liked-products";
+import { LikedProductsPage } from "@/feature/liked/liked-products";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -21,7 +21,7 @@ export default function Page() {
           }
         />
         <main className="grow overflow-y-auto pb-16">
-          <LikedProducts />
+          <LikedProductsPage />
         </main>
         <Footer />
       </div>

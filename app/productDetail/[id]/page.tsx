@@ -60,7 +60,7 @@ export default async function ProductPage({
         <DeliveryInfo />
         <ProductDetails />
         <ProductImages imageUrl={productData.imageUrl} />
-        <PurchaseButton cartItemId={Number(id)} />
+        <PurchaseButton cartItemId={Number(id)} productId={Number(id)} />
         <Footer />
       </div>
     </div>

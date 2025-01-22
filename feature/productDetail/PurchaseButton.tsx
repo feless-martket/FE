@@ -5,14 +5,20 @@ import axios from "axios";
 import { useContext, useState } from "react";
 import { AuthContext } from "@/context/AuthContext";
 import { Heart } from "lucide-react";
+import { addLike } from "@/feature/liked/api/liked-api";
 
 // cartItemId를 prop으로 받아온다고 가정
 // 상품 상세 페이지에서 <PurchaseButton cartItemId={원하는아이디}/> 형태로 사용
 interface PurchaseButtonProps {
   cartItemId: number;
+  productId: number;
 }
 
-export default function PurchaseButton({ cartItemId }: PurchaseButtonProps) {
+export default function PurchaseButton({
+  cartItemId,
+  productId,
+}: PurchaseButtonProps) {
+  console.log("PurchaseButton에 전달된 productId: ", productId);
   const router = useRouter();
   const auth = useContext(AuthContext);
   const [isLiked, setIsLiked] = useState<boolean>(false);
@@ -57,6 +63,7 @@ export default function PurchaseButton({ cartItemId }: PurchaseButtonProps) {
   };
 
   const handleLike = async () => {
+    console.log("현재 productId: ", productId);
     // 로그인이 되어있지 않은 경우
     if (!auth?.isLoggedIn) {
       alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.");
@@ -64,6 +71,13 @@ export default function PurchaseButton({ cartItemId }: PurchaseButtonProps) {
       return;
     }
 
+    try {
+      const response = await addLike(auth.userInfo.username, productId);
+      alert(response.message);
+    } catch (error: any) {
+      console.error("찜 추가 실패:", error);
+      alert("찜 추가 중 오류가 발생했습니다.");
+    }
     // 로그인 상태라면 좋아요 상태 토글
     const nextLikedState = !isLiked;
     setIsLiked(nextLikedState);
