@@ -1,10 +1,16 @@
 import myApi from "@/lib/axios";
 
 // 찜한 상품 목록 조회
-export const getLikedProducts = async (username: string) => {
-  const res = await myApi.get(`/like/member/${username}`);
+export const getLikedProducts = async (username: string): Promise<number> => {
+  const res = await myApi.get<number>(`/like/member/${username}`);
   return res.data;
 };
+
+interface LikeResponseDto {
+  success: boolean;
+  message: string;
+  likeCount: number;
+}
 
 // 상품 좋아요 수 조회
 export const getLikeCount = async (productId: number) => {
@@ -13,14 +19,23 @@ export const getLikeCount = async (productId: number) => {
 };
 
 // 찜 추가
-export const addLike = async (username: string, productId: number) => {
-  const res = await myApi.post("/like", { username, productId });
+export const addLike = async (
+  username: string,
+  productId: number
+): Promise<LikeResponseDto> => {
+  const res = await myApi.post<LikeResponseDto>("/like", {
+    username,
+    productId,
+  });
   return res.data;
 };
 
 // 찜 취소
-export const cancelLike = async (username: string, productId: number) => {
-  const res = await myApi.delete("/like", {
+export const cancelLike = async (
+  username: string,
+  productId: number
+): Promise<LikeResponseDto> => {
+  const res = await myApi.delete<LikeResponseDto>("/like", {
     data: { username, productId },
   });
   return res.data;

@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
-
+import ProductImage from "@/feature/productDetail/ProductImage";
 import { FilterTabs } from "@/feature/search/FilterTabs";
 import { FilterCategory, Product } from "@/feature/search/filter";
 import {
@@ -185,13 +185,7 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
             {filteredProducts.map((product) => (
               <Link key={product.id} href={`/productDetail/${product.id}`}>
                 <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
-                  <Image
-                    src={product.imageUrls || "/placeholder.svg"}
-                    alt={product.name}
-                    width={500}
-                    height={500}
-                    className="rounded-lg object-cover"
-                  />
+                  <ProductImage imageUrls={product.imageUrls}></ProductImage>
                   <Button
                     size="icon"
                     variant="secondary"
