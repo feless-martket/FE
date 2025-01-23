@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useContext, useEffect } from "react";
-import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OrderItems } from "@/feature/payment/orderItems";
 import { CustomerInfoSection } from "@/feature/payment/customerInfo";
@@ -10,55 +9,79 @@ import { DeliveryNotes } from "@/feature/payment/deliveryNote";
 import { PointsSection } from "@/feature/payment/pointSection";
 import { AuthContext } from "@/context/AuthContext";
 import { Footer } from "@/components/layout/footer";
-
-// import { PaymentMethod } from "@/feature/payment/paymentMethod";
-import type {
-  CustomerInfo,
-  //   DeliveryAddress,
-  OrderFormData,
-} from "@/feature/payment/types/orders";
 import { CheckoutPage } from "@/feature/payment/checkoutPage";
+import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import myApi from "@/lib/axios";
 
+// 주문 관련 타입
+interface DeliveryAddress {
+  zipCode?: string;
+  address: string;
+  detailAddress: string;
+  deliveryNote?: string;
+}
+
+interface OrderItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+interface CustomerInfo {
+  name: string;
+  phone: string;
+}
+
+interface OrderData {
+  customerInfo: CustomerInfo;
+  deliveryAddress: DeliveryAddress;
+  items: OrderItem[];
+  usedPoints: number;
+  totalPrice: number;
+}
+
+// LocalStorage 키
+const ORDER_DATA_KEY = "orderData";
+
 export default function OrderPage() {
   const router = useRouter();
-
   const authContext = useContext(AuthContext);
   const { isLoading, isLoggedIn, userInfo } = authContext || {};
 
-  const [cartItems, setCartItems] = useState([]);
+  // 장바구니 아이템
+  const [cartItems, setCartItems] = useState<any[]>([]);
   const [itemsLoading, setItemsLoading] = useState(true);
-  const [itemsError, setItemsError] = useState(null);
+  const [itemsError, setItemsError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
-    customerInfo: {
-      name: "",
-      phone: "",
-    },
-    items: [],
+  // 포인트
+  const [localUsedPoints, setLocalUsedPoints] = useState(0);
+
+  // 배송지
+  const [deliveryAddress, setDeliveryAddress] = useState<DeliveryAddress>({
+    zipCode: "",
+    address: "",
+    detailAddress: "",
+    deliveryNote: "",
   });
 
-  const [usedPoints, setUsedPoints] = useState(0);
+  // 주문자 정보(유저 정보)
+  const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
+    name: "",
+    phone: "",
+  });
 
-  const goToBack = () => {
-    router.back();
-  };
-  // userInfo -> formData.customerInfo
   useEffect(() => {
     if (userInfo) {
-      setFormData((prev) => ({
-        ...prev,
-        customerInfo: {
-          ...prev.customerInfo,
-          name: userInfo.name || "",
-          phone: userInfo.phoneNumber || "",
-        },
-      }));
+      setCustomerInfo({
+        name: userInfo.name || "",
+        phone: userInfo.phoneNumber || "",
+      });
     }
   }, [userInfo]);
 
-  // 장바구니에서 아이템 가져오기
+  // 1) 장바구니 불러오기
   useEffect(() => {
     async function fetchCart() {
       try {
@@ -69,6 +92,7 @@ export default function OrderPage() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = res.data;
+        console.log("cart data:", data);
         setCartItems(data.cartItems || []);
       } catch (err) {
         console.error("장바구니 조회 실패:", err);
@@ -80,34 +104,87 @@ export default function OrderPage() {
     fetchCart();
   }, []);
 
-  // cartItems -> formData.items
-  useEffect(() => {
-    setFormData((prev) => ({
+  // 2) cartItems → items
+  const items: OrderItem[] = cartItems.map((item) => ({
+    id: item.productId,
+    name: item.productName,
+    price: item.price,
+    quantity: item.quantity,
+  }));
+
+  // 3) 결제금액 계산
+  const subtotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
+  const shippingFee = 3000;
+  const discount = localUsedPoints;
+  const total = subtotal + shippingFee - discount;
+
+  // 뒤로가기
+  const goToBack = () => {
+    router.back();
+  };
+
+  // 배송지 onSave
+  const handleSaveDelivery = (addr: {
+    zipCode?: string;
+    address: string;
+    detailAddress: string;
+  }) => {
+    setDeliveryAddress((prev) => ({
       ...prev,
-      items: cartItems.map((item) => ({
-        id: item.productId,
-        name: item.productName,
-        price: item.price,
-        quantity: item.quantity,
-      })),
+      ...addr,
     }));
-  }, [cartItems]);
+    console.log("[OrderPage] updated deliveryAddress:", addr);
+  };
+
+  // 포인트 onChange
+  const handlePointsChange = (points: number) => {
+    setLocalUsedPoints(points);
+  };
+
+  const handleSaveDeliveryNote = (note: string) => {
+    const updatedDeliveryAddress = {
+      ...deliveryAddress,
+      deliveryNote: note,
+    };
+    setDeliveryAddress(updatedDeliveryAddress);
+
+    const updatedOrderData: OrderData = {
+      customerInfo,
+      deliveryAddress: updatedDeliveryAddress,
+      items,
+      usedPoints: localUsedPoints,
+      totalPrice: total,
+    };
+    localStorage.setItem(ORDER_DATA_KEY, JSON.stringify(updatedOrderData));
+    console.log(
+      "[OrderPage] Updated deliveryNote and saved to localStorage:",
+      updatedOrderData,
+    );
+  };
+
+  // LocalStorage에 저장 함수
+  function saveOrderDataToLocalStorage() {
+    // 구성
+    const orderData: OrderData = {
+      customerInfo,
+      deliveryAddress,
+      items,
+      usedPoints: localUsedPoints,
+      totalPrice: total,
+    };
+
+    // JSON 직렬화 후 저장
+    localStorage.setItem(ORDER_DATA_KEY, JSON.stringify(orderData));
+    console.log("[OrderPage] save to localStorage:", orderData);
+  }
 
   if (itemsLoading) return <div>상품 로딩 중...</div>;
   if (itemsError) return <div>{itemsError}</div>;
 
-  // 물건 가격
-  const subtotal = formData.items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
-  const shippingFee = 3000;
-  const discount = usedPoints;
-  const total = subtotal + shippingFee - discount;
-
   return (
     <div className="bg-gray-100">
       <div className="mx-auto max-w-[360px] space-y-6 bg-white p-4">
+        {/* 상단 */}
         <div className="flex items-center gap-24 text-center">
           <Button variant="ghost" size="icon" onClick={goToBack}>
             <ChevronLeft className="size-4" />
@@ -115,32 +192,34 @@ export default function OrderPage() {
           <h1 className="text-lg font-bold">주문서</h1>
         </div>
 
-        {/* 장바구니 상품 표시 */}
         <OrderItems items={cartItems} />
 
-        <div className="h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
-
         {/* 주문자 정보 */}
-        <CustomerInfoSection info={formData.customerInfo} />
-        <div className="h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
+        <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
+        <CustomerInfoSection info={customerInfo} />
 
+        {/* 배송지 */}
+        <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
         <DeliveryAddressSection
-          savedAddress={formData.deliveryAddress}
-          onSave={(address) =>
-            setFormData((prev) => ({ ...prev, deliveryAddress: address }))
-          }
+          savedAddress={deliveryAddress}
+          onSave={handleSaveDelivery}
         />
-        <div className="h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
 
-        <DeliveryNotes />
-        <div className="h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
+        {/* 요청사항 */}
+        <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
+        <DeliveryNotes
+          deliveryNote={deliveryAddress.deliveryNote}
+          onSave={handleSaveDeliveryNote}
+        />
 
+        {/* 포인트 */}
+        <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
         <PointsSection
           availablePoints={1000}
-          onPointsChange={(points) => setUsedPoints(points)}
+          onPointsChange={handlePointsChange}
         />
 
-        {/* 결제금액 표시 */}
+        {/* 결제 금액 */}
         <div className="space-y-2 border-t pt-4">
           <div className="flex justify-between">
             <span>상품금액</span>
@@ -157,12 +236,16 @@ export default function OrderPage() {
             </span>
           </div>
           <div className="flex justify-between font-medium">
-            <span>결제예정금액</span> <span>{total.toLocaleString()}원</span>
+            <span>결제예정금액</span>
+            <span>{total.toLocaleString()}원</span>
           </div>
         </div>
 
-        {/* (5) CheckoutPage에 totalAmount를 props로 넘김 */}
-        <CheckoutPage totalAmount={total} />
+        {/* CheckoutPage */}
+        <CheckoutPage
+          totalAmount={total}
+          onSaveOrderData={saveOrderDataToLocalStorage}
+        />
       </div>
       <Footer />
     </div>
