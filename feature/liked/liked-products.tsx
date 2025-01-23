@@ -11,7 +11,7 @@ interface ProductResponseDto {
   name: string;
   price: number;
   discount?: number;
-  imageUrl: string[];
+  imageUrls: string[];
 }
 
 export function LikedProductsPage() {
@@ -63,7 +63,7 @@ export function LikedProductsPage() {
         {products.map((product) => (
           <div key={product.id} className="flex gap-4">
             <Image
-              src={product.imageUrl?.[0] || "/img/mooni.png"}
+              src={product.imageUrls?.[0] || "/img/mooni.png"}
               alt={product.name}
               width={100}
               height={100}
