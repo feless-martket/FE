@@ -10,6 +10,7 @@ import DeliveryInfo from "@/feature/productDetail/DeliveryInfo";
 import ProductImages from "@/feature/productDetail/ProductImages";
 import { Footer } from "@/components/layout/footer";
 import { baseURL } from "@/lib/axios";
+
 // 상품 데이터 타입 정의
 interface ProductData {
   id: number;
@@ -20,7 +21,7 @@ interface ProductData {
   productStatus: string;
   mainCategory: string;
   subCategory: string;
-  imageUrl: string[];
+  imageUrls: string[];
 }
 
 // Dynamic Route에서 id 가져오기
@@ -48,21 +49,23 @@ export default async function ProductPage({
   console.log(productData);
 
   return (
-    <div className="flex min-h-screen w-full justify-center bg-gray-100">
+    <div className="flex min-h-screen flex-col bg-gray-100">
       <div className="mx-auto max-w-[360px] bg-white">
         <ProductHeader productName={productData.name} />
         <Home />
-        <ProductImage imageUrl={productData.imageUrl} />
+        <ProductImage imageUrls={productData.imageUrls} />
         <ProductInfo
           productName={productData.name}
           productPrice={productData.price}
         />
         <DeliveryInfo />
         <ProductDetails />
-        <ProductImages imageUrl={productData.imageUrl} />
+        <div className="overflow-y-auto bg-gray-50">
+          <ProductImages imageUrls={productData.imageUrls} />
+        </div>
         <PurchaseButton cartItemId={Number(id)} />
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 }
