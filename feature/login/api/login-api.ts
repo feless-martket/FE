@@ -13,7 +13,7 @@ export async function loginApiCall(
   username: string,
   password: string
 ): Promise<LoginResponseDto> {
-  console.log("로그인 API 호출 >>>", { username, password });
+  // console.log("로그인 API 호출 >>>", { username, password });
 
   // fetch를 통해 백엔드 /users/login 엔드포인트에 POST
   const res = await myApi.post("/users/login", {
@@ -30,7 +30,7 @@ export async function loginApiCall(
 
   // 성공 시 JSON 파싱
   const data: LoginResponseDto = await res.data;
-  console.log("로그인 API 성공 >>>", data);
+  // console.log("로그인 API 성공 >>>", data);
 
   // 응답 헤더에서 토큰 추출
   // const accessToken = res.headers.get("Authorization")?.replace("Bearer ", "");

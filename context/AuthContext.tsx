@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // }
 
         // const data = await res.json();
-        console.log("사용자 정보 불러오기 성공:", res.data);
+        // console.log("사용자 정보 불러오기 성공:", res.data);
 
         setUserInfo(res.data);
         setIsLoggedIn(true);

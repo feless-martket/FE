@@ -42,12 +42,6 @@ export function LikedProductsPage() {
       }
     }
 
-    // 로그인 안된 경우 처리
-    if (!isLoggedIn) {
-      router.push("/login");
-      return;
-    }
-
     // username이 유효할 때만 API 호출
     if (username) {
       fetchData();
