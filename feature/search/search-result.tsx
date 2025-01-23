@@ -186,7 +186,7 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
               <Link key={product.id} href={`/productDetail/${product.id}`}>
                 <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
                   <Image
-                    src={product.imageUrls[0] || "/placeholder.svg"}
+                    src={product.imageUrls || "/placeholder.svg"}
                     alt={product.name}
                     width={500}
                     height={500}
