@@ -25,3 +25,17 @@ export const cancelLike = async (username: string, productId: number) => {
   });
   return res.data;
 };
+
+// 찜 여부 확인
+export const checkIsLiked = async (
+  username: string,
+  productId: number
+): Promise<boolean> => {
+  const res = await myApi.get<boolean>("/like/check", {
+    params: {
+      username,
+      productId,
+    },
+  });
+  return res.data;
+};

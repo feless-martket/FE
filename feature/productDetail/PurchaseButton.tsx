@@ -1,15 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import axios from "axios";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/AuthContext";
 import { Heart } from "lucide-react";
-import { addLike, cancelLike } from "@/feature/liked/api/liked-api";
-import { Message } from "../../node_modules/postcss/lib/result.d";
+import {
+  addLike,
+  cancelLike,
+  checkIsLiked,
+} from "@/feature/liked/api/liked-api";
+import myApi from "@/lib/axios"; // 전역 인터셉터가 있는 axios 인스턴스
+// import axios from "axios"; // 개별 인스턴스를 굳이 쓸 필요가 없다면 주석처리
 
-// cartItemId를 prop으로 받아온다고 가정
-// 상품 상세 페이지에서 <PurchaseButton cartItemId={원하는아이디}/> 형태로 사용
 interface PurchaseButtonProps {
   cartItemId: number;
   productId: number;
@@ -19,38 +21,39 @@ export default function PurchaseButton({
   cartItemId,
   productId,
 }: PurchaseButtonProps) {
-  console.log("PurchaseButton에 전달된 productId: ", productId);
   const router = useRouter();
   const auth = useContext(AuthContext);
+
+  // 찜 상태
   const [isLiked, setIsLiked] = useState<boolean>(false);
 
-  const axiosInstance = axios.create({
-    baseURL: "http://localhost:8080",
-  });
+  // 컴포넌트 마운트 시, 이미 찜했는지 확인
+  useEffect(() => {
+    async function initLikedState() {
+      if (!auth?.isLoggedIn) return; // 로그인 안된 상태면 체크 불필요
+      if (!auth?.userInfo?.username) return; // username이 없으면 패스
 
-  // 요청 인터셉터 (토큰 자동 설정)
-  axiosInstance.interceptors.request.use(
-    (config) => {
-      const token = localStorage.getItem("accessToken");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      try {
+        const liked = await checkIsLiked(auth.userInfo.username, productId);
+        setIsLiked(liked);
+      } catch (error) {
+        console.error("이미 찜했는지 확인 중 오류:", error);
       }
-      return config;
-    },
-    (error) => Promise.reject(error)
-  );
+    }
 
-  // 장바구니에 담고 나서 바로 장바구니 화면으로 이동하는 함수
+    initLikedState();
+  }, [auth, productId]);
+
+  // 장바구니 추가 로직
   const handleAddToCartAndNavigate = async () => {
     try {
-      const response = await axiosInstance.post("/cart", {
+      const response = await myApi.post("/cart", {
         cartItemId,
-        quantity: 1, // 기본 수량을 1로
+        quantity: 1,
       });
-
       if (response.status === 200) {
         alert("상품이 장바구니에 추가되었습니다.");
-        router.push("/cart"); // 장바구니 페이지로 이동
+        router.push("/cart");
       }
     } catch (error) {
       console.error("장바구니 추가 중 오류 발생:", error);
@@ -58,27 +61,31 @@ export default function PurchaseButton({
     }
   };
 
+  // 구매하기 로직
   const handleBuyNow = () => {
     alert("구매하기 로직을 구현하세요!");
-    // 예) 바로 결제 페이지로 이동하는 등
+    // 예: 결제 페이지로 이동 etc.
   };
 
+  // 찜 추가/취소 토글
   const handleLikeToggle = async () => {
     console.log("현재 productId: ", productId);
-    // 로그인이 되어있지 않은 경우
+
+    // 로그인 체크
     if (!auth?.isLoggedIn) {
       alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.");
-      router.push("/login"); // 로그인 페이지로 이동
+      router.push("/login");
       return;
     }
 
     try {
       if (isLiked) {
-        // 이미 찜한 상태라면 찜 취소
+        // 이미 찜 => 찜 취소
         const response = await cancelLike(auth.userInfo!.username, productId);
         alert(response.message || "찜 취소가 완료되었습니다.");
         setIsLiked(false);
       } else {
+        // 아직 찜 안 됨 => 찜 추가
         const response = await addLike(auth.userInfo!.username, productId);
         alert(response.message || "찜 추가가 완료되었습니다.");
         setIsLiked(true);
@@ -92,13 +99,13 @@ export default function PurchaseButton({
   return (
     <div className="fixed inset-x-0 bottom-10 bg-gray-100 pb-[16px]">
       <div className="mx-auto flex w-full max-w-[360px] items-center space-x-2 bg-white">
-        {/* 좋아요 버튼 (디자인 예시) */}
+        {/* 좋아요(찜) 버튼 */}
         <button
           onClick={handleLikeToggle}
-          className="flex size-12 items-center justify-center rounded border"
+          className="flex w-12 h-12 items-center justify-center rounded border"
         >
           <Heart
-            className="size-6"
+            className="w-6 h-6"
             fill={isLiked ? "green" : "none"}
             stroke="green"
           />
