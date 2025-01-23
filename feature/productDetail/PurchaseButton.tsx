@@ -11,6 +11,7 @@ import {
   cancelLike,
   addLike,
 } from "@/feature/liked/api/liked-api";
+import { SecondModal } from "@/components/modal/secondmodal";
 
 interface PurchaseButtonProps {
   cartItemId: number;
@@ -27,9 +28,14 @@ export default function PurchaseButton({
     baseURL: "http://localhost:8080",
   });
 
+  // 찜 여부 & 찜 갯수
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(0);
 
+  // "로그인이 필요합니다" 모달 상태
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // 초기 로드 시 찜 상태 세팅
   useEffect(() => {
     async function initLikedState() {
       if (!auth?.isLoggedIn || !auth.userInfo) return;
@@ -79,8 +85,7 @@ export default function PurchaseButton({
 
   const handleLikeToggle = async () => {
     if (!auth?.isLoggedIn) {
-      alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.");
-      router.push("/login");
+      setShowLoginModal(true);
       return;
     }
 
@@ -141,6 +146,18 @@ export default function PurchaseButton({
           </button>
         </div>
       </div>
+      <SecondModal
+        open={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        title="로그인이 필요합니다."
+        description="로그인 페이지로 이동하시겠습니까?"
+        confirmText="확인"
+        cancelText="취소"
+        onConfirm={() => {
+          setShowLoginModal(false);
+          router.push("/login");
+        }}
+      />
     </div>
   );
 }

@@ -37,11 +37,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const token = localStorage.getItem("accessToken");
 
         // 토큰이 없으면 로그인 페이지로 리다이렉트
-        if (!token) {
-          console.warn("토큰이 없습니다. 로그인 페이지로 이동합니다.");
-          router.push("/login");
-          throw new Error("토큰이 없습니다.");
-        }
+        // if (!token) {
+        //   console.warn("토큰이 없습니다. 로그인 페이지로 이동합니다.");
+        //   router.push("/login");
+        //   throw new Error("토큰이 없습니다.");
+        // }
 
         const res = await myApi.get("/users/me", {
           headers: {
