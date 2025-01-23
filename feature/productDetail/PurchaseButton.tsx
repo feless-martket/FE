@@ -5,7 +5,8 @@ import axios from "axios";
 import { useContext, useState } from "react";
 import { AuthContext } from "@/context/AuthContext";
 import { Heart } from "lucide-react";
-import { addLike } from "@/feature/liked/api/liked-api";
+import { addLike, cancelLike } from "@/feature/liked/api/liked-api";
+import { Message } from "../../node_modules/postcss/lib/result.d";
 
 // cartItemId를 prop으로 받아온다고 가정
 // 상품 상세 페이지에서 <PurchaseButton cartItemId={원하는아이디}/> 형태로 사용
@@ -62,7 +63,7 @@ export default function PurchaseButton({
     // 예) 바로 결제 페이지로 이동하는 등
   };
 
-  const handleLike = async () => {
+  const handleLikeToggle = async () => {
     console.log("현재 productId: ", productId);
     // 로그인이 되어있지 않은 경우
     if (!auth?.isLoggedIn) {
@@ -72,15 +73,20 @@ export default function PurchaseButton({
     }
 
     try {
-      const response = await addLike(auth.userInfo.username, productId);
-      alert(response.message);
+      if (isLiked) {
+        // 이미 찜한 상태라면 찜 취소
+        const response = await cancelLike(auth.userInfo!.username, productId);
+        alert(response.message || "찜 취소가 완료되었습니다.");
+        setIsLiked(false);
+      } else {
+        const response = await addLike(auth.userInfo!.username, productId);
+        alert(response.message || "찜 추가가 완료되었습니다.");
+        setIsLiked(true);
+      }
     } catch (error: any) {
-      console.error("찜 추가 실패:", error);
-      alert("찜 추가 중 오류가 발생했습니다.");
+      console.error("찜 토글 실패:", error);
+      alert("찜 처리 중 오류가 발생했습니다.");
     }
-    // 로그인 상태라면 좋아요 상태 토글
-    const nextLikedState = !isLiked;
-    setIsLiked(nextLikedState);
   };
 
   return (
@@ -88,7 +94,7 @@ export default function PurchaseButton({
       <div className="mx-auto flex w-full max-w-[360px] items-center space-x-2 bg-white">
         {/* 좋아요 버튼 (디자인 예시) */}
         <button
-          onClick={handleLike}
+          onClick={handleLikeToggle}
           className="flex size-12 items-center justify-center rounded border"
         >
           <Heart
