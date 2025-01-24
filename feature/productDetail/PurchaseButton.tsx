@@ -92,12 +92,12 @@ export default function PurchaseButton({
     try {
       if (isLiked) {
         const response = await cancelLike(auth.userInfo!.username, productId);
-        alert(response.message || "찜 취소가 완료되었습니다.");
+        // alert(response.message || "찜 취소가 완료되었습니다.");
         setIsLiked(false);
         setLikeCount((prev) => prev - 1);
       } else {
         const response = await addLike(auth.userInfo!.username, productId);
-        alert(response.message || "찜 추가가 완료되었습니다.");
+        // alert(response.message || "찜 추가가 완료되었습니다.");
         setIsLiked(true);
         setLikeCount((prev) => prev + 1);
       }
