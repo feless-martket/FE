@@ -12,7 +12,7 @@ interface Option {
 const categories: Option[] = [
   { value: "VEGETABLE", label: "채소" },
   { value: "FRUIT", label: "과일,견과,쌀" },
-  { value: "SEAFOOD", label: "수산,해산,건어물"},
+  { value: "SEAFOOD", label: "수산,해산,건어물" },
 ];
 
 const discountstatus: Option[] = [
@@ -31,18 +31,33 @@ const vegetableSubCategories: Option[] = [
   { value: "GREEN_VEGETABLE", label: "오이·호박·고추" },
 ];
 
-const seafoodSubCategories : Option[] =[
+const seafoodSubCategories: Option[] = [
   { value: "FISH", label: "생선류" },
-  { value: "SHELLFISH", label: "조개류" }
+  { value: "SHELLFISH", label: "조개류" },
+];
 
-]
+const productStatuses: Option[] = [
+  { value: "AVAILABLE", label: "판매 가능" },
+  { value: "UNAVAILABLE", label: "판매 불가능" },
+];
+
+const deliveries: Option[] = [
+  { value: "GENERAL_DELIVERY", label: "일반배송" },
+  { value: "EARLY_DELIVERY", label: "새벽배송" },
+  { value: "SELLER_DELIVERY", label: "판매자배송" },
+];
+
+const seafoodSubCategories: Option[] = [
+  { value: "FISH", label: "생선류" },
+  { value: "SHELLFISH", label: "조개류" },
+];
 
 const quantities: Option[] = Array.from({ length: 100 }, (_, i) => ({
   value: String(i + 1),
   label: String(i + 1),
 }));
 
-discountstatus
+discountstatus;
 export default function ProductForm() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
@@ -51,6 +66,8 @@ export default function ProductForm() {
   const [discountstatuses, setdiscountstatus] = useState<string>("");
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const formRef = useRef<HTMLFormElement>(null); // 폼 리셋을 위해 ref 사용
+  const [productStatus, setProductStatus] = useState<string>("");
+  const [delivery, setdelivery] = useState<string>("");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -80,6 +97,8 @@ export default function ProductForm() {
     formData.append("discountstatus", discountstatuses);
     formData.append("mainCategory", selectedCategory);
     formData.append("subCategory", selectedSubCategory);
+    formData.append("productStatus", productStatus);
+    formData.append("delivery", delivery);
 
     selectedImages.forEach((image) => {
       formData.append("imgURL", image);
@@ -93,7 +112,7 @@ export default function ProductForm() {
       });
 
       console.log("서버 응답:", response.data);
-      alert("상품이 등록되었습니다.");  
+      alert("상품이 등록되었습니다.");
 
       // 값 초기화
       formRef.current?.reset(); // 폼 필드 초기화
@@ -101,6 +120,8 @@ export default function ProductForm() {
       setSelectedSubCategory("");
       setSelectedQuantity("");
       setSelectedImages([]);
+      setProductStatus("");
+      setdelivery("");
     } catch (error) {
       console.error("오류 발생:", error);
       alert("상품 등록에 실패했습니다. 다시 시도해 주세요.");
@@ -156,13 +177,13 @@ export default function ProductForm() {
                       {subCategory.label}
                     </option>
                   ))
-                  : selectedCategory === "SEAFOOD"
+                : selectedCategory === "SEAFOOD"
                   ? seafoodSubCategories.map((subCategory) => (
                       <option key={subCategory.value} value={subCategory.value}>
                         {subCategory.label}
                       </option>
                     ))
-                : null}
+                  : null}
           </select>
           <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
         </div>
@@ -205,10 +226,10 @@ export default function ProductForm() {
       </div>
 
       <div>
-      <h2>할인률</h2>
+        <h2>할인률</h2>
       </div>
       <div className="grid grid-cols-2 gap-2">
-      <div className="relative">
+        <div className="relative">
           <select
             value={discountstatuses}
             onChange={(e) => {
@@ -225,22 +246,22 @@ export default function ProductForm() {
           </select>
           <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
         </div>
-      <div className="relative">
-        <select
-          value={discount}
-          onChange={(e) => setdiscount(e.target.value)}
-          className="w-full appearance-none rounded-md border bg-white px-3 py-2 pr-8"
-        >
-          <option value="">할인률</option>
-          {quantities.map((quantity) => (
-            <option key={quantity.value} value={quantity.value}>
-              {quantity.label}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
+        <div className="relative">
+          <select
+            value={discount}
+            onChange={(e) => setdiscount(e.target.value)}
+            className="w-full appearance-none rounded-md border bg-white px-3 py-2 pr-8"
+          >
+            <option value="">할인률</option>
+            {quantities.map((quantity) => (
+              <option key={quantity.value} value={quantity.value}>
+                {quantity.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
+        </div>
       </div>
-</div>
       <div>
         <h2>수량</h2>
       </div>
@@ -254,6 +275,44 @@ export default function ProductForm() {
           {quantities.map((quantity) => (
             <option key={quantity.value} value={quantity.value}>
               {quantity.label}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
+      </div>
+
+      <div>
+        <h2>상품 상태</h2>
+      </div>
+      <div className="relative">
+        <select
+          value={productStatus}
+          onChange={(e) => setProductStatus(e.target.value)}
+          className="w-full appearance-none rounded-md border bg-white px-3 py-2 pr-8"
+        >
+          <option value="">상품 상태 선택</option>
+          {productStatuses.map((status) => (
+            <option key={status.value} value={status.value}>
+              {status.label}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-5 -translate-y-1/2 text-gray-400" />
+      </div>
+
+      <div>
+        <h2>배송</h2>
+      </div>
+      <div className="relative">
+        <select
+          value={delivery}
+          onChange={(e) => setdelivery(e.target.value)}
+          className="w-full appearance-none rounded-md border bg-white px-3 py-2 pr-8"
+        >
+          <option value="">배송 옵션 선택</option>
+          {deliveries.map((status) => (
+            <option key={status.value} value={status.value}>
+              {status.label}
             </option>
           ))}
         </select>

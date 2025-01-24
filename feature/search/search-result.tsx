@@ -178,19 +178,15 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
         totalFilteredCount={filteredProducts.length} // 추가: 필터링된 상품 개수 전달s
       />
 
-
-
       {/* 상품 리스트 */}
       <div className="flex-1">
         <ScrollArea className="flex-1">
           <div className="grid grid-cols-2 gap-4 p-4">
             {filteredProducts.map((product) => (
-              
               <Link key={product.id} href={`/productDetail/${product.id}`}>
                 <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
-              
                   <Image
-                    src={product.imageUrls[0]}
+                    src={product.imageUrls[0] || "/placeholder.svg"}
                     alt={product.name}
                     width={500}
                     height={500}
