@@ -7,9 +7,13 @@ import axios from "axios";
 // 상품 상세 페이지에서 <PurchaseButton cartItemId={원하는아이디}/> 형태로 사용
 interface PurchaseButtonProps {
   cartItemId: number;
+  productStatus: string;
 }
 
-export default function PurchaseButton({ cartItemId }: PurchaseButtonProps) {
+export default function PurchaseButton({
+  cartItemId,
+  productStatus,
+}: PurchaseButtonProps) {
   const router = useRouter();
   const axiosInstance = axios.create({
     baseURL: "http://localhost:8080",
@@ -72,20 +76,29 @@ export default function PurchaseButton({ cartItemId }: PurchaseButtonProps) {
         </button>
 
         {/* 장바구니 담기 & 구매하기 버튼 */}
-        <div className="flex flex-1 space-x-2">
+        {productStatus === "UNAVAILABLE" ? (
           <button
-            onClick={handleAddToCartAndNavigate}
-            className="flex-1 bg-gray-500 text-white py-4 rounded"
+            className="flex-1 bg-gray-400 text-white py-4 rounded cursor-not-allowed"
+            disabled
           >
-            장바구니 담기
+            현재 품절된 상품입니다.
           </button>
-          <button
-            onClick={handleBuyNow}
-            className="flex-1 bg-green-500 text-white py-4 rounded"
-          >
-            구매하기
-          </button>
-        </div>
+        ) : (
+          <div className="flex flex-1 space-x-2">
+            <button
+              onClick={handleAddToCartAndNavigate}
+              className="flex-1 bg-gray-500 text-white py-4 rounded"
+            >
+              장바구니 담기
+            </button>
+            <button
+              onClick={handleBuyNow}
+              className="flex-1 bg-green-500 text-white py-4 rounded"
+            >
+              구매하기
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
