@@ -10,7 +10,7 @@ import Link from "next/link";
 import { ShoppingCart, Heart, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import myApi from "@/lib/axios";
+import { addToCart } from "@/feature/productDetail/ProductDetailButton-api";
 
 interface ProductResponseDto {
   id: number;
@@ -34,10 +34,15 @@ export function LikedProductsPage() {
   const username = userInfo?.username || "undefined";
   const router = useRouter();
 
-  // AlertMsg 3초 뒤 사라짐
-  setTimeout(() => {
-    setAlertMsg(null);
-  }, 3000);
+  // AlertMsg 5초 뒤 사라짐
+  useEffect(() => {
+    if (alertMsg) {
+      const timer = setTimeout(() => {
+        setAlertMsg(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [alertMsg]);
 
   // 찜 목록 불러오기
   useEffect(() => {
@@ -96,10 +101,16 @@ export function LikedProductsPage() {
   // 장바구니 담기 함수
   const handleAddToCart = async (productId: number) => {
     try {
-      const response = await myApi.post("cart", {
-        cartItemId: productId,
-        quantity: 1,
-      });
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setAlertType("destructive");
+
+        return;
+      }
+
+      // addToCart(productId: number, quantity: number, token: string)
+      const response = await addToCart(productId, 1, token);
+
       if (response.status === 200) {
         setAlertType("default");
         setAlertMsg("상품이 장바구니에 추가되었습니다.");
@@ -152,7 +163,23 @@ export function LikedProductsPage() {
             <AlertTitle>
               {alertType === "destructive" ? "오류" : "알림"}
             </AlertTitle>
-            <AlertDescription>{alertMsg}</AlertDescription>
+            <AlertDescription>
+              {alertMsg}
+              {alertType === "default" &&
+                alertMsg.includes("장바구니에 추가") && (
+                  <div className="mt-2 flex justify-end">
+                    <Button
+                      variant="outline"
+                      className="border-green-500 text-green-500 hover:border-green-600 hover:bg-green-50 hover:text-green-600"
+                      onClick={() => {
+                        router.push("/cart");
+                      }}
+                    >
+                      장바구니로 이동
+                    </Button>
+                  </div>
+                )}
+            </AlertDescription>
           </Alert>
         </div>
       )}

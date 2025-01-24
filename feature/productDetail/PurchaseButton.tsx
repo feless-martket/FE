@@ -27,58 +27,70 @@ export default function PurchaseButton({
 }: PurchaseButtonProps) {
   const router = useRouter();
   const auth = useContext(AuthContext);
-  const axiosInstance = axios.create({
-    baseURL: "http://localhost:8080",
-  });
 
-  // 찜 여부 & 찜 갯수
+  // 찜 여부 & 찜 개수
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(0);
 
   // "로그인이 필요합니다" 모달 상태
   const [showLoginModal, setShowLoginModal] = useState(false);
+  // "장바구니로 이동" 모달 상태
+  const [showCartModal, setShowCartModal] = useState(false);
 
-  // 초기 로드 시 찜 상태 세팅
   useEffect(() => {
-    async function initLikedState() {
-      if (!auth?.isLoggedIn || !auth.userInfo) return;
+    async function fetchLikeCount() {
       try {
-        const liked = await checkIsLiked(auth.userInfo.username, productId);
-        setIsLiked(liked);
         const count = await getLikeCount(productId);
         setLikeCount(count);
       } catch (error) {
-        console.error("좋아요 상태 초기화 실패", error);
+        console.error("좋아요 갯수 불러오기 실패:", error);
       }
     }
-    initLikedState();
+    fetchLikeCount();
+  }, [productId]);
+
+  useEffect(() => {
+    if (auth?.isLoggedIn && auth?.userInfo) {
+      checkIsLiked(auth.userInfo.username, productId)
+        .then((liked) => {
+          setIsLiked(liked);
+        })
+        .catch((error) => {
+          console.error("찜 여부 확인 실패:", error);
+        });
+    }
   }, [auth, productId]);
 
-  axiosInstance.interceptors.request.use(
-    (config) => {
-      const token = localStorage.getItem("accessToken");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    },
-    (error) => Promise.reject(error)
-  );
+  // 초기 로드 시 찜 상태 세팅
+  // useEffect(() => {
+  //   async function initLikedState() {
+  //     if (!auth?.isLoggedIn || !auth.userInfo) return;
+  //     try {
+  //       const liked = await checkIsLiked(auth.userInfo.username, productId);
+  //       setIsLiked(liked);
 
+  //       const count = await getLikeCount(productId);
+  //       setLikeCount(count);
+  //     } catch (error) {
+  //       console.error("좋아요 상태 초기화 실패", error);
+  //     }
+  //   }
+  //   initLikedState();
+  // }, [auth, productId]);
+
+  // 장바구니 담기 API 호출
   const handleAddToCartAndNavigate = async () => {
     try {
       const token = localStorage.getItem("accessToken");
-      if (!token) {
-        alert("로그인이 필요합니다.");
-        router.push("/login");
+      if (!auth?.isLoggedIn) {
+        setShowLoginModal(true);
         return;
       }
 
       const response = await addToCart(cartItemId, 1, token);
 
       if (response.status === 200) {
-        alert("상품이 장바구니에 추가되었습니다.");
-        router.push("/cart");
+        setShowCartModal(true);
       }
     } catch (error) {
       console.error("장바구니 추가 중 오류 발생:", error);
@@ -94,25 +106,33 @@ export default function PurchaseButton({
     }
   };
 
+  // 구매하기 로직
   const handleBuyNow = () => {
     alert("구매하기 로직을 구현하세요!");
   };
 
+  // 찜 토글 (좋아요)
   const handleLikeToggle = async () => {
     if (!auth?.isLoggedIn) {
       setShowLoginModal(true);
       return;
     }
 
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      alert("권한이 없습니다. 로그인 상태를 확인하세요.");
+      return;
+    }
+
     try {
       if (isLiked) {
-        const response = await cancelLike(auth.userInfo!.username, productId);
-        // alert(response.message || "찜 취소가 완료되었습니다.");
+        // 이미 찜 -> 찜 취소
+        await cancelLike(auth.userInfo!.username, productId);
         setIsLiked(false);
-        setLikeCount((prev) => prev - 1);
+        setLikeCount((prev) => Math.max(prev - 1, 0));
       } else {
-        const response = await addLike(auth.userInfo!.username, productId);
-        // alert(response.message || "찜 추가가 완료되었습니다.");
+        // 찜 추고
+        await addLike(auth.userInfo!.username, productId);
         setIsLiked(true);
         setLikeCount((prev) => prev + 1);
       }
@@ -144,32 +164,39 @@ export default function PurchaseButton({
             </span>
           </button>
 
-          {/* 장바구니 담기 버튼 */}
-        {productStatus === "UNAVAILABLE" ? (
-          <button
-            className="flex-1 bg-gray-400 text-white py-4 rounded cursor-not-allowed"
-            disabled
-          >
-            현재 품절된 상품입니다.
-          </button>
-        ) : (
-              <button
-              onClick={handleAddToCartAndNavigate}
-              className="flex-1 bg-gray-50 text-gray-700 py-3.5 px-4 rounded-full text-sm font-medium border border-gray-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-            >
-              장바구니 담기
-            </button>
-
-          {/* 구매하기 버튼 */}
+          {/* 상품 상태에 따른 버튼 렌더링 */}
+          {productStatus === "UNAVAILABLE" ? (
+            /* 품절된 상품일 경우 */
             <button
-              onClick={handleBuyNow}
-              className="flex-1 bg-green-500 text-white py-3.5 px-4 rounded-full text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              className="flex-1 cursor-not-allowed rounded bg-gray-400 py-4 text-white"
+              disabled
             >
-              구매하기
+              현재 품절된 상품입니다.
             </button>
-          </div>
-        )}
+          ) : (
+            /* 판매 중인 상품일 경우, 장바구니 + 구매하기 버튼 */
+            <>
+              {/* 장바구니 담기 버튼 */}
+              <button
+                onClick={handleAddToCartAndNavigate}
+                className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              >
+                장바구니 담기
+              </button>
+
+              {/* 구매하기 버튼 */}
+              <button
+                onClick={handleBuyNow}
+                className="flex-1 rounded-full bg-green-500 px-4 py-3.5 text-sm font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              >
+                구매하기
+              </button>
+            </>
+          )}
+        </div>
       </div>
+
+      {/* 로그인 필요 모달 */}
       <SecondModal
         open={showLoginModal}
         onClose={() => setShowLoginModal(false)}
@@ -180,6 +207,19 @@ export default function PurchaseButton({
         onConfirm={() => {
           setShowLoginModal(false);
           router.push("/login");
+        }}
+      />
+      {/* 장바구니로 이동 모달 */}
+      <SecondModal
+        open={showCartModal}
+        onClose={() => setShowCartModal(false)}
+        title="장바구니에 추가되었습니다."
+        description="장바구니로 이동하시겠습니까?"
+        confirmText="이동"
+        cancelText="계속 쇼핑"
+        onConfirm={() => {
+          setShowCartModal(false);
+          router.push("/cart");
         }}
       />
     </div>
