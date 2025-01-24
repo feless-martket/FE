@@ -1,5 +1,6 @@
 "use client";
 
+import { addToCart } from "@/feature/productDetail/ProductDetailButton-api"; // addToCart 함수 임포트
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
@@ -16,11 +17,13 @@ import { SecondModal } from "@/components/modal/secondmodal";
 interface PurchaseButtonProps {
   cartItemId: number;
   productId: number;
+  productStatus: "AVAILABLE" | "UNAVAILABLE";
 }
 
 export default function PurchaseButton({
   cartItemId,
   productId,
+  productStatus,
 }: PurchaseButtonProps) {
   const router = useRouter();
   const auth = useContext(AuthContext);
@@ -64,10 +67,14 @@ export default function PurchaseButton({
 
   const handleAddToCartAndNavigate = async () => {
     try {
-      const response = await axiosInstance.post("/cart", {
-        cartItemId,
-        quantity: 1,
-      });
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        router.push("/login");
+        return;
+      }
+
+      const response = await addToCart(cartItemId, 1, token);
 
       if (response.status === 200) {
         alert("상품이 장바구니에 추가되었습니다.");
@@ -75,7 +82,15 @@ export default function PurchaseButton({
       }
     } catch (error) {
       console.error("장바구니 추가 중 오류 발생:", error);
-      alert("장바구니에 담는 데 실패했습니다.");
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 403) {
+          alert("권한이 없습니다. 로그인 상태를 확인하세요.");
+        } else {
+          alert("장바구니에 담는 데 실패했습니다.");
+        }
+      } else {
+        alert("알 수 없는 오류가 발생했습니다.");
+      }
     }
   };
 
@@ -130,21 +145,30 @@ export default function PurchaseButton({
           </button>
 
           {/* 장바구니 담기 버튼 */}
+        {productStatus === "UNAVAILABLE" ? (
           <button
-            onClick={handleAddToCartAndNavigate}
-            className="flex-1 bg-gray-50 text-gray-700 py-3.5 px-4 rounded-full text-sm font-medium border border-gray-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="flex-1 bg-gray-400 text-white py-4 rounded cursor-not-allowed"
+            disabled
           >
-            장바구니 담기
+            현재 품절된 상품입니다.
           </button>
+        ) : (
+              <button
+              onClick={handleAddToCartAndNavigate}
+              className="flex-1 bg-gray-50 text-gray-700 py-3.5 px-4 rounded-full text-sm font-medium border border-gray-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            >
+              장바구니 담기
+            </button>
 
           {/* 구매하기 버튼 */}
-          <button
-            onClick={handleBuyNow}
-            className="flex-1 bg-green-500 text-white py-3.5 px-4 rounded-full text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-          >
-            구매하기
-          </button>
-        </div>
+            <button
+              onClick={handleBuyNow}
+              className="flex-1 bg-green-500 text-white py-3.5 px-4 rounded-full text-sm font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            >
+              구매하기
+            </button>
+          </div>
+        )}
       </div>
       <SecondModal
         open={showLoginModal}
