@@ -2,11 +2,14 @@
 import myApi from "@/lib/axios";
 import { baseURL } from "@/lib/axios";
 
-
-export const fetchProducts = async (subCategory: string, page: number, size :number) => {
+export const fetchProducts = async (
+  subCategory: string,
+  page: number,
+  size: number
+) => {
   try {
     const response = await myApi.get(
-        `/product/category/${encodeURIComponent(subCategory)}?page=${page}&size=${size}`
+      `/product/category/${encodeURIComponent(subCategory)}?page=${page}&size=${size}`
     );
     return response.data;
   } catch (error: any) {
@@ -16,8 +19,12 @@ export const fetchProducts = async (subCategory: string, page: number, size :num
     );
     throw error;
   }
-};  
-export const fetchProductsByMainCategory = async (mainCategory: string,page: number, size :number) => {
+};
+export const fetchProductsByMainCategory = async (
+  mainCategory: string,
+  page: number,
+  size: number
+) => {
   try {
     const response = await myApi.get(
       `/product/main-category/${encodeURIComponent(mainCategory)}?page=${page}&size=${size}`
