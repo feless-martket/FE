@@ -31,11 +31,6 @@ const vegetableSubCategories: Option[] = [
   { value: "GREEN_VEGETABLE", label: "오이·호박·고추" },
 ];
 
-const seafoodSubCategories: Option[] = [
-  { value: "FISH", label: "생선류" },
-  { value: "SHELLFISH", label: "조개류" },
-];
-
 const productStatuses: Option[] = [
   { value: "AVAILABLE", label: "판매 가능" },
   { value: "UNAVAILABLE", label: "판매 불가능" },
@@ -57,7 +52,6 @@ const quantities: Option[] = Array.from({ length: 100 }, (_, i) => ({
   label: String(i + 1),
 }));
 
-discountstatus;
 export default function ProductForm() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
