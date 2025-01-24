@@ -34,6 +34,12 @@ export function LikedProductsPage() {
   const username = userInfo?.username || "undefined";
   const router = useRouter();
 
+  // 할인 가격
+  const calculateFinalPrice = (price: number, discount: number) => {
+    const finalPrice = price - price * (discount / 100);
+    return new Intl.NumberFormat().format(finalPrice); // 천 단위로 콤마 추가
+  };
+
   // AlertMsg 5초 뒤 사라짐
   useEffect(() => {
     if (alertMsg) {
@@ -214,16 +220,30 @@ export function LikedProductsPage() {
                   <div className="line-clamp-2 text-sm group-hover:text-gray-900">
                     {product.name}
                   </div>
-                  <div className="mt-2 flex items-center gap-2">
-                    {product.discount && (
-                      <span className="font-medium text-red-500">
-                        {product.discount}%
+                  <div className="mb-1 flex items-center">
+                    {product.discount !== null &&
+                    product.discount !== undefined ? (
+                      <>
+                        <span className="mr-1 text-base font-bold text-rose-500">
+                          {product.discount}%
+                        </span>
+                        <span className="text-base font-bold">
+                          {calculateFinalPrice(product.price, product.discount)}
+                          원
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-base font-bold">
+                        {product.price.toLocaleString()}원
                       </span>
                     )}
-                    <span className="font-medium">
-                      {product.price.toLocaleString()}원
-                    </span>
                   </div>
+                  {product.discount !== null &&
+                    product.discount !== undefined && (
+                      <p className="text-xs text-gray-400 line-through">
+                        {product.price.toLocaleString()}원
+                      </p>
+                    )}
                 </div>
                 {/* 버튼 영역 */}
                 <div className="mt-2 flex justify-end space-x-2">
