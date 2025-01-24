@@ -121,11 +121,6 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
     return new Intl.NumberFormat().format(finalPrice); // 천 단위로 콤마 추가
   };
 
-  const calculateFinalPrice = (price: number, discount: number) => {
-    const finalPrice = price - price * (discount / 100);
-    return new Intl.NumberFormat().format(finalPrice); // 천 단위로 콤마 추가
-  };
-
   /**
    * 초기화 버튼 클릭 시
    */
