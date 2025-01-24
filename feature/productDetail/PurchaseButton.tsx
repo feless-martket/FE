@@ -1,5 +1,6 @@
 "use client";
 
+import { addToCart } from "@/feature/productDetail/ProductDetailButton-api"; // addToCart 함수 임포트
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
@@ -7,7 +8,7 @@ import axios from "axios";
 // 상품 상세 페이지에서 <PurchaseButton cartItemId={원하는아이디}/> 형태로 사용
 interface PurchaseButtonProps {
   cartItemId: number;
-  productStatus: string;
+  productStatus: "AVAILABLE" | "UNAVAILABLE";
 }
 
 export default function PurchaseButton({
@@ -15,29 +16,18 @@ export default function PurchaseButton({
   productStatus,
 }: PurchaseButtonProps) {
   const router = useRouter();
-  const axiosInstance = axios.create({
-    baseURL: "http://localhost:8080",
-  });
-
-  // 요청 인터셉터 (토큰 자동 설정)
-  axiosInstance.interceptors.request.use(
-    (config) => {
-      const token = localStorage.getItem("accessToken");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    },
-    (error) => Promise.reject(error)
-  );
 
   // 장바구니에 담고 나서 바로 장바구니 화면으로 이동하는 함수
   const handleAddToCartAndNavigate = async () => {
     try {
-      const response = await axiosInstance.post("/cart", {
-        cartItemId,
-        quantity: 1, // 기본 수량을 1로
-      });
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        router.push("/login");
+        return;
+      }
+
+      const response = await addToCart(cartItemId, 1, token);
 
       if (response.status === 200) {
         alert("상품이 장바구니에 추가되었습니다.");
@@ -45,13 +35,20 @@ export default function PurchaseButton({
       }
     } catch (error) {
       console.error("장바구니 추가 중 오류 발생:", error);
-      alert("장바구니에 담는 데 실패했습니다.");
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 403) {
+          alert("권한이 없습니다. 로그인 상태를 확인하세요.");
+        } else {
+          alert("장바구니에 담는 데 실패했습니다.");
+        }
+      } else {
+        alert("알 수 없는 오류가 발생했습니다.");
+      }
     }
   };
 
   const handleBuyNow = () => {
     alert("구매하기 로직을 구현하세요!");
-    // 예) 바로 결제 페이지로 이동하는 등
   };
 
   return (
