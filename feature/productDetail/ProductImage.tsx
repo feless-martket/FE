@@ -3,6 +3,15 @@ interface ProductImageProps {
 }
 
 export default function ProductImage({ imageUrls }: ProductImageProps) {
+  if (!imageUrls || imageUrls.length === 0) {
+    // 데이터가 아직 로드되지 않았을 때
+    return (
+      <div className="flex items-center justify-center bg-gray-50">
+        <p>Loading...</p> {/* 로딩 메시지 또는 스켈레톤 UI */}
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center justify-center bg-gray-50">
       <div className="p-4 max-w-xs">
