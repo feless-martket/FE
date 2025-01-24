@@ -23,6 +23,7 @@ interface ProductData {
   mainCategory: string;
   subCategory: string;
   imageUrls: string[];
+  discount : number;
 }
 
 export default function ProductPage({ params }: { params: { id: string } }) {
@@ -84,6 +85,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <ProductInfo
           productName={productData.name}
           productPrice={productData.price}
+          productDiscount ={productData.discount}
+          productdescription ={productData.description}
         />
         <DeliveryInfo />
         <ProductDetails />
@@ -92,7 +95,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         </div>
         <PurchaseButton cartItemId={Number(id)} productId={Number(id)} />
       </div>
-      <Footer />
+      <Footer/>
     </div>
   );
 }
