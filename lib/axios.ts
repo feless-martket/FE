@@ -11,23 +11,6 @@ const myApi = axios.create({
   },
 });
 
-// 요청 인터셉터: 로컬 스토리지에서 accessToken 가져와 Authorization 헤더 자동 설정
-// myApi.interceptors.request.use(
-//   (response)
-//   (config) => {
-//     if (typeof window !== "undefined") {
-//       const token = localStorage.getItem("accessToken");
-//       if (token && config.headers) {
-//         config.headers.Authorization = `Bearer ${token}`;
-//       }
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
-
 // axios.ts 파일 내에서 myApi 설정 이후에 추가
 myApi.interceptors.response.use(
   (response) => response,

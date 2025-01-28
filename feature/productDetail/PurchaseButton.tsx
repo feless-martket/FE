@@ -131,7 +131,7 @@ export default function PurchaseButton({
         setIsLiked(false);
         setLikeCount((prev) => Math.max(prev - 1, 0));
       } else {
-        // 찜 추고
+        // 찜 추가
         await addLike(auth.userInfo!.username, productId);
         setIsLiked(true);
         setLikeCount((prev) => prev + 1);
