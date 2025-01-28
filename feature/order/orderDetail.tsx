@@ -23,12 +23,12 @@ export default function OrderDetail({ order, onBack }: OrderDetailProps) {
     orderNumber: order.tossOrderID,
     status: order.orderStatus,
     deliveryInfo: {
-      recipient: order.memberInfos.name,
-      phone: order.memberInfos.phone,
-      address: order.memberInfos.address,
-      deatilAddress: order.memberInfos.detailAddress,
-      postalCode: order.memberInfos.postalCode,
-      request: order.memberInfos.deliveryNote,
+      recipient: order.memberInfo.name,
+      phone: order.memberInfo.phone,
+      address: order.memberInfo.address,
+      deatilAddress: order.memberInfo.detailAddress,
+      postalCode: order.memberInfo.postalCode,
+      request: order.memberInfo.deliveryNote,
     },
     payment: {
       method: order.paymentMethod,
@@ -67,11 +67,11 @@ export default function OrderDetail({ order, onBack }: OrderDetailProps) {
             <div className="flex">
               <span className="w-20 text-gray-600">주소</span>
               <span>
+                {`(${orderDetail.deliveryInfo.postalCode})`}
+                <br />
                 {orderDetail.deliveryInfo.address}
                 <br />
                 {orderDetail.deliveryInfo.deatilAddress}
-                <br />
-                {`(${orderDetail.deliveryInfo.postalCode})`}
               </span>
               {/* <span>{orderDetail.deliveryInfo.deatilAddress}</span> */}
             </div>
