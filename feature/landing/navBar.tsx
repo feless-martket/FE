@@ -6,15 +6,13 @@ import { cn } from "@/lib/utils";
 import RecommendedSection from "./section/recommendedSection";
 import NewSection from "./section/newSection";
 import BestSection from "./section/bestSection";
-import BudgetSection from "./section/bestSection";
-import SpecialSection from "./section/bestSection";
+import WeekendSaleSeciton from "./section/weekendSaleSection";
 
 const tabs = [
   { id: "recommended", label: "추천", component: RecommendedSection },
   { id: "new", label: "신상품", component: NewSection },
   { id: "best", label: "베스트", component: BestSection },
-  { id: "budget", label: "주말특가", component: BudgetSection },
-  // { id: "special", label: "특가/혜택", component: SpecialSection },
+  { id: "weekend", label: "주말특가", component: WeekendSaleSeciton },
 ];
 
 export default function NavigationTabs() {

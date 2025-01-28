@@ -67,7 +67,7 @@ export default function OrderDetail({ order, onBack }: OrderDetailProps) {
             <div className="flex">
               <span className="w-20 text-gray-600">주소</span>
               <span>
-                {`(${orderDetail.deliveryInfo.postalCode})`}
+                {`(햣${orderDetail.deliveryInfo.postalCode})`}
                 <br />
                 {orderDetail.deliveryInfo.address}
                 <br />
