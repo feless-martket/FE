@@ -15,15 +15,16 @@ import { categoryMapping } from "@/feature/category/category-mapping";
 import { mainCategoryMapping } from "@/feature/category/category-mapping";
 import { AuthContext } from "@/context/AuthContext";
 import {
-  checkIsLiked,
   addLike,
   cancelLike,
+  checkIsLiked,
 } from "@/feature/liked/api/liked-api";
+import { SecondModal } from "@/components/modal/secondmodal";
 
 interface Product {
   id: string;
   name: string;
-  price: number;
+  price: number; // 정가
   imageUrls: string[];
   delivery: string;
   category: string;
@@ -34,24 +35,27 @@ interface Product {
 
 export default function ProductList() {
   const searchParams = useSearchParams();
-  const mainParam = searchParams.get("main");
-  const paramCategory = searchParams.get("category");
-  const [currentPage, setCurrentPage] = useState(0);
-  const pageSize = 6;
-  const [totalPages, setTotalPages] = useState(1);
+  const mainParam = searchParams.get("main"); // 메인카테고리 파라미터
+  const paramCategory = searchParams.get("category"); // 서브카테고리 파라미터
+  const [currentPage, setCurrentPage] = useState(0); // 페이지 상태 추가
+  const pageSize = 6; // 페이지당 항목 수
+  const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
   const auth = useContext(AuthContext);
+  // "로그인이 필요합니다" 모달 상태
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+  // mainParam에 따른 서브카테고리 목록
   const currentCategory = categories.find(
     (category) => category.name === mainParam
   );
   const subcategories = currentCategory?.subCategories || [];
 
+  // URL 파라미터가 유효하면 이를 초기 선택된 탭으로 설정, 아니면 기본값 "전체보기" 사용
   const [selectedTab, setSelectedTab] = useState<string>(() => {
     if (paramCategory && subcategories.includes(paramCategory)) {
       return paramCategory;
@@ -59,13 +63,14 @@ export default function ProductList() {
     return "전체보기";
   });
 
+  // URL 파라미터 변경 시 selectedTab 업데이트
   useEffect(() => {
     if (paramCategory && subcategories.includes(paramCategory)) {
       setSelectedTab(paramCategory);
     }
   }, [paramCategory, subcategories]);
 
-  // 상품 목록과 좋아요 상태를 함께 불러오기
+  // 상품 목록 불러오기
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
@@ -80,8 +85,8 @@ export default function ProductList() {
             currentPage,
             pageSize
           );
-          data = response.content;
-          totalCount = response.totalElements;
+          data = response.content; // 상품 데이터
+          totalCount = response.totalElements; // 총 상품 개수
         } else {
           const apiCategory = categoryMapping[selectedTab] || selectedTab;
           const response = await fetchProducts(
@@ -93,7 +98,6 @@ export default function ProductList() {
           totalCount = response.totalElements;
         }
 
-        // 로그인한 경우 각 상품의 좋아요 상태 확인
         if (auth?.isLoggedIn && auth?.userInfo) {
           const productsWithLikeStatus = await Promise.all(
             data.map(async (product) => {
@@ -105,7 +109,7 @@ export default function ProductList() {
                 return { ...product, isLiked };
               } catch (error) {
                 console.error(
-                  `좋아요 상태 확인 실패 (상품 ID: ${product.id}):`,
+                  `좋아요 상태 확인 실패(상품 ID: ${product.id}:`,
                   error
                 );
                 return { ...product, isLiked: false };
@@ -116,8 +120,7 @@ export default function ProductList() {
         } else {
           setProducts(data.map((product) => ({ ...product, isLiked: false })));
         }
-
-        setTotalPages(Math.ceil(totalCount / pageSize));
+        setTotalPages(Math.ceil(totalCount / pageSize)); // 전체 페이지 수 계산
       } catch (err: any) {
         setError("상품을 불러오는 데 실패했습니다.");
       } finally {
@@ -129,9 +132,10 @@ export default function ProductList() {
 
   const calculateFinalPrice = (price: number, discount: number) => {
     const finalPrice = price - price * (discount / 100);
-    return new Intl.NumberFormat().format(finalPrice);
+    return new Intl.NumberFormat().format(finalPrice); // 천 단위로 콤마 추가
   };
 
+  // 페이지 버튼 클릭 시 페이지 변경 함수
   const handlePageChange = (page: number) => {
     if (page >= 0 && page < totalPages) {
       setCurrentPage(page);
@@ -206,11 +210,13 @@ export default function ProductList() {
         ))}
       </div>
 
+      {/* Loading & Error State */}
       {loading && (
         <div className="text-center text-gray-500">상품을 불러오는 중...</div>
       )}
       {error && <div className="text-center text-red-500">{error}</div>}
 
+      {/* Product Count and Filters */}
       <div className="mb-4 flex items-center justify-between px-4">
         <span className="text-sm text-gray-600">총 {products.length}개</span>
         <div className="flex gap-2">
@@ -223,6 +229,7 @@ export default function ProductList() {
         </div>
       </div>
 
+      {/* Product Grid */}
       <div className="grid grid-cols-2 gap-4 px-4">
         {products.map((product) => (
           <Link
@@ -231,25 +238,28 @@ export default function ProductList() {
             className="block"
           >
             <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
-              <div className="relative h-[120px] w-[140px]">
+              <div className="relative w-[140px] h-[120px]">
                 <Image
                   src={product.imageUrls[0] || "/placeholder.svg"}
                   alt={product.name}
-                  layout="fill"
-                  objectFit="cover"
+                  layout="fill" // 부모 요소를 채우도록 설정
+                  objectFit="cover" // 이미지 비율 유지
                   className="rounded-lg"
                 />
 
+                {/* 버튼 */}
                 <Button
                   size="icon"
                   variant="secondary"
-                  className={`absolute bottom-2 right-2 z-10 rounded-full ${
-                    product.isLiked ? "bg-rose-500 text-white" : "bg-gray-200"
-                  }`}
+                  className="absolute bottom-4 right-4 rounded-full opacity-90 hover:opacity-100"
                   onClick={(e) => handleLikeToggle(e, product.id)}
                 >
                   <Heart
-                    className={`size-4 ${product.isLiked ? "fill-current" : ""}`}
+                    className={`size-5 transition-all duration-300 ${
+                      product.isLiked
+                        ? "fill-green-500 text-green-500"
+                        : "fill-transparent text-green-500"
+                    }`}
                   />
                 </Button>
               </div>
@@ -283,7 +293,9 @@ export default function ProductList() {
         ))}
       </div>
 
-      <div className="mt-4 flex items-center justify-center gap-4">
+      {/* Pagination */}
+      {/* Pagination */}
+      <div className="mt-4 flex justify-center gap-4 items-center">
         <Button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 0}
@@ -305,6 +317,21 @@ export default function ProductList() {
           다음
         </Button>
       </div>
+      {/* 로그인 모달 */}
+      {showLoginModal && (
+        <SecondModal
+          open={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+          title="로그인이 필요합니다."
+          description="로그인 페이지로 이동하시겠습니까?"
+          confirmText="확인"
+          cancelText="취소"
+          onConfirm={() => {
+            setShowLoginModal(false);
+            router.push("/login");
+          }}
+        />
+      )}
     </div>
   );
 }
