@@ -4,18 +4,19 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, ShoppingCart } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { fetchProductsByDiscountStatus } from "@/feature/productList/fetchProductsByDiscountStatus";
 
 interface Product {
   id: string;
   name: string;
-  price: number; // 정가
+  price: number;
   imageUrls: string[];
   delivery: string;
   category: string;
 }
+
+type SortOption = "POPULAR" | "PRICE" | "DISCOUNT";
 
 export default function BudgetSection() {
   // 주말특가 상품만 가져옴
@@ -31,6 +32,19 @@ export default function BudgetSection() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 정렬 메뉴(드롭다운) 관련 상태
+  const [sortMenuOpen, setSortMenuOpen] = useState(false);
+
+  // 현재 어떤 정렬 옵션인지 관리
+  const [sortOption, setSortOption] = useState<SortOption>("POPULAR");
+
+  // 정렬 옵션을 한글 라벨로 표시하기 위한 매핑
+  const sortLabels: Record<SortOption, string> = {
+    POPULAR: "인기순",
+    PRICE: "가격순",
+    DISCOUNT: "할인율순",
+  };
+
   // 주말특가 상품 불러오기
   useEffect(() => {
     const loadProducts = async () => {
@@ -38,15 +52,35 @@ export default function BudgetSection() {
       setError(null);
 
       try {
-        console.log(currentPage);
-        console.log(pageSize);
         const response = await fetchProductsByDiscountStatus(
           discountStatus,
           currentPage,
           pageSize,
         );
         const { content, totalElements } = response;
-        setProducts(content);
+        // API로 가져온 상품 목록을 로컬 state에 저장
+        let newProducts: Product[] = content;
+
+        switch (sortOption) {
+          case "PRICE":
+            // 오름차순 가격순
+            newProducts = [...newProducts].sort((a, b) => a.price - b.price);
+            break;
+          case "DISCOUNT":
+            // 할인율순 (예: 정가 - 할인후가를 계산해 비교)
+            // 현재는 "35% 고정 할인"이라는 가정으로, 정가 대비 할인액이 큰 순으로 정렬
+            newProducts = [...newProducts].sort((a, b) => {
+              const discountA = a.price - a.price * 0.65;
+              const discountB = b.price - b.price * 0.65;
+              return discountB - discountA; // 큰 할인액 순
+            });
+            break;
+          case "POPULAR":
+          default:
+            break;
+        }
+
+        setProducts(newProducts);
         setTotalPages(Math.ceil(totalElements / pageSize));
       } catch (error) {
         setError("주말특가 상품을 불러오는 데 실패했습니다.");
@@ -56,7 +90,8 @@ export default function BudgetSection() {
     };
 
     loadProducts();
-  }, [discountStatus, currentPage]);
+    // sortOption 변경 시에도 재호출
+  }, [discountStatus, currentPage, sortOption]);
 
   // 페이지 버튼 클릭 시 페이지 변경 함수
   const handlePageChange = (page: number) => {
@@ -65,16 +100,56 @@ export default function BudgetSection() {
     }
   };
 
+  // 정렬 옵션이 바뀔 때 핸들러
+  const handleSortChange = (option: SortOption) => {
+    setSortOption(option);
+    setSortMenuOpen(false); // 메뉴 닫기
+    setCurrentPage(0); // 정렬이 바뀌었으니 페이지를 0으로 초기화하는 것도 고려
+  };
+
   return (
     <div className="flex flex-col">
-      {/* 제목 또는 섹션 헤더 */}
+      {/* 섹션 헤더 */}
       <div className="mb-4 mt-2 flex items-center justify-between px-4">
         <h2 className="text-lg font-bold text-emerald-600">주말특가</h2>
-        {/* 필요하다면 정렬/필터 버튼 추가 */}
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="text-sm">
-            추천순 <ChevronDown className="ml-1 size-4" />
-          </Button>
+
+        {/* 정렬/필터 버튼 그룹 */}
+        <div className="relative flex gap-2">
+          {/* 정렬 드롭다운 */}
+          <div className="relative inline-block text-left">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-sm"
+              onClick={() => setSortMenuOpen(!sortMenuOpen)}
+            >
+              {sortLabels[sortOption]} <ChevronDown className="ml-1 size-4" />
+            </Button>
+            {sortMenuOpen && (
+              <div className="absolute right-0 z-10 mt-2 w-36 rounded-md bg-white shadow-md">
+                <button
+                  className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                  onClick={() => handleSortChange("POPULAR")}
+                >
+                  인기순
+                </button>
+                <button
+                  className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                  onClick={() => handleSortChange("PRICE")}
+                >
+                  가격순
+                </button>
+                <button
+                  className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                  onClick={() => handleSortChange("DISCOUNT")}
+                >
+                  할인율순
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* 추가 필터 버튼 예시 */}
           <Button variant="outline" size="sm" className="text-sm">
             필터
           </Button>
