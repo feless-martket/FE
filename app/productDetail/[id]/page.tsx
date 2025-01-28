@@ -93,7 +93,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <div className="overflow-y-auto bg-gray-50">
           <ProductImages imageUrls={productData.imageUrls} />
         </div>
-        <PurchaseButton cartItemId={Number(id)} />
+        <PurchaseButton cartItemId={Number(id)} productId={Number(id)} />
       </div>
       <Footer/>
     </div>

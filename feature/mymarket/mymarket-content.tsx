@@ -3,9 +3,17 @@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SecondModal } from "@/components/modal/secondmodal";
+import { getLikedProducts } from "@/feature/liked/api/liked-api";
 
+interface ProductResponseDto {
+  id: number;
+  name: string;
+  price: number;
+  discount?: number;
+  imageUrls: string[];
+}
 interface MenuItem {
   id: string;
   name: string;
@@ -20,7 +28,7 @@ const menuItems: MenuItem[] = [
   { id: "orderHistory", name: "주문내역", link: "/orders" },
   { id: "shipping", name: "선물내역", link: "/gifts" },
   { id: "regular", name: "자주 사는 상품", link: "/frequent" },
-  { id: "liked", name: "찜한 상품", value: "5개", link: "/liked" },
+  { id: "liked", name: "찜한 상품", value: "0개", link: "/liked" },
   { id: "reviews", name: "상품후기", link: "/reviews" },
   { id: "refunds", name: "결제수단", link: "/payment" },
   { id: "address", name: "배송지 관리", link: "/address" },
@@ -42,6 +50,38 @@ interface MyMarketContentProps {
 export function MyMarketContent({ userInfo }: MyMarketContentProps) {
   const { logout } = useAuth(); // useAuth에서 logout 함수 가져오기
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const [likedCount, setLikedCount] = useState(0);
+
+  const [dynamicMenuItems, setDynamicMenuItems] =
+    useState<MenuItem[]>(menuItems);
+
+  useEffect(() => {
+    // userInfo에 username이 있는 경우에만 찜한 상품 목록 불러오기
+    if (!userInfo?.username) return;
+
+    async function fetchLikedProducts() {
+      try {
+        // getLikedProducts가 ProductResponseDto[] 반환한다고 가정
+        const products: ProductResponseDto[] = await getLikedProducts(
+          userInfo.username
+        );
+        const count = products.length;
+        setLikedCount(count);
+
+        // "liked" 항목의 value를 "{count}개"로 업데이트
+        setDynamicMenuItems((prev) =>
+          prev.map((item) =>
+            item.id === "liked" ? { ...item, value: `${count}개` } : item
+          )
+        );
+      } catch (error) {
+        console.error("찜 목록 불러오기 오류:", error);
+      }
+    }
+
+    fetchLikedProducts();
+  }, [userInfo]);
 
   return (
     <div className="pb-16">
@@ -65,7 +105,7 @@ export function MyMarketContent({ userInfo }: MyMarketContentProps) {
         </div>
       </div>
       <div className="flex flex-col">
-        {menuItems.map((item) => {
+        {dynamicMenuItems.map((item) => {
           if (item.id === "logout") {
             // 로그아웃 항목은 버튼으로 처리
             return (
