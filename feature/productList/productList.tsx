@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, useContext } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ChevronDown, ShoppingCart, Heart } from "lucide-react";
+import { ChevronDown, Heart } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   fetchProducts,
   fetchProductsByMainCategory,
@@ -14,35 +13,45 @@ import {
 import { categories } from "@/feature/category/category-list";
 import { categoryMapping } from "@/feature/category/category-mapping";
 import { mainCategoryMapping } from "@/feature/category/category-mapping";
+import { AuthContext } from "@/context/AuthContext";
+import {
+  checkIsLiked,
+  addLike,
+  cancelLike,
+} from "@/feature/liked/api/liked-api";
 
 interface Product {
   id: string;
   name: string;
-  price: number; // 정가
+  price: number;
   imageUrls: string[];
   delivery: string;
   category: string;
   discount?: number | null;
+  isLiked?: boolean;
+  likeCount?: number;
 }
 
 export default function ProductList() {
   const searchParams = useSearchParams();
-  const mainParam = searchParams.get("main"); // 메인카테고리 파라미터
-  const paramCategory = searchParams.get("category"); // 서브카테고리 파라미터
-  const [currentPage, setCurrentPage] = useState(0); // 페이지 상태 추가
-  const pageSize = 6; // 페이지당 항목 수
-  const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
+  const mainParam = searchParams.get("main");
+  const paramCategory = searchParams.get("category");
+  const [currentPage, setCurrentPage] = useState(0);
+  const pageSize = 6;
+  const [totalPages, setTotalPages] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // mainParam에 따른 서브카테고리 목록
+  const router = useRouter();
+  const auth = useContext(AuthContext);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
   const currentCategory = categories.find(
     (category) => category.name === mainParam
   );
   const subcategories = currentCategory?.subCategories || [];
 
-  // URL 파라미터가 유효하면 이를 초기 선택된 탭으로 설정, 아니면 기본값 "전체보기" 사용
   const [selectedTab, setSelectedTab] = useState<string>(() => {
     if (paramCategory && subcategories.includes(paramCategory)) {
       return paramCategory;
@@ -50,14 +59,13 @@ export default function ProductList() {
     return "전체보기";
   });
 
-  // URL 파라미터 변경 시 selectedTab 업데이트
   useEffect(() => {
     if (paramCategory && subcategories.includes(paramCategory)) {
       setSelectedTab(paramCategory);
     }
   }, [paramCategory, subcategories]);
 
-  // 상품 목록 불러오기
+  // 상품 목록과 좋아요 상태를 함께 불러오기
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
@@ -72,8 +80,8 @@ export default function ProductList() {
             currentPage,
             pageSize
           );
-          data = response.content; // 상품 데이터
-          totalCount = response.totalElements; // 총 상품 개수
+          data = response.content;
+          totalCount = response.totalElements;
         } else {
           const apiCategory = categoryMapping[selectedTab] || selectedTab;
           const response = await fetchProducts(
@@ -84,8 +92,32 @@ export default function ProductList() {
           data = response.content;
           totalCount = response.totalElements;
         }
-        setProducts(data);
-        setTotalPages(Math.ceil(totalCount / pageSize)); // 전체 페이지 수 계산
+
+        // 로그인한 경우 각 상품의 좋아요 상태 확인
+        if (auth?.isLoggedIn && auth?.userInfo) {
+          const productsWithLikeStatus = await Promise.all(
+            data.map(async (product) => {
+              try {
+                const isLiked = await checkIsLiked(
+                  auth.userInfo!.username,
+                  product.id
+                );
+                return { ...product, isLiked };
+              } catch (error) {
+                console.error(
+                  `좋아요 상태 확인 실패 (상품 ID: ${product.id}):`,
+                  error
+                );
+                return { ...product, isLiked: false };
+              }
+            })
+          );
+          setProducts(productsWithLikeStatus);
+        } else {
+          setProducts(data.map((product) => ({ ...product, isLiked: false })));
+        }
+
+        setTotalPages(Math.ceil(totalCount / pageSize));
       } catch (err: any) {
         setError("상품을 불러오는 데 실패했습니다.");
       } finally {
@@ -93,17 +125,65 @@ export default function ProductList() {
       }
     };
     loadProducts();
-  }, [selectedTab, currentPage]);
+  }, [selectedTab, currentPage, auth]);
 
   const calculateFinalPrice = (price: number, discount: number) => {
     const finalPrice = price - price * (discount / 100);
-    return new Intl.NumberFormat().format(finalPrice); // 천 단위로 콤마 추가
+    return new Intl.NumberFormat().format(finalPrice);
   };
 
-  // 페이지 버튼 클릭 시 페이지 변경 함수
   const handlePageChange = (page: number) => {
     if (page >= 0 && page < totalPages) {
       setCurrentPage(page);
+    }
+  };
+
+  const handleLikeToggle = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    productId: string
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!auth?.isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    const product = products.find((p) => p.id === productId);
+    if (!product) return;
+
+    try {
+      if (product.isLiked) {
+        const response = await cancelLike(auth.userInfo!.username, productId);
+        if (response.success) {
+          setProducts((prevProducts) =>
+            prevProducts.map((p) =>
+              p.id === productId
+                ? { ...p, isLiked: false, likeCount: response.likeCount }
+                : p
+            )
+          );
+        } else {
+          alert(response.message || "찜 취소에 실패했습니다.");
+        }
+      } else {
+        const response = await addLike(auth.userInfo!.username, productId);
+        if (response.success) {
+          setProducts((prevProducts) =>
+            prevProducts.map((p) =>
+              p.id === productId
+                ? { ...p, isLiked: true, likeCount: response.likeCount }
+                : p
+            )
+          );
+        } else {
+          alert(response.message || "찜 추가에 실패했습니다.");
+        }
+      }
+    } catch (error) {
+      console.error("찜 토글 실패:", error);
+      alert("찜 처리 중 오류가 발생했습니다.");
     }
   };
 
@@ -126,13 +206,11 @@ export default function ProductList() {
         ))}
       </div>
 
-      {/* Loading & Error State */}
       {loading && (
         <div className="text-center text-gray-500">상품을 불러오는 중...</div>
       )}
       {error && <div className="text-center text-red-500">{error}</div>}
 
-      {/* Product Count and Filters */}
       <div className="mb-4 flex items-center justify-between px-4">
         <span className="text-sm text-gray-600">총 {products.length}개</span>
         <div className="flex gap-2">
@@ -145,7 +223,6 @@ export default function ProductList() {
         </div>
       </div>
 
-      {/* Product Grid */}
       <div className="grid grid-cols-2 gap-4 px-4">
         {products.map((product) => (
           <Link
@@ -154,22 +231,26 @@ export default function ProductList() {
             className="block"
           >
             <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
-              <div className="relative w-[140px] h-[120px]">
+              <div className="relative h-[120px] w-[140px]">
                 <Image
                   src={product.imageUrls[0] || "/placeholder.svg"}
                   alt={product.name}
-                  layout="fill" // 부모 요소를 채우도록 설정
-                  objectFit="cover" // 이미지 비율 유지
+                  layout="fill"
+                  objectFit="cover"
                   className="rounded-lg"
                 />
 
-                {/* 버튼 */}
                 <Button
                   size="icon"
                   variant="secondary"
-                  className="absolute bottom-2 right-2 z-10 rounded-full bg-gray-200 p-1"
+                  className={`absolute bottom-2 right-2 z-10 rounded-full ${
+                    product.isLiked ? "bg-rose-500 text-white" : "bg-gray-200"
+                  }`}
+                  onClick={(e) => handleLikeToggle(e, product.id)}
                 >
-                  <Heart className="size-1 text-gray-600" />
+                  <Heart
+                    className={`size-4 ${product.isLiked ? "fill-current" : ""}`}
+                  />
                 </Button>
               </div>
               <p className="mb-1 text-xs text-gray-500">{product.delivery}</p>
@@ -202,9 +283,7 @@ export default function ProductList() {
         ))}
       </div>
 
-      {/* Pagination */}
-      {/* Pagination */}
-      <div className="mt-4 flex justify-center gap-4 items-center">
+      <div className="mt-4 flex items-center justify-center gap-4">
         <Button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 0}
