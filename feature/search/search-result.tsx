@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronDown, ShoppingCart } from "lucide-react";
+import { ChevronDown, ShoppingCart, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -201,7 +201,7 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
                         variant="secondary"
                         className="absolute bottom-2 right-2 z-10 rounded-full bg-gray-200 p-1"
                       >
-                        <ShoppingCart className="size-1 text-gray-600" />
+                        <Heart className="size-1 text-gray-600" />
                       </Button>
                     </div>
                     <p className="mb-1 text-xs text-gray-500">

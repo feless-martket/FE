@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ChevronDown, ShoppingCart } from "lucide-react";
+import { ChevronDown, ShoppingCart, Heart } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +22,7 @@ interface Product {
   imageUrls: string[];
   delivery: string;
   category: string;
-  discount ?: number|null
+  discount?: number | null;
 }
 
 export default function ProductList() {
@@ -95,8 +95,8 @@ export default function ProductList() {
     loadProducts();
   }, [selectedTab, currentPage]);
 
-  const calculateFinalPrice = (price: number, discount:number) => {
-    const finalPrice = price - (price * (discount / 100));
+  const calculateFinalPrice = (price: number, discount: number) => {
+    const finalPrice = price - price * (discount / 100);
     return new Intl.NumberFormat().format(finalPrice); // 천 단위로 콤마 추가
   };
 
@@ -153,52 +153,51 @@ export default function ProductList() {
             href={`/productDetail/${product.id}`}
             className="block"
           >
-           <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
-           <div className="relative w-[140px] h-[120px]">
-  <Image
-    src={product.imageUrls[0] || "/placeholder.svg"}
-    alt={product.name}
-    layout="fill" // 부모 요소를 채우도록 설정
-    objectFit="cover" // 이미지 비율 유지
-    className="rounded-lg"
-  />
+            <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
+              <div className="relative w-[140px] h-[120px]">
+                <Image
+                  src={product.imageUrls[0] || "/placeholder.svg"}
+                  alt={product.name}
+                  layout="fill" // 부모 요소를 채우도록 설정
+                  objectFit="cover" // 이미지 비율 유지
+                  className="rounded-lg"
+                />
 
-
-             {/* 버튼 */}
-             <Button
-               size="icon"
-               variant="secondary"
-               className="absolute bottom-2 right-2 z-10 rounded-full bg-gray-200 p-1"
-             >
-               <ShoppingCart className="size-1 text-gray-600" />
-             </Button>
-           </div>
+                {/* 버튼 */}
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="absolute bottom-2 right-2 z-10 rounded-full bg-gray-200 p-1"
+                >
+                  <Heart className="size-1 text-gray-600" />
+                </Button>
+              </div>
               <p className="mb-1 text-xs text-gray-500">{product.delivery}</p>
               <h3 className="mb-1 line-clamp-1 text-sm font-medium text-gray-800">
                 {product.name}
               </h3>
               <div className="mb-1 flex items-center">
-                  {product.discount !== null && product.discount !== undefined ? (
-                    <>
-                      <span className="mr-1 text-base font-bold text-rose-500">
-                        {product.discount}%
-                      </span>
-                      <span className="text-base font-bold">
-                        {calculateFinalPrice(product.price, product.discount)}원
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-base font-bold">
-                      {product.price.toLocaleString()}원
+                {product.discount !== null && product.discount !== undefined ? (
+                  <>
+                    <span className="mr-1 text-base font-bold text-rose-500">
+                      {product.discount}%
                     </span>
-                  )}
-                </div>
-                {product.discount !== null && product.discount !== undefined && (
-                  <p className="text-xs text-gray-400 line-through">
+                    <span className="text-base font-bold">
+                      {calculateFinalPrice(product.price, product.discount)}원
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-base font-bold">
                     {product.price.toLocaleString()}원
-                  </p>
+                  </span>
                 )}
               </div>
+              {product.discount !== null && product.discount !== undefined && (
+                <p className="text-xs text-gray-400 line-through">
+                  {product.price.toLocaleString()}원
+                </p>
+              )}
+            </div>
           </Link>
         ))}
       </div>
