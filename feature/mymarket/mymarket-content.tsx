@@ -17,7 +17,7 @@ const menuItems: MenuItem[] = [
   { id: "points", name: "적립금", value: "96원", link: "/points" },
   { id: "coupons", name: "쿠폰", value: "0장", link: "/coupons" },
   { id: "loan", name: "친구초대", value: "지금 5,000원 받기", link: "/invite" },
-  { id: "orderHistory", name: "주문내역", link: "/orders" },
+  { id: "orderHistory", name: "주문내역", link: "/order" },
   { id: "shipping", name: "선물내역", link: "/gifts" },
   { id: "regular", name: "자주 사는 상품", link: "/frequent" },
   { id: "liked", name: "찜한 상품", value: "5개", link: "/liked" },

@@ -5,13 +5,13 @@ interface ProductImageProps {
 export default function ProductImage({ imageUrls }: ProductImageProps) {
   return (
     <div className="flex items-center justify-center bg-gray-50">
-      <div className="p-4 max-w-xs">
+      <div className="max-w-xs p-4">
         {" "}
         {/* 최대 너비를 더 작게 설정 */}
         <img
           src={imageUrls[0]}
           alt="Product"
-          className="rounded-lg w-full h-auto object-cover"
+          className="h-auto w-full rounded-lg object-cover"
         />
       </div>
     </div>

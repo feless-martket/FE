@@ -13,8 +13,8 @@ const tabs = [
   { id: "recommended", label: "추천", component: RecommendedSection },
   { id: "new", label: "신상품", component: NewSection },
   { id: "best", label: "베스트", component: BestSection },
-  { id: "budget", label: "알뜰쇼핑", component: BudgetSection },
-  { id: "special", label: "특가/혜택", component: SpecialSection },
+  { id: "budget", label: "주말특가", component: BudgetSection },
+  // { id: "special", label: "특가/혜택", component: SpecialSection },
 ];
 
 export default function NavigationTabs() {
@@ -25,7 +25,7 @@ export default function NavigationTabs() {
 
   return (
     <div>
-      <nav className="top-[90px] z-10 h-[38px] w-[360px] bg-background">
+      <nav className="top-[90px] z-10 mt-[51px] h-[38px] w-[360px] bg-background">
         <div className="flex h-full">
           {tabs.map((tab) => (
             <button

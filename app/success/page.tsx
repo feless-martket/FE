@@ -105,7 +105,7 @@ export default function SuccessPage() {
           tossOrderId: confirmJson.orderId,
           paymentKey: confirmJson.paymentKey,
           balanceAmount: confirmJson.balanceAmount,
-          paymentMethod: confirmJson.method,
+          paymentMethod: confirmJson.easyPay.provider,
           totalPrice: orderData.totalPrice,
           usedPoint: orderData?.usedPoints,
           shipping: {

@@ -1,35 +1,39 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { OrderList } from "@/app/order/page";
+import { parse, format } from "date-fns";
 
 interface OrderDetailProps {
-  orderId: string;
+  order: OrderList;
   onBack: () => void;
 }
 
-export default function OrderDetail({ orderId, onBack }: OrderDetailProps) {
+export default function OrderDetail({ order, onBack }: OrderDetailProps) {
+  const parsedDate = parse(
+    order.orderDate,
+    "yyyy-MM-dd'T'HH:mm:ss.SSSSSS",
+    new Date(),
+  );
+  const formattedDate = format(parsedDate, "yyyy.MM.dd (HH시 mm분)");
+
   const orderDetail = {
-    orderDate: "2023.06.11 01:05",
-    orderNumber: "2288291924",
-    status: "배송완료",
+    orderDate: formattedDate,
+    orderNumber: order.tossOrderID,
+    status: order.orderStatus,
     deliveryInfo: {
-      recipient: "홍길동",
-      phone: "010-1234-5678",
-      address: "서울특별시 강남구 테헤란로 123 456동 789호",
-      request: "문 앞에 놓아주세요",
-    },
-    product: {
-      name: "[롤렉스] 제주 슈퍼드 모짜렐라 치즈 (100g X 3)",
-      price: 53365,
-      quantity: 1,
+      recipient: order.memberInfos.name,
+      phone: order.memberInfos.phone,
+      address: order.memberInfos.address,
+      deatilAddress: order.memberInfos.detailAddress,
+      postalCode: order.memberInfos.postalCode,
+      request: order.memberInfos.deliveryNote,
     },
     payment: {
-      method: "신용카드",
-      cardInfo: "신한카드 1234",
-      totalPrice: 53365,
-      shippingFee: 0,
+      method: order.paymentMethod,
+      totalPrice: order.totalPrice - 3000,
+      shippingFee: 3000,
     },
   };
 
@@ -42,9 +46,9 @@ export default function OrderDetail({ orderId, onBack }: OrderDetailProps) {
         <div className="rounded-lg bg-gray-50 p-4">
           <div className="mb-2 text-lg font-medium">{orderDetail.status}</div>
           <div className="text-sm text-gray-600">
-            주문일시 {orderDetail.orderDate}
+            주문일시: {orderDetail.orderDate}
             <br />
-            주문번호 {orderDetail.orderNumber}
+            주문번호: {orderDetail.orderNumber}
           </div>
         </div>
 
@@ -62,7 +66,14 @@ export default function OrderDetail({ orderId, onBack }: OrderDetailProps) {
             </div>
             <div className="flex">
               <span className="w-20 text-gray-600">주소</span>
-              <span>{orderDetail.deliveryInfo.address}</span>
+              <span>
+                {orderDetail.deliveryInfo.address}
+                <br />
+                {orderDetail.deliveryInfo.deatilAddress}
+                <br />
+                {`(${orderDetail.deliveryInfo.postalCode})`}
+              </span>
+              {/* <span>{orderDetail.deliveryInfo.deatilAddress}</span> */}
             </div>
             <div className="flex">
               <span className="w-20 text-gray-600">배송요청</span>
@@ -76,12 +87,15 @@ export default function OrderDetail({ orderId, onBack }: OrderDetailProps) {
         {/* Product Info */}
         <div>
           <h2 className="mb-3 font-medium">주문상품</h2>
-          <div className="rounded-lg border p-4">
-            <div className="mb-3 font-medium">{orderDetail.product.name}</div>
-            <div className="text-sm text-gray-600">
-              {orderDetail.product.price.toLocaleString()}원 ·{" "}
-              {orderDetail.product.quantity}개
-            </div>
+          <div className="space-y-2 rounded-lg border p-4">
+            {order.products.map((prod) => (
+              <div key={prod.id} className="text-sm">
+                <div className="font-medium">{prod.name}</div>
+                <div className="text-gray-600">
+                  {prod.price.toLocaleString()}원 · {prod.quantity}개
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -92,10 +106,6 @@ export default function OrderDetail({ orderId, onBack }: OrderDetailProps) {
             <div className="flex justify-between">
               <span className="text-gray-600">결제방법</span>
               <span>{orderDetail.payment.method}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">카드정보</span>
-              <span>{orderDetail.payment.cardInfo}</span>
             </div>
             <Separator className="my-3" />
             <div className="flex justify-between">
