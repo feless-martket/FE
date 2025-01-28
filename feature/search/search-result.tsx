@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { ChevronDown, ShoppingCart, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,6 +15,10 @@ import {
   FilterParams,
 } from "@/feature/search/search-api";
 import { filterMapping } from "@/feature/search/filter-mapping";
+import { AuthContext } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { addLike, cancelLike } from "@/feature/liked/api/liked-api";
+import { SecondModal } from "@/components/modal/secondmodal";
 
 // 필터 옵션 상수
 const FILTER_OPTIONS: FilterCategory = {
@@ -48,6 +52,16 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
     []
   );
   const [selectedDeliveries, setSelectedDeliveries] = useState<string[]>([]);
+
+  // Auth, 라우터
+  const auth = useContext(AuthContext);
+  const router = useRouter();
+  // 로그인 모달
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  // 상품별 찜 여부를 관리하기위한 객체
+  const [likedProducts, setLikedProducts] = useState<{
+    [productId: number]: boolean;
+  }>({});
 
   // const [selectedPrices, setSelectedPrices] = useState<string[]>([]);
   // const [selectedDiscounts, setSelectedDiscounts] = useState<string[]>([]);
@@ -147,6 +161,87 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
     }
   };
 
+  // 상품 별 찜 여부 확인 & 토글 기능
+  useEffect(() => {
+    if (auth?.isLoggedIn && auth?.userInfo && filteredProducts.length > 0) {
+      const fetchLikedStatusForAll = async () => {
+        try {
+          const statuses: { [key: number]: boolean } = {};
+
+          // 상품 목록을 순회하며 checkIsLiked API 호출
+          for (const product of filteredProducts) {
+            const isLiked = await checkIsLiked(
+              auth.userInfo.username,
+              product.id
+            );
+            statuses[product.id] = isLiked;
+          }
+
+          setLikedProducts(statuses);
+        } catch (error) {
+          console.error("전체 찜 여부 확인 실패:", error);
+        }
+      };
+
+      fetchLikedStatusForAll();
+    }
+  }, [auth, filteredProducts]);
+
+  /**
+   * 찜 토글 버튼을 클릭했을 때
+   */
+  const handleLikeToggle = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    productId: number
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 로그인 안됐으면 로그인 모달 열거나 다른 처리
+    if (!auth?.isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      alert("권한이 없습니다. 로그인 상태를 확인하세요.");
+      return;
+    }
+
+    // 현재 상품의 찜상태
+    const currentlyLiked = likedProducts[productId] ?? false;
+
+    try {
+      if (currentlyLiked) {
+        // 이미 찜되어 있다면 => 찜 해제
+        const response = await cancelLike(auth.userInfo!.username, productId);
+        if (response.success) {
+          setLikedProducts((prev) => ({
+            ...prev,
+            [productId]: false,
+          }));
+        } else {
+          alert(response.message || "찜 취소에 실패했습니다.");
+        }
+      } else {
+        // 찜 안되어 있다면 => 찜 추가
+        const response = await addLike(auth.userInfo!.username, productId);
+        if (response.success) {
+          setLikedProducts((prev) => ({
+            ...prev,
+            [productId]: true,
+          }));
+        } else {
+          alert(response.message || "찜 추가에 실패했습니다.");
+        }
+      }
+    } catch (error: any) {
+      console.error("찜 토글 실패:", error);
+      alert("찜 처리 중 오류가 발생했습니다.");
+    }
+  };
+
   const deliveryMapping: { [key: string]: string } = {
     GENERAL_DELIVERY: "일반배송",
     EARLY_DELIVERY: "새벽배송",
@@ -200,8 +295,15 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
                         size="icon"
                         variant="secondary"
                         className="absolute bottom-2 right-2 z-10 rounded-full bg-gray-200 p-1"
+                        onClick={(e) => handleLikeToggle(e, product.id)}
                       >
-                        <Heart className="size-1 text-gray-600" />
+                        <Heart
+                          className={`size-5 transition-all duration-300 ${
+                            likedProducts[product.id]
+                              ? "fill-green-500 text-green-500"
+                              : "fill-transparent text-green-500"
+                          }`}
+                        />
                       </Button>
                     </div>
                     <p className="mb-1 text-xs text-gray-500">
@@ -248,6 +350,19 @@ export function ProductFilter({ results, onFilterChange }: ProductFilterProps) {
           </div>
         </ScrollArea>
       </div>
+      {/* 로그인 필요 모달 */}
+      <SecondModal
+        open={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        title="로그인이 필요합니다."
+        description="로그인 페이지로 이동하시겠습니까?"
+        confirmText="확인"
+        cancelText="취소"
+        onConfirm={() => {
+          setShowLoginModal(false);
+          router.push("/login");
+        }}
+      />
     </div>
   );
 }
