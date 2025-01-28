@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Crown } from "lucide-react";
 import {
   fetchBestLikedProducts,
@@ -14,24 +14,38 @@ const BestSection: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchBestProducts = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const fetchedProducts = await fetchBestLikedProducts(10);
-        setProducts(fetchedProducts);
-      } catch (err: any) {
-        console.error("베스트 상품 불러오기 오류:", err);
-        setError("인기 상품을 불러오는 데 실패했습니다.");
-        alert("인기 상품을 불러오는 데 실패했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBestProducts();
+  const fetchBestProducts = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const fetchedProducts = await fetchBestLikedProducts(10);
+      setProducts(fetchedProducts.sort((a, b) => b.likeCount - a.likeCount));
+    } catch (err: any) {
+      console.error("베스트 상품 불러오기 오류:", err);
+      setError("인기 상품을 불러오는 데 실패했습니다.");
+      alert("인기 상품을 불러오는 데 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchBestProducts();
+  }, [fetchBestProducts]);
+
+  const handleLikeUpdate = useCallback(
+    (productId: number, newLikeCount: number) => {
+      setProducts((prevProducts) => {
+        const updatedProducts = prevProducts.map((product) =>
+          product.id === productId
+            ? { ...product, likeCount: newLikeCount }
+            : product
+        );
+        return updatedProducts.sort((a, b) => b.likeCount - a.likeCount);
+      });
+    },
+    []
+  );
 
   return (
     <div className="px-4 py-6 bg-gray-50">
@@ -54,7 +68,12 @@ const BestSection: React.FC = () => {
       {!loading && (
         <div className="divide-y divide-gray-100 bg-white rounded-lg overflow-hidden shadow">
           {products.map((product, index) => (
-            <ProductCard key={product.id} product={product} index={index} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              index={index}
+              onLikeUpdate={handleLikeUpdate}
+            />
           ))}
         </div>
       )}

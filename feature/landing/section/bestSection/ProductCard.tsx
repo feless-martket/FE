@@ -19,9 +19,14 @@ import { SecondModal } from "@/components/modal/secondmodal";
 interface ProductCardProps {
   product: ProductResponseDto;
   index: number;
+  onLikeUpdate: (productId: number, newLikeCount: number) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
+const ProductCard: React.FC<ProductCardProps> = ({
+  product,
+  index,
+  onLikeUpdate,
+}) => {
   const isTopThree = index < 3;
   const finalPrice = product.discount
     ? Math.floor(product.price * (1 - product.discount / 100))
@@ -65,7 +70,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
         const response = await cancelLike(auth.userInfo!.username, product.id);
         if (response.success) {
           setIsLiked(false);
-          setLikeCount((prev) => Math.max(prev - 1, 0));
+          const newLikeCount = Math.max(likeCount - 1, 0);
+          setLikeCount(newLikeCount);
+          onLikeUpdate(product.id, newLikeCount);
         } else {
           alert(response.message || "찜 취소에 실패했습니다.");
         }
@@ -73,7 +80,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
         const response = await addLike(auth.userInfo!.username, product.id);
         if (response.success) {
           setIsLiked(true);
-          setLikeCount((prev) => prev + 1);
+          const newLikeCount = likeCount + 1;
+          setLikeCount(newLikeCount);
+          onLikeUpdate(product.id, newLikeCount);
         } else {
           alert(response.message || "찜 추가에 실패했습니다.");
         }
@@ -140,7 +149,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
         aria-label={isLiked ? "찜 취소하기" : "찜하기"}
       >
         <Heart
-          className={`h-5 w-5 transition-all duration-300 ${
+          className={`size-5 transition-all duration-300 ${
             isLiked
               ? "fill-green-500 text-green-500"
               : "fill-transparent text-green-500"
@@ -151,18 +160,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
         </span>
       </button>
 
-      <SecondModal
-        open={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        title="로그인이 필요합니다."
-        description="로그인 페이지로 이동하시겠습니까?"
-        confirmText="확인"
-        cancelText="취소"
-        onConfirm={() => {
-          setShowLoginModal(false);
-          router.push("/login");
-        }}
-      />
+      {showLoginModal && (
+        // eslint-disable-next-line tailwindcss/migration-from-tailwind-2
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+            <h2 className="mb-4 text-lg font-semibold text-gray-800">
+              로그인이 필요합니다
+            </h2>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowLoginModal(false)}
+                className="rounded px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => router.push("/login")}
+                className="rounded bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              >
+                로그인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
