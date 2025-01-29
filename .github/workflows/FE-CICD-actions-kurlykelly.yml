@@ -1,0 +1,82 @@
+name: Blue-Green Deployment
+
+on:
+  push:
+    branches: [release]
+
+env:
+  NEXT_PUBLIC_SERVER_BASE_URL_BLUE: ${{ secrets.NEXT_PUBLIC_SERVER_BASE_URL_BLUE }}
+  NEXT_PUBLIC_SERVER_BASE_URL_GREEN: ${{ secrets.NEXT_PUBLIC_SERVER_BASE_URL_GREEN }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build application
+        run: npm run build
+
+      - name: Check current active environment
+        id: check-active
+        run: |
+          # 현재 활성화된 환경 확인 (예: API 호출 또는 파일 확인)
+          CURRENT_ENV=$(curl -s ${{ secrets.STATUS_CHECK_URL }})
+          echo "::set-output name=current::$CURRENT_ENV"
+
+      - name: Deploy to Blue
+        if: steps.check-active.outputs.current == 'green'
+        env:
+          NEXT_PUBLIC_SERVER_BASE_URL: ${{ env.NEXT_PUBLIC_SERVER_BASE_URL_BLUE }}
+        run: |
+          # 블루 환경 배포 스크립트
+          ./deploy-blue.sh
+
+      - name: Deploy to Green
+        if: steps.check-active.outputs.current == 'blue'
+        env:
+          NEXT_PUBLIC_SERVER_BASE_URL: ${{ env.NEXT_PUBLIC_SERVER_BASE_URL_GREEN }}
+        run: |
+          # 그린 환경 배포 스크립트
+          ./deploy-green.sh
+
+      - name: Health Check
+        id: health_check
+        run: |
+          # 새로 배포된 환경의 헬스 체크
+          HEALTH_STATUS=$(curl -s ${{ secrets.HEALTH_CHECK_URL }})
+          if [ "$HEALTH_STATUS" != "healthy" ]; then
+            echo "Health check failed"
+            exit 1
+          fi
+
+      - name: Switch Traffic
+        if: success()
+        run: |
+          # 트래픽 전환 (로드밸런서 설정 변경 등)
+          if [ "${{ steps.check-active.outputs.current }}" == "blue" ]; then
+            # 그린으로 전환
+            ./switch-to-green.sh
+          else
+            # 블루로 전환
+            ./switch-to-blue.sh
+          fi
+
+      - name: Rollback on Failure
+        if: failure()
+        run: |
+          # 배포 실패시 이전 환경으로 롤백
+          if [ "${{ steps.check-active.outputs.current }}" == "blue" ]; then
+            ./switch-to-blue.sh
+          else
+            ./switch-to-green.sh
+          fi

@@ -1,7 +1,10 @@
 import axios from "axios";
-const { NEXT_PUBLIC_SERVER_BASE_URL_DEV } = process.env;
-export const baseURL =
-  NEXT_PUBLIC_SERVER_BASE_URL_DEV || "http://localhost:8080";
+
+if (!process.env.NEXT_PUBLIC_SERVER_BASE_URL) {
+  throw new Error("NEXT_PUBLIC_SERVER_BASE_URL이 설정되지 않았습니다.");
+}
+
+export const baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_URL;
 
 const myApi = axios.create({
   baseURL,
