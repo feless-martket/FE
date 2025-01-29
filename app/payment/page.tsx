@@ -19,7 +19,7 @@ interface DeliveryAddress {
   zipCode?: string;
   address: string;
   detailAddress: string;
-  deliveryNote?: string;
+  deliveryNote: string;
 }
 
 interface OrderItem {
@@ -158,7 +158,7 @@ export default function OrderPage() {
     localStorage.setItem(ORDER_DATA_KEY, JSON.stringify(updatedOrderData));
     console.log(
       "[OrderPage] Updated deliveryNote and saved to localStorage:",
-      updatedOrderData,
+      updatedOrderData
     );
   };
 
@@ -208,7 +208,7 @@ export default function OrderPage() {
         {/* 요청사항 */}
         <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
         <DeliveryNotes
-          deliveryNote={deliveryAddress.deliveryNote}
+          deliveryNote={deliveryAddress.deliveryNote || ""}
           onSave={handleSaveDeliveryNote}
         />
 
