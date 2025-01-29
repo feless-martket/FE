@@ -1,6 +1,5 @@
 // API 클라이언트
 import myApi from "@/lib/axios";
-import { baseURL } from "@/lib/axios";
 
 export const fetchProducts = async (
   subCategory: string,

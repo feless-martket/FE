@@ -182,7 +182,7 @@ export default function SearchFeature() {
 
       {/* 검색 결과가 있을 때 → 필터 컴포넌트 렌더 */}
       {showResults && (
-        <>
+        <React.Fragment>
           {console.log(
             "부모가 ProductFilter에 넘겨주는 productFilters:",
             productFilters

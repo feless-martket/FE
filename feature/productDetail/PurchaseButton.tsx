@@ -87,6 +87,11 @@ export default function PurchaseButton({
         return;
       }
 
+      if (!token) {
+        alert("권한이 없습니다. 로그인 상태를 확인하세요.");
+        return;
+      }
+
       const response = await addToCart(cartItemId, 1, token);
 
       if (response.status === 200) {
@@ -168,7 +173,7 @@ export default function PurchaseButton({
           {productStatus === "UNAVAILABLE" ? (
             /* 품절된 상품일 경우 */
             <button
-              className="flex-1 cursor-not-allowed rounded bg-gray-400 py-4 text-white"
+              className="flex-1 rounded-full bg-gray-400 px-4 py-3.5 text-sm font-medium text-white"
               disabled
             >
               현재 품절된 상품입니다.

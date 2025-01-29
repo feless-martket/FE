@@ -22,15 +22,19 @@ import {
 import { SecondModal } from "@/components/modal/secondmodal";
 
 interface Product {
-  id: string;
+  id: number;
   name: string;
-  price: number; // 정가
+  price: number;
   imageUrls: string[];
   delivery: string;
   category: string;
   discount?: number | null;
   isLiked?: boolean;
   likeCount?: number;
+  productStatus: "AVAILABLE" | "UNAVAILABLE";
+  mainCategory?: string;
+  subCategory?: string;
+  description?: string;
 }
 
 export default function ProductList() {
@@ -53,6 +57,7 @@ export default function ProductList() {
   const currentCategory = categories.find(
     (category) => category.name === mainParam
   );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const subcategories = currentCategory?.subCategories || [];
 
   // URL 파라미터가 유효하면 이를 초기 선택된 탭으로 설정, 아니면 기본값 "전체보기" 사용
@@ -100,7 +105,7 @@ export default function ProductList() {
 
         if (auth?.isLoggedIn && auth?.userInfo) {
           const productsWithLikeStatus = await Promise.all(
-            data.map(async (product) => {
+            data.map(async (product: Product) => {
               try {
                 const isLiked = await checkIsLiked(
                   auth.userInfo!.username,
@@ -118,9 +123,15 @@ export default function ProductList() {
           );
           setProducts(productsWithLikeStatus);
         } else {
-          setProducts(data.map((product) => ({ ...product, isLiked: false })));
+          setProducts(
+            data.map((product: Product) => ({
+              ...product,
+              isLiked: false,
+            }))
+          );
         }
         setTotalPages(Math.ceil(totalCount / pageSize)); // 전체 페이지 수 계산
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err: any) {
         setError("상품을 불러오는 데 실패했습니다.");
       } finally {
@@ -144,7 +155,7 @@ export default function ProductList() {
 
   const handleLikeToggle = async (
     e: React.MouseEvent<HTMLButtonElement>,
-    productId: string
+    productId: number
   ) => {
     e.preventDefault();
     e.stopPropagation();
@@ -293,7 +304,6 @@ export default function ProductList() {
         ))}
       </div>
 
-      {/* Pagination */}
       {/* Pagination */}
       <div className="mt-4 flex justify-center gap-4 items-center">
         <Button

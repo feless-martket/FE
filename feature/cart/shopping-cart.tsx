@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useContext } from "react";
-import axios from "axios";
 import { Header } from "@/components/layout/header";
 import { AuthContext } from "@/context/AuthContext";
 import Link from "next/link";
@@ -30,15 +29,16 @@ interface CartData {
 
 // 장바구니 컴포넌트
 export const ShoppingCart = () => {
-  const { isLoading: authLoading, isLoggedIn } = useContext(AuthContext); // AuthContext에서 로그인 상태 가져오기
+  const authContext = useContext(AuthContext);
+  const isLoggedIn = authContext?.isLoggedIn;
 
   const [cartData, setCartData] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemsToDelete, setItemsToDelete] = useState<number[]>([]);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const router = useRouter();
   const goToPayment = () => {
@@ -79,7 +79,7 @@ export const ShoppingCart = () => {
       } else {
         setCartData(response.data);
         setSelectedItems(
-          response.data.cartItems.map((item) => item.cartItemId),
+          response.data.cartItems.map((item) => item.cartItemId)
         );
       }
 
@@ -111,7 +111,7 @@ export const ShoppingCart = () => {
       const updatedCartItems = prev.cartItems.map((item) =>
         item.cartItemId === cartItemId
           ? { ...item, quantity: Math.max(newQuantity, 1) }
-          : item,
+          : item
       );
 
       const updatedTotalPrice = calculateTotalPrice(updatedCartItems);
@@ -151,7 +151,9 @@ export const ShoppingCart = () => {
           quantity: quantity,
         },
       });
-      console.log("수량 업데이트 성공:", response.data);
+      if (response.status === 200) {
+        console.log("수량 업데이트 성공:", response.data);
+      }
     } catch (err: any) {
       if (err.response?.status === 400) {
         setError("잘못된 요청입니다. 수량은 1 이상이어야 합니다.");
@@ -161,6 +163,8 @@ export const ShoppingCart = () => {
       console.error("Error saving cart item:", err);
     } finally {
       setIsSaving(false);
+      // 에러 발생 시 장바구니 데이터 다시 불러오기
+      //fetchCartData();
     }
   };
 
@@ -178,7 +182,7 @@ export const ShoppingCart = () => {
     setSelectedItems((prev) =>
       prev.includes(cartItemId)
         ? prev.filter((id) => id !== cartItemId)
-        : [...prev, cartItemId],
+        : [...prev, cartItemId]
     );
   };
 
@@ -210,8 +214,8 @@ export const ShoppingCart = () => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }),
-        ),
+          })
+        )
       );
 
       setIsDeleteModalOpen(false);
@@ -236,7 +240,7 @@ export const ShoppingCart = () => {
       .reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  if (authLoading || loading) return <div>Loading...</div>;
+  if (loading) return <div>Loading...</div>;
 
   // 로그인 인증이 되지 않은 사용자의 경우
   if (!isLoggedIn) {
