@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev-json-server": "next dev & json-server db.json -p 5001",
-    "build": "next build",
+    "build": "next build --no-lint",
     "start": "next start",
     "lint": "eslint . --ignore-path .gitignore --fix"
   },
