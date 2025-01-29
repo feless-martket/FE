@@ -2,7 +2,7 @@ name: Blue-Green Deployment
 
 on:
   push:
-    branches: [main]
+    branches: [release]
 
 env:
   NEXT_PUBLIC_SERVER_BASE_URL_BLUE: ${{ secrets.NEXT_PUBLIC_SERVER_BASE_URL_BLUE }}
