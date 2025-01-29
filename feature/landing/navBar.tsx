@@ -5,9 +5,9 @@ import { cn } from "@/lib/utils";
 
 import RecommendedSection from "./section/recommendedSection";
 import NewSection from "./section/newSection";
-import BestSection from "./section/bestSection";
-import BudgetSection from "./section/bestSection";
-import SpecialSection from "./section/bestSection";
+import BestSection from "./section/bestSection/bestSection";
+import BudgetSection from "@/feature/landing/section/BudgetSection";
+import SpecialSection from "@/feature/landing/section/SpecialSection";
 
 const tabs = [
   { id: "recommended", label: "추천", component: RecommendedSection },
@@ -35,7 +35,7 @@ export default function NavigationTabs() {
                 "flex-1 text-sm relative",
                 activeTab === tab.id
                   ? "font-pretendard text-[14px] font-semibold leading-[17px] -tracking-wider text-[#0DBD88]"
-                  : "font-pretendard text-[14px] font-semibold leading-[17px] -tracking-wider text-gray-500",
+                  : "font-pretendard text-[14px] font-semibold leading-[17px] -tracking-wider text-gray-500"
               )}
             >
               {tab.label}

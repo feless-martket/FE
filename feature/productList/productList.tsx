@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, useContext } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ChevronDown, ShoppingCart } from "lucide-react";
+import { ChevronDown, Heart } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   fetchProducts,
   fetchProductsByMainCategory,
@@ -14,6 +13,13 @@ import {
 import { categories } from "@/feature/category/category-list";
 import { categoryMapping } from "@/feature/category/category-mapping";
 import { mainCategoryMapping } from "@/feature/category/category-mapping";
+import { AuthContext } from "@/context/AuthContext";
+import {
+  addLike,
+  cancelLike,
+  checkIsLiked,
+} from "@/feature/liked/api/liked-api";
+import { SecondModal } from "@/components/modal/secondmodal";
 
 interface Product {
   id: string;
@@ -22,7 +28,9 @@ interface Product {
   imageUrls: string[];
   delivery: string;
   category: string;
-  discount ?: number|null
+  discount?: number | null;
+  isLiked?: boolean;
+  likeCount?: number;
 }
 
 export default function ProductList() {
@@ -35,6 +43,11 @@ export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
+  const auth = useContext(AuthContext);
+  // "로그인이 필요합니다" 모달 상태
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // mainParam에 따른 서브카테고리 목록
   const currentCategory = categories.find(
@@ -84,7 +97,29 @@ export default function ProductList() {
           data = response.content;
           totalCount = response.totalElements;
         }
-        setProducts(data);
+
+        if (auth?.isLoggedIn && auth?.userInfo) {
+          const productsWithLikeStatus = await Promise.all(
+            data.map(async (product) => {
+              try {
+                const isLiked = await checkIsLiked(
+                  auth.userInfo!.username,
+                  product.id
+                );
+                return { ...product, isLiked };
+              } catch (error) {
+                console.error(
+                  `좋아요 상태 확인 실패(상품 ID: ${product.id}:`,
+                  error
+                );
+                return { ...product, isLiked: false };
+              }
+            })
+          );
+          setProducts(productsWithLikeStatus);
+        } else {
+          setProducts(data.map((product) => ({ ...product, isLiked: false })));
+        }
         setTotalPages(Math.ceil(totalCount / pageSize)); // 전체 페이지 수 계산
       } catch (err: any) {
         setError("상품을 불러오는 데 실패했습니다.");
@@ -93,10 +128,10 @@ export default function ProductList() {
       }
     };
     loadProducts();
-  }, [selectedTab, currentPage]);
+  }, [selectedTab, currentPage, auth]);
 
-  const calculateFinalPrice = (price: number, discount:number) => {
-    const finalPrice = price - (price * (discount / 100));
+  const calculateFinalPrice = (price: number, discount: number) => {
+    const finalPrice = price - price * (discount / 100);
     return new Intl.NumberFormat().format(finalPrice); // 천 단위로 콤마 추가
   };
 
@@ -104,6 +139,55 @@ export default function ProductList() {
   const handlePageChange = (page: number) => {
     if (page >= 0 && page < totalPages) {
       setCurrentPage(page);
+    }
+  };
+
+  const handleLikeToggle = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    productId: string
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!auth?.isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    const product = products.find((p) => p.id === productId);
+    if (!product) return;
+
+    try {
+      if (product.isLiked) {
+        const response = await cancelLike(auth.userInfo!.username, productId);
+        if (response.success) {
+          setProducts((prevProducts) =>
+            prevProducts.map((p) =>
+              p.id === productId
+                ? { ...p, isLiked: false, likeCount: response.likeCount }
+                : p
+            )
+          );
+        } else {
+          alert(response.message || "찜 취소에 실패했습니다.");
+        }
+      } else {
+        const response = await addLike(auth.userInfo!.username, productId);
+        if (response.success) {
+          setProducts((prevProducts) =>
+            prevProducts.map((p) =>
+              p.id === productId
+                ? { ...p, isLiked: true, likeCount: response.likeCount }
+                : p
+            )
+          );
+        } else {
+          alert(response.message || "찜 추가에 실패했습니다.");
+        }
+      }
+    } catch (error) {
+      console.error("찜 토글 실패:", error);
+      alert("찜 처리 중 오류가 발생했습니다.");
     }
   };
 
@@ -153,52 +237,58 @@ export default function ProductList() {
             href={`/productDetail/${product.id}`}
             className="block"
           >
-           <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
-           <div className="relative w-[140px] h-[120px]">
-  <Image
-    src={product.imageUrls[0] || "/placeholder.svg"}
-    alt={product.name}
-    layout="fill" // 부모 요소를 채우도록 설정
-    objectFit="cover" // 이미지 비율 유지
-    className="rounded-lg"
-  />
+            <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
+              <div className="relative w-[140px] h-[120px]">
+                <Image
+                  src={product.imageUrls[0] || "/placeholder.svg"}
+                  alt={product.name}
+                  layout="fill" // 부모 요소를 채우도록 설정
+                  objectFit="cover" // 이미지 비율 유지
+                  className="rounded-lg"
+                />
 
-
-             {/* 버튼 */}
-             <Button
-               size="icon"
-               variant="secondary"
-               className="absolute bottom-2 right-2 z-10 rounded-full bg-gray-200 p-1"
-             >
-               <ShoppingCart className="size-1 text-gray-600" />
-             </Button>
-           </div>
+                {/* 버튼 */}
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="absolute bottom-4 right-4 rounded-full opacity-90 hover:opacity-100"
+                  onClick={(e) => handleLikeToggle(e, product.id)}
+                >
+                  <Heart
+                    className={`size-5 transition-all duration-300 ${
+                      product.isLiked
+                        ? "fill-green-500 text-green-500"
+                        : "fill-transparent text-green-500"
+                    }`}
+                  />
+                </Button>
+              </div>
               <p className="mb-1 text-xs text-gray-500">{product.delivery}</p>
               <h3 className="mb-1 line-clamp-1 text-sm font-medium text-gray-800">
                 {product.name}
               </h3>
               <div className="mb-1 flex items-center">
-                  {product.discount !== null && product.discount !== undefined ? (
-                    <>
-                      <span className="mr-1 text-base font-bold text-rose-500">
-                        {product.discount}%
-                      </span>
-                      <span className="text-base font-bold">
-                        {calculateFinalPrice(product.price, product.discount)}원
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-base font-bold">
-                      {product.price.toLocaleString()}원
+                {product.discount !== null && product.discount !== undefined ? (
+                  <>
+                    <span className="mr-1 text-base font-bold text-rose-500">
+                      {product.discount}%
                     </span>
-                  )}
-                </div>
-                {product.discount !== null && product.discount !== undefined && (
-                  <p className="text-xs text-gray-400 line-through">
+                    <span className="text-base font-bold">
+                      {calculateFinalPrice(product.price, product.discount)}원
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-base font-bold">
                     {product.price.toLocaleString()}원
-                  </p>
+                  </span>
                 )}
               </div>
+              {product.discount !== null && product.discount !== undefined && (
+                <p className="text-xs text-gray-400 line-through">
+                  {product.price.toLocaleString()}원
+                </p>
+              )}
+            </div>
           </Link>
         ))}
       </div>
@@ -227,6 +317,21 @@ export default function ProductList() {
           다음
         </Button>
       </div>
+      {/* 로그인 모달 */}
+      {showLoginModal && (
+        <SecondModal
+          open={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+          title="로그인이 필요합니다."
+          description="로그인 페이지로 이동하시겠습니까?"
+          confirmText="확인"
+          cancelText="취소"
+          onConfirm={() => {
+            setShowLoginModal(false);
+            router.push("/login");
+          }}
+        />
+      )}
     </div>
   );
 }
