@@ -72,15 +72,24 @@ export default function CarouselImages() {
             />
 
             {/* 상품 이름 */}
+<<<<<<< HEAD
             <span className="mb-2 block w-[120px] truncate text-[15px] font-medium">
+=======
+            <span className="text-[15px] font-medium block w-[120px] overflow-hidden whitespace-nowrap text-ellipsis mb-2">
+>>>>>>> 691e603fcdea28fb680f2c9e75bc7481066f3d7d
               {product.name}
             </span>
 
             {/* 가격 및 할인 정보 */}
             <div>
               <ul>
+<<<<<<< HEAD
                 <li className="flex items-center text-xs">
                   <span className="mr-2 text-sm font-bold text-red-500">
+=======
+                <li className="text-xs flex items-center">
+                  <span className="text-red-500 text-sm font-bold mr-2">
+>>>>>>> 691e603fcdea28fb680f2c9e75bc7481066f3d7d
                     {product.discount}%
                   </span>
                   <span className="text-sm font-bold">
