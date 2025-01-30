@@ -82,6 +82,7 @@ export default function BudgetSection() {
 
         setProducts(newProducts);
         setTotalPages(Math.ceil(totalElements / pageSize));
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         setError("주말특가 상품을 불러오는 데 실패했습니다.");
       } finally {
