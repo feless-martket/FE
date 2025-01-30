@@ -11,21 +11,14 @@ import { ShoppingCart, Heart, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { addToCart } from "@/feature/productDetail/ProductDetailButton-api";
-
-interface ProductResponseDto {
-  id: number;
-  name: string;
-  price: number;
-  discount?: number;
-  imageUrls: string[];
-}
+import { ProductResponseDto } from "@/feature/landing/section/bestSection/bestProductService";
 
 export function LikedProductsPage() {
   const [products, setProducts] = useState<ProductResponseDto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [alertMsg, setAlertMsg] = useState<String | null>(null);
+  const [alertMsg, setAlertMsg] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<"default" | "destructive">(
     "default"
   );
