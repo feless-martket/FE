@@ -11,6 +11,7 @@ interface Product {
   id: string;
   name: string;
   price: number;
+  discount: number;
   imageUrls: string[];
   delivery: string;
   category: string;
@@ -116,7 +117,6 @@ export default function BudgetSection() {
 
         {/* 정렬/필터 버튼 그룹 */}
         <div className="relative flex gap-2">
-          {/* 정렬 드롭다운 */}
           <div className="relative inline-block text-left">
             <Button
               variant="outline"
@@ -150,7 +150,6 @@ export default function BudgetSection() {
             )}
           </div>
 
-          {/* 추가 필터 버튼 예시 */}
           <Button variant="outline" size="sm" className="text-sm">
             필터
           </Button>
@@ -191,9 +190,8 @@ export default function BudgetSection() {
                 {product.name}
               </h3>
               <div className="mb-1 flex items-center">
-                {/* 할인율 예시 35% 고정 */}
                 <span className="mr-1 text-base font-bold text-rose-500">
-                  35%
+                  {product.discount}%
                 </span>
                 <span className="text-base font-bold">
                   {(product.price * 0.65).toLocaleString()}원

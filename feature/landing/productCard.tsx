@@ -50,17 +50,17 @@ export default function CarouselImages() {
               try {
                 isLiked = await checkIsLiked(
                   auth.userInfo.username,
-                  product.id
+                  product.id,
                 );
               } catch (error) {
                 console.error(
                   `찜 여부 확인 실패(상품 ID: ${product.id}):`,
-                  error
+                  error,
                 );
               }
             }
             return { ...product, isLiked };
-          })
+          }),
         );
         setProducts(productsWithLike);
       } catch (error) {
@@ -80,7 +80,7 @@ export default function CarouselImages() {
 
   const handleLikeToggle = async (
     e: React.MouseEvent<HTMLButtonElement>,
-    productId: number
+    productId: number,
   ) => {
     e.preventDefault();
     e.stopPropagation();
@@ -107,8 +107,8 @@ export default function CarouselImages() {
             prevProducts.map((p) =>
               p.id === productId
                 ? { ...p, isLiked: false, likeCount: response.likeCount }
-                : p
-            )
+                : p,
+            ),
           );
         } else {
           alert(response.message || "찜 취소에 실패했습니다.");
@@ -120,8 +120,8 @@ export default function CarouselImages() {
             prevProducts.map((p) =>
               p.id === productId
                 ? { ...p, isLiked: true, likeCount: response.likeCount }
-                : p
-            )
+                : p,
+            ),
           );
         } else {
           alert(response.message || "찜 추가에 실패했습니다.");
@@ -133,20 +133,12 @@ export default function CarouselImages() {
     }
   };
   return (
-<<<<<<< HEAD
     <div className="flex items-center justify-center">
-=======
-    <div className="flex justify-center items-center">
->>>>>>> 691e603fcdea28fb680f2c9e75bc7481066f3d7d
       <div className="overflow-x-auto">
         {products.map((product) => (
           <Card
             key={product.id}
-<<<<<<< HEAD
             className="group relative w-[320px] overflow-hidden rounded-md shadow-lg"
-=======
-            className="group relative w-[320px] rounded-md overflow-hidden shadow-lg"
->>>>>>> 691e603fcdea28fb680f2c9e75bc7481066f3d7d
             onClick={() => goToDetailPage(product.id)} // 클릭 시 상세 페이지로 이동
           >
             {/* 주말특가 배너 */}
@@ -167,10 +159,6 @@ export default function CarouselImages() {
                   size="icon"
                   variant="secondary"
                   className="absolute bottom-4 right-4 rounded-full opacity-90 hover:opacity-100"
-<<<<<<< HEAD
-                >
-                  <ShoppingCart className="size-4" />
-=======
                   onClick={(e) => handleLikeToggle(e, product.id)}
                 >
                   <Heart
@@ -180,7 +168,6 @@ export default function CarouselImages() {
                         : "fill-transparent text-green-500"
                     }`}
                   />
->>>>>>> 691e603fcdea28fb680f2c9e75bc7481066f3d7d
                 </Button>
               </div>
 
@@ -197,11 +184,7 @@ export default function CarouselImages() {
                   <span className="text-lg font-bold">
                     {calculateDiscountedPrice(
                       product.price,
-<<<<<<< HEAD
                       product.discount,
-=======
-                      product.discount
->>>>>>> 691e603fcdea28fb680f2c9e75bc7481066f3d7d
                     ).toLocaleString()}
                     원
                   </span>
@@ -219,8 +202,6 @@ export default function CarouselImages() {
           </Card>
         ))}
       </div>
-<<<<<<< HEAD
-=======
       {/* 로그인 모달 */}
       {showLoginModal && (
         <SecondModal
@@ -236,7 +217,6 @@ export default function CarouselImages() {
           }}
         />
       )}
->>>>>>> 691e603fcdea28fb680f2c9e75bc7481066f3d7d
     </div>
   );
 }

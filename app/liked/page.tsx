@@ -4,8 +4,7 @@ import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { PageLayout } from "@/components/layout/pagelayout";
 import { LikedProductsPage } from "@/feature/liked/liked-products";
-import { ChevronLeft, ShoppingCart } from "lucide-react";
-import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function Page() {
@@ -18,9 +17,9 @@ export default function Page() {
         closeButton={
           <button
             onClick={() => router.back()}
-            className="absolute left-0 top-1 flex h-6 w-6 items-center justify-center"
+            className="absolute left-0 top-1 flex size-6 items-center justify-center"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="size-6" />
           </button>
         }
       />
