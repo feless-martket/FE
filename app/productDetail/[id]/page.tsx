@@ -19,7 +19,7 @@ interface ProductData {
   description: string;
   price: number;
   quantity: number;
-  ProductStatus: "AVAILABLE" | "UNAVAILABLE";
+  productStatus: "AVAILABLE" | "UNAVAILABLE";
   mainCategory: string;
   subCategory: string;
   imageUrls: string[];
@@ -93,12 +93,12 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <div className="overflow-y-auto bg-gray-50">
           <ProductImages imageUrls={productData.imageUrls} />
         </div>
+        <></>
         <PurchaseButton 
-        cartItemId={Number(id)} 
-        productId={Number(id)}
-          productStatus = {productData.ProductStatus}
-
-        />
+    cartItemId={Number(id)} 
+    productId={Number(id)}
+    productStatus={productData.productStatus} 
+/>
       </div>
       <Footer/>
     </div>
