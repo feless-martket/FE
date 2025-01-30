@@ -48,7 +48,7 @@ const ORDER_DATA_KEY = "orderData";
 export default function OrderPage() {
   const router = useRouter();
   const authContext = useContext(AuthContext);
-  const { isLoading, isLoggedIn, userInfo } = authContext || {};
+  const { userInfo } = authContext || {}; //isLoading, isLoggedIn 제외
 
   // 장바구니 아이템
   const [cartItems, setCartItems] = useState<any[]>([]);

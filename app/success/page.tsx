@@ -37,7 +37,7 @@ const ORDER_DATA_KEY = "orderData";
 export default function SuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [responseData, setResponseData] = useState(null);
+  // const [responseData, setResponseData] = useState(null);
 
   // 중복 호출 방지
   const hasConfirmedRef = useRef(false);
@@ -105,16 +105,16 @@ export default function SuccessPage() {
           tossOrderId: confirmJson.orderId,
           paymentKey: confirmJson.paymentKey,
           balanceAmount: confirmJson.balanceAmount,
-          paymentMethod: confirmJson.method,
-          totalPrice: orderData.totalPrice,
+          paymentMethod: confirmJson.easyPay.provider,
+          totalPrice: orderData?.totalPrice,
           usedPoint: orderData?.usedPoints,
           shipping: {
-            zipCode: orderData.deliveryAddress.zipCode,
-            address: orderData.deliveryAddress.address,
-            detailAddress: orderData.deliveryAddress.detailAddress,
+            zipCode: orderData?.deliveryAddress.zipCode,
+            address: orderData?.deliveryAddress.address,
+            detailAddress: orderData?.deliveryAddress.detailAddress,
             deliveryNote: orderData?.deliveryAddress.deliveryNote,
           },
-          orderItems: orderData.items.map((it) => ({
+          orderItems: orderData?.items.map((it) => ({
             productId: it.id,
             quantity: it.quantity,
           })),
@@ -146,7 +146,7 @@ export default function SuccessPage() {
         handleClearLocalStorage();
 
         // state에 저장
-        setResponseData(confirmJson);
+        // setResponseData(confirmJson);
       } catch (error: any) {
         // 실패 시 fail 페이지로 이동
         console.error("오류:", error);

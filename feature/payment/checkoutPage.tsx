@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import { v4 as uuidv4 } from "uuid";
 import { nanoid } from "nanoid";
-import Router from "next/router";
+import { PaymentWidgets } from "@/feature/payment/types/tossPayment";
 
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 const customerKey = uuidv4();
@@ -18,7 +18,7 @@ export function CheckoutPage({
   totalAmount,
   onSaveOrderData,
 }: CheckoutPageProps) {
-  const [widgets, setWidgets] = useState(null);
+  const [widgets, setWidgets] = useState<PaymentWidgets | null>(null);
   const [ready, setReady] = useState(false);
 
   // 렌더링(ref) 체크: 'renderPaymentMethods'가 이미 실행되었는지 확인
@@ -42,14 +42,14 @@ export function CheckoutPage({
 
     async function renderOrUpdateWidgets() {
       if (!hasRenderedRef.current) {
-        // **최초**: 위젯 렌더
-        await widgets.setAmount({ currency: "KRW", value: totalAmount });
+        // 위젯 렌더
+        await widgets?.setAmount({ currency: "KRW", value: totalAmount });
         await Promise.all([
-          widgets.renderPaymentMethods({
+          widgets?.renderPaymentMethods({
             selector: "#payment-method",
             variantKey: "DEFAULT",
           }),
-          widgets.renderAgreement({
+          widgets?.renderAgreement({
             selector: "#agreement",
             variantKey: "AGREEMENT",
           }),
@@ -57,7 +57,7 @@ export function CheckoutPage({
         setReady(true);
         hasRenderedRef.current = true;
       } else {
-        await widgets.setAmount({ currency: "KRW", value: totalAmount });
+        await widgets?.setAmount({ currency: "KRW", value: totalAmount });
       }
     }
 

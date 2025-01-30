@@ -19,7 +19,7 @@ interface Product {
 
 type SortOption = "POPULAR" | "PRICE" | "DISCOUNT";
 
-export default function NewSection() {
+export default function BudgetSection() {
   // 주말특가 상품만 가져옴
   const discountStatus = "WEEKEND_SPECIAL";
 
@@ -113,7 +113,7 @@ export default function NewSection() {
     <div className="flex flex-col">
       {/* 섹션 헤더 */}
       <div className="mb-4 mt-2 flex items-center justify-between px-4">
-        <h2 className="text-lg font-bold text-emerald-600">신상품</h2>
+        <h2 className="text-lg font-bold text-emerald-600">주말특가</h2>
 
         {/* 정렬/필터 버튼 그룹 */}
         <div className="relative flex gap-2">
