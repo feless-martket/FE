@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { ChevronDown, ShoppingCart, Heart } from "lucide-react";
+import { ChevronDown, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
-import ProductImage from "@/feature/productDetail/ProductImage";
+
 import { FilterTabs } from "@/feature/search/FilterTabs";
 import { FilterCategory, Product } from "@/feature/search/filter";
 import {
@@ -17,7 +16,11 @@ import {
 import { filterMapping } from "@/feature/search/filter-mapping";
 import { AuthContext } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { addLike, cancelLike } from "@/feature/liked/api/liked-api";
+import {
+  addLike,
+  cancelLike,
+  checkIsLiked,
+} from "@/feature/liked/api/liked-api";
 import { SecondModal } from "@/components/modal/secondmodal";
 
 // 필터 옵션 상수
