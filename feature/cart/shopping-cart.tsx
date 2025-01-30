@@ -16,7 +16,7 @@ interface CartItem {
   productName: string;
   quantity: number;
   price: number;
-  imgURL: string;
+  imageUrls: string[];
   isSelected?: boolean;
 }
 

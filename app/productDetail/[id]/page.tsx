@@ -19,7 +19,7 @@ interface ProductData {
   description: string;
   price: number;
   quantity: number;
-  productStatus: string;
+  productStatus: "AVAILABLE" | "UNAVAILABLE";
   mainCategory: string;
   subCategory: string;
   imageUrls: string[];
