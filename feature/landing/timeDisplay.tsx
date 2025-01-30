@@ -34,8 +34,8 @@ function TimeDisplay() {
   return (
     <div className="flex items-center space-x-2">
       {/* 시계 아이콘 */}
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500">
-        <ClockIcon className="h-4 w-4 text-white" />
+      <div className="flex size-8 items-center justify-center rounded-full bg-green-500">
+        <ClockIcon className="size-4 text-white" />
       </div>
 
       {/* 시간 표시 */}

@@ -23,7 +23,7 @@ interface ProductData {
   mainCategory: string;
   subCategory: string;
   imageUrls: string[];
-  discount : number;
+  discount: number;
 }
 
 export default function ProductPage({ params }: { params: { id: string } }) {
@@ -57,10 +57,10 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
         <div className="w-full max-w-[360px] bg-white p-4">
           {/* 스켈레톤 UI */}
-          <div className="h-8 w-3/4 bg-gray-200 rounded animate-pulse mb-4"></div>
-          <div className="h-[200px] w-full bg-gray-200 rounded-lg animate-pulse mb-4"></div>
-          <div className="h-6 w-1/2 bg-gray-200 rounded animate-pulse mb-2"></div>
-          <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+          <div className="mb-4 h-8 w-3/4 animate-pulse rounded bg-gray-200"></div>
+          <div className="mb-4 h-[200px] w-full animate-pulse rounded-lg bg-gray-200"></div>
+          <div className="mb-2 h-6 w-1/2 animate-pulse rounded bg-gray-200"></div>
+          <div className="h-4 w-3/4 animate-pulse rounded bg-gray-200"></div>
         </div>
       </div>
     );
@@ -85,8 +85,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <ProductInfo
           productName={productData.name}
           productPrice={productData.price}
-          productDiscount ={productData.discount}
-          productdescription ={productData.description}
+          productDiscount={productData.discount}
+          productdescription={productData.description}
         />
         <DeliveryInfo />
         <ProductDetails />
@@ -94,13 +94,13 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           <ProductImages imageUrls={productData.imageUrls} />
         </div>
         <></>
-        <PurchaseButton 
-    cartItemId={Number(id)} 
-    productId={Number(id)}
-    productStatus={productData.productStatus} 
-/>
+        <PurchaseButton
+          cartItemId={Number(id)}
+          productId={Number(id)}
+          productStatus={productData.productStatus}
+        />
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

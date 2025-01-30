@@ -19,7 +19,7 @@ interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           headers: {
             Authorization: `Bearer ${token}`, // Authorization 헤더에 토큰 포함
           },
-        }
+        },
       );
     } catch (error) {
       console.error("로그아웃 API 호출 실패: ", error);
