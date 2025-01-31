@@ -19,11 +19,11 @@ interface ProductData {
   description: string;
   price: number;
   quantity: number;
-  productStatus: string;
+  productStatus: "AVAILABLE" | "UNAVAILABLE";
   mainCategory: string;
   subCategory: string;
   imageUrls: string[];
-  discount : number;
+  discount: number;
 }
 
 export default function ProductPage({ params }: { params: { id: string } }) {
@@ -85,17 +85,21 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <ProductInfo
           productName={productData.name}
           productPrice={productData.price}
-          productDiscount ={productData.discount}
-          productdescription ={productData.description}
+          productDiscount={productData.discount}
+          productdescription={productData.description}
         />
         <DeliveryInfo />
         <ProductDetails />
         <div className="overflow-y-auto bg-gray-50">
           <ProductImages imageUrls={productData.imageUrls} />
         </div>
-        <PurchaseButton cartItemId={Number(id)} productId={Number(id)} />
+        <PurchaseButton
+          cartItemId={Number(id)}
+          productId={Number(id)}
+          productStatus={productData.productStatus}
+        />
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

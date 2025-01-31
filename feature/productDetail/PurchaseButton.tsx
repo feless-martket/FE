@@ -28,6 +28,8 @@ export default function PurchaseButton({
   const router = useRouter();
   const auth = useContext(AuthContext);
 
+  console.log("상품 상태", productStatus);
+
   // 찜 여부 & 찜 개수
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(0);
@@ -60,23 +62,6 @@ export default function PurchaseButton({
         });
     }
   }, [auth, productId]);
-
-  // 초기 로드 시 찜 상태 세팅
-  // useEffect(() => {
-  //   async function initLikedState() {
-  //     if (!auth?.isLoggedIn || !auth.userInfo) return;
-  //     try {
-  //       const liked = await checkIsLiked(auth.userInfo.username, productId);
-  //       setIsLiked(liked);
-
-  //       const count = await getLikeCount(productId);
-  //       setLikeCount(count);
-  //     } catch (error) {
-  //       console.error("좋아요 상태 초기화 실패", error);
-  //     }
-  //   }
-  //   initLikedState();
-  // }, [auth, productId]);
 
   // 장바구니 담기 API 호출
   const handleAddToCartAndNavigate = async () => {
@@ -149,13 +134,13 @@ export default function PurchaseButton({
           {/* 찜하기 버튼 */}
           <button
             onClick={handleLikeToggle}
-            className="flex flex-col items-center justify-center w-12 h-12 rounded-full border-2 border-gray-200 hover:border-green-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            className="flex size-12 flex-col items-center justify-center rounded-full border-2 border-gray-200 transition-all duration-300 hover:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
             aria-label={isLiked ? "찜 취소하기" : "찜하기"}
           >
             <Heart
-              className={`w-5 h-5 transition-all duration-300 ${
+              className={`size-5 transition-all duration-300 ${
                 isLiked
-                  ? "fill-green-500 text-green-500 scale-110"
+                  ? "scale-110 fill-green-500 text-green-500"
                   : "text-gray-400 hover:text-green-500"
               }`}
             />
