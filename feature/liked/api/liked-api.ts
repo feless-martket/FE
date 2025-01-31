@@ -1,8 +1,11 @@
+import { ProductResponseDto } from "@/feature/landing/section/bestSection/bestProductService";
 import myApi from "@/lib/axios";
 
 // 찜한 상품 목록 조회
-export const getLikedProducts = async (username: string): Promise<number> => {
-  const res = await myApi.get<number>(`/like/member/${username}`);
+export const getLikedProducts = async (
+  username: string
+): Promise<ProductResponseDto[]> => {
+  const res = await myApi.get<ProductResponseDto[]>(`/like/member/${username}`);
   return res.data;
 };
 
