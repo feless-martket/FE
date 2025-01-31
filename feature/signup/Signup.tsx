@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Modal } from "@/components/modal/modal";
-import { Header } from "@/components/layout/header";
+// import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import {
   signupUser,
@@ -112,7 +112,7 @@ export default function SignupForm() {
     verificationCode: "",
   });
 
-  const [showVerificationInput, setShowVerificationInput] = useState(false);
+  // const [showVerificationInput, setShowVerificationInput] = useState(false);
   const [showEmailVerificationInput, setEmailShowVerificationInput] =
     useState(false);
 
@@ -168,6 +168,7 @@ export default function SignupForm() {
 
     const allChecked = Object.entries(newTerms)
       .filter(([key]) => key !== "all")
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .every(([_, value]) => value);
 
     setTerms({
@@ -258,8 +259,8 @@ export default function SignupForm() {
         formData.email,
         formData.emailVerificationCode,
       );
-      console.log(emailVerificationResult.status);
-      if (emailVerificationResult.status) {
+      console.log(emailVerificationResult); // 원래 emailVerificationResult.status
+      if (emailVerificationResult) {
         setModal({
           isOpen: true,
           message: "인증이 완료되었습니다.",
@@ -274,6 +275,7 @@ export default function SignupForm() {
         });
         setisEmailCodeChecked(false);
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setModal({
         isOpen: true,
@@ -418,7 +420,7 @@ export default function SignupForm() {
       setIsIdChecked(false);
       setIsEmailChecked(false);
       setIsPhoneChecked(false);
-      setShowVerificationInput(false);
+      // setShowVerificationInput(false);
       setIsIdDuplicate(false);
       setIsEmailDuplicate(false);
       setIsPhoneDuplicate(false);
