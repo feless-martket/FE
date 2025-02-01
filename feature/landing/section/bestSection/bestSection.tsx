@@ -12,6 +12,7 @@ import ProductCard from "@/feature/landing/section/bestSection/ProductCard";
 const BestSection: React.FC = () => {
   const [products, setProducts] = useState<ProductResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string | null>(null);
 
   const fetchBestProducts = useCallback(async () => {

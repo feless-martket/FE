@@ -63,10 +63,17 @@ export default function ProductList() {
     return "전체보기";
   });
 
+<<<<<<< HEAD
   const deliveryMapping: Record<string, string> = {
     GENERAL_DELIVERY: "일반배송",
     EARLY_DELIVERY: "새벽배송",
     SELLER_DELIVERY: "판매자 배송",
+=======
+  const deliveryMapping: { [key: string]: string } = {
+    GENERAL_DELIVERY: "일반배송",
+    EARLY_DELIVERY: "새벽배송",
+    SELLER_DELIVERY: "판매자직접배송",
+>>>>>>> 89aeb0fde13e29b6616a9b65ba42de67414a4924
   };
 
   // URL 파라미터 변경 시 selectedTab 업데이트
@@ -270,7 +277,11 @@ export default function ProductList() {
                 </Button>
               </div>
               <p className="mb-1 text-xs text-gray-500">
+<<<<<<< HEAD
                 {deliveryMapping[product.delivery] || product.delivery}
+=======
+                {deliveryMapping[product.delivery]}
+>>>>>>> 89aeb0fde13e29b6616a9b65ba42de67414a4924
               </p>
               <h3 className="mb-1 line-clamp-1 text-sm font-medium text-gray-800">
                 {product.name}

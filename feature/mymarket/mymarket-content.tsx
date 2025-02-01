@@ -7,13 +7,6 @@ import { useEffect, useState } from "react";
 import { SecondModal } from "@/components/modal/secondmodal";
 import { getLikedProducts } from "@/feature/liked/api/liked-api";
 
-interface ProductResponseDto {
-  id: number;
-  name: string;
-  price: number;
-  discount?: number;
-  imageUrls: string[];
-}
 interface MenuItem {
   id: string;
   name: string;
@@ -51,21 +44,20 @@ export function MyMarketContent({ userInfo }: MyMarketContentProps) {
   const { logout } = useAuth(); // useAuth에서 logout 함수 가져오기
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [likedCount, setLikedCount] = useState(0);
 
   const [dynamicMenuItems, setDynamicMenuItems] =
     useState<MenuItem[]>(menuItems);
 
   useEffect(() => {
-    // userInfo에 username이 있는 경우에만 찜한 상품 목록 불러오기
-    if (!userInfo?.username) return;
-
     async function fetchLikedProducts() {
       try {
+        if (!userInfo?.username) {
+          return;
+        }
         // getLikedProducts가 ProductResponseDto[] 반환한다고 가정
-        const products: ProductResponseDto[] = await getLikedProducts(
-          userInfo.username
-        );
+        const products = await getLikedProducts(userInfo.username);
         const count = products.length;
         setLikedCount(count);
 
