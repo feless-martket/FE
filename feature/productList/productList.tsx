@@ -51,7 +51,7 @@ export default function ProductList() {
 
   // mainParam에 따른 서브카테고리 목록
   const currentCategory = categories.find(
-    (category) => category.name === mainParam
+    (category) => category.name === mainParam,
   );
   const subcategories = currentCategory?.subCategories || [];
 
@@ -62,6 +62,12 @@ export default function ProductList() {
     }
     return "전체보기";
   });
+
+  const deliveryMapping: Record<string, string> = {
+    GENERAL_DELIVERY: "일반배송",
+    EARLY_DELIVERY: "새벽배송",
+    SELLER_DELIVERY: "판매자 배송",
+  };
 
   // URL 파라미터 변경 시 selectedTab 업데이트
   useEffect(() => {
@@ -83,7 +89,7 @@ export default function ProductList() {
           const response = await fetchProductsByMainCategory(
             mainCategoryCode,
             currentPage,
-            pageSize
+            pageSize,
           );
           data = response.content; // 상품 데이터
           totalCount = response.totalElements; // 총 상품 개수
@@ -92,7 +98,7 @@ export default function ProductList() {
           const response = await fetchProducts(
             apiCategory,
             currentPage,
-            pageSize
+            pageSize,
           );
           data = response.content;
           totalCount = response.totalElements;
@@ -104,17 +110,17 @@ export default function ProductList() {
               try {
                 const isLiked = await checkIsLiked(
                   auth.userInfo!.username,
-                  product.id
+                  product.id,
                 );
                 return { ...product, isLiked };
               } catch (error) {
                 console.error(
                   `좋아요 상태 확인 실패(상품 ID: ${product.id}:`,
-                  error
+                  error,
                 );
                 return { ...product, isLiked: false };
               }
-            })
+            }),
           );
           setProducts(productsWithLikeStatus);
         } else {
@@ -144,7 +150,7 @@ export default function ProductList() {
 
   const handleLikeToggle = async (
     e: React.MouseEvent<HTMLButtonElement>,
-    productId: string
+    productId: string,
   ) => {
     e.preventDefault();
     e.stopPropagation();
@@ -165,8 +171,8 @@ export default function ProductList() {
             prevProducts.map((p) =>
               p.id === productId
                 ? { ...p, isLiked: false, likeCount: response.likeCount }
-                : p
-            )
+                : p,
+            ),
           );
         } else {
           alert(response.message || "찜 취소에 실패했습니다.");
@@ -178,8 +184,8 @@ export default function ProductList() {
             prevProducts.map((p) =>
               p.id === productId
                 ? { ...p, isLiked: true, likeCount: response.likeCount }
-                : p
-            )
+                : p,
+            ),
           );
         } else {
           alert(response.message || "찜 추가에 실패했습니다.");
@@ -238,7 +244,7 @@ export default function ProductList() {
             className="block"
           >
             <div className="relative flex flex-col rounded-none bg-white p-2 shadow-sm">
-              <div className="relative w-[140px] h-[120px]">
+              <div className="relative h-[120px] w-[140px]">
                 <Image
                   src={product.imageUrls[0] || "/placeholder.svg"}
                   alt={product.name}
@@ -263,7 +269,9 @@ export default function ProductList() {
                   />
                 </Button>
               </div>
-              <p className="mb-1 text-xs text-gray-500">{product.delivery}</p>
+              <p className="mb-1 text-xs text-gray-500">
+                {deliveryMapping[product.delivery] || product.delivery}
+              </p>
               <h3 className="mb-1 line-clamp-1 text-sm font-medium text-gray-800">
                 {product.name}
               </h3>
@@ -295,7 +303,7 @@ export default function ProductList() {
 
       {/* Pagination */}
       {/* Pagination */}
-      <div className="mt-4 flex justify-center gap-4 items-center">
+      <div className="mt-4 flex items-center justify-center gap-4">
         <Button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 0}

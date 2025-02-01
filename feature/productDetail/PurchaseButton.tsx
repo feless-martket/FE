@@ -37,6 +37,10 @@ export default function PurchaseButton({
   // "장바구니로 이동" 모달 상태
   const [showCartModal, setShowCartModal] = useState(false);
 
+  const goToPayment = () => {
+    router.push("/payment");
+  };
+
   useEffect(() => {
     async function fetchLikeCount() {
       try {
@@ -108,7 +112,7 @@ export default function PurchaseButton({
 
   // 구매하기 로직
   const handleBuyNow = () => {
-    alert("구매하기 로직을 구현하세요!");
+    goToPayment();
   };
 
   // 찜 토글 (좋아요)
@@ -149,13 +153,13 @@ export default function PurchaseButton({
           {/* 찜하기 버튼 */}
           <button
             onClick={handleLikeToggle}
-            className="flex flex-col items-center justify-center w-12 h-12 rounded-full border-2 border-gray-200 hover:border-green-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            className="flex size-12 flex-col items-center justify-center rounded-full border-2 border-gray-200 transition-all duration-300 hover:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
             aria-label={isLiked ? "찜 취소하기" : "찜하기"}
           >
             <Heart
-              className={`w-5 h-5 transition-all duration-300 ${
+              className={`size-5 transition-all duration-300 ${
                 isLiked
-                  ? "fill-green-500 text-green-500 scale-110"
+                  ? "scale-110 fill-green-500 text-green-500"
                   : "text-gray-400 hover:text-green-500"
               }`}
             />
