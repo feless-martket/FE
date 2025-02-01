@@ -105,16 +105,16 @@ export default function HeroSlider() {
         >
           <Image
             src={slides[page].image}
-            alt={slides[page].title}
+            alt={""}
             fill
             className="object-cover"
             priority
           />
           <div className="absolute inset-x-4 bottom-4">
             <h1 className="whitespace-pre-line text-lg font-bold text-white">
-              {slides[page].title}
+              {""}
             </h1>
-            <p className="mt-1 text-sm text-white">{slides[page].subtitle}</p>
+            <p className="mt-1 text-sm text-white">{""}</p>
           </div>
         </motion.div>
       </AnimatePresence>

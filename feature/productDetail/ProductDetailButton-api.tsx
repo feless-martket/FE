@@ -4,7 +4,7 @@ import myApi from "@/lib/axios";
 export const addToCart = async (
   cartItemId: number,
   quantity: number,
-  token: string
+  token: string,
 ) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -18,7 +18,7 @@ export const addToCart = async (
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     return response;
   } catch (error) {

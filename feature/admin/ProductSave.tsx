@@ -73,13 +73,13 @@ export default function ProductForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const productName = (e.target as HTMLFormElement).elements.namedItem(
-      "productName"
+      "productName",
     ) as HTMLInputElement;
     const productDescription = (e.target as HTMLFormElement).elements.namedItem(
-      "productDescription"
+      "productDescription",
     ) as HTMLInputElement;
     const productPrice = (e.target as HTMLFormElement).elements.namedItem(
-      "productPrice"
+      "productPrice",
     ) as HTMLInputElement;
 
     const formData = new FormData();
@@ -327,7 +327,7 @@ export default function ProductForm() {
                   key={index}
                   src={URL.createObjectURL(image)}
                   alt={`선택된 이미지 ${index + 1}`}
-                  className="object-cover w-24 h-24 mr-2"
+                  className="mr-2 size-24 object-cover"
                 />
               ))
             : "이미지를 첨부해 주세요."}
