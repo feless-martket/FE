@@ -6,7 +6,7 @@ import { OrderItems } from "@/feature/payment/orderItems";
 import { CustomerInfoSection } from "@/feature/payment/customerInfo";
 import { DeliveryAddressSection } from "@/feature/payment/deliveryAddress";
 import { DeliveryNotes } from "@/feature/payment/deliveryNote";
-import { PointsSection } from "@/feature/payment/pointSection";
+// import { PointsSection } from "@/feature/payment/pointSection";
 import { AuthContext } from "@/context/AuthContext";
 import { Footer } from "@/components/layout/footer";
 import { CheckoutPage } from "@/feature/payment/checkoutPage";
@@ -56,7 +56,7 @@ export default function OrderPage() {
   const [itemsError, setItemsError] = useState<string | null>(null);
 
   // 포인트
-  const [localUsedPoints, setLocalUsedPoints] = useState(0);
+  // const [localUsedPoints, setLocalUsedPoints] = useState(0);
 
   // 배송지
   const [deliveryAddress, setDeliveryAddress] = useState<DeliveryAddress>({
@@ -115,8 +115,8 @@ export default function OrderPage() {
   // 3) 결제금액 계산
   const subtotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
   const shippingFee = 3000;
-  const discount = localUsedPoints;
-  const total = subtotal + shippingFee - discount;
+  // const discount = localUsedPoints;
+  const total = subtotal + shippingFee;
 
   // 뒤로가기
   const goToBack = () => {
@@ -137,9 +137,9 @@ export default function OrderPage() {
   };
 
   // 포인트 onChange
-  const handlePointsChange = (points: number) => {
-    setLocalUsedPoints(points);
-  };
+  // const handlePointsChange = (points: number) => {
+  //   setLocalUsedPoints(points);
+  // };
 
   const handleSaveDeliveryNote = (note: string) => {
     const updatedDeliveryAddress = {
@@ -152,7 +152,7 @@ export default function OrderPage() {
       customerInfo,
       deliveryAddress: updatedDeliveryAddress,
       items,
-      usedPoints: localUsedPoints,
+      usedPoints: 0,
       totalPrice: total,
     };
     localStorage.setItem(ORDER_DATA_KEY, JSON.stringify(updatedOrderData));
@@ -169,7 +169,7 @@ export default function OrderPage() {
       customerInfo,
       deliveryAddress,
       items,
-      usedPoints: localUsedPoints,
+      usedPoints: 0,
       totalPrice: total,
     };
 
@@ -213,11 +213,11 @@ export default function OrderPage() {
         />
 
         {/* 포인트 */}
-        <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
+        {/* <div className=" h-3 !w-[360px] translate-x-[-14px] bg-gray-100" />
         <PointsSection
           availablePoints={1000}
           onPointsChange={handlePointsChange}
-        />
+        /> */}
 
         {/* 결제 금액 */}
         <div className="space-y-2 border-t pt-4">
@@ -227,7 +227,7 @@ export default function OrderPage() {
           </div>
           <div className="flex justify-between">
             <span>상품할인금액</span>
-            <span>{discount.toLocaleString()}원</span>
+            <span>{0}원</span>
           </div>
           <div className="flex justify-between">
             <span>배송비</span>
