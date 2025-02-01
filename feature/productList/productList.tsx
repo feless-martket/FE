@@ -63,6 +63,12 @@ export default function ProductList() {
     return "전체보기";
   });
 
+  const deliveryMapping: { [key: string]: string } = {
+    GENERAL_DELIVERY: "일반배송",
+    EARLY_DELIVERY: "새벽배송",
+    SELLER_DELIVERY: "판매자직접배송",
+  };
+
   // URL 파라미터 변경 시 selectedTab 업데이트
   useEffect(() => {
     if (paramCategory && subcategories.includes(paramCategory)) {
@@ -263,7 +269,9 @@ export default function ProductList() {
                   />
                 </Button>
               </div>
-              <p className="mb-1 text-xs text-gray-500">{product.delivery}</p>
+              <p className="mb-1 text-xs text-gray-500">
+                {deliveryMapping[product.delivery]}
+              </p>
               <h3 className="mb-1 line-clamp-1 text-sm font-medium text-gray-800">
                 {product.name}
               </h3>
