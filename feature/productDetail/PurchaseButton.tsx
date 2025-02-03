@@ -39,6 +39,10 @@ export default function PurchaseButton({
   // "장바구니로 이동" 모달 상태
   const [showCartModal, setShowCartModal] = useState(false);
 
+  const goToPayment = () => {
+    router.push("/payment");
+  };
+
   useEffect(() => {
     async function fetchLikeCount() {
       try {
@@ -93,7 +97,7 @@ export default function PurchaseButton({
 
   // 구매하기 로직
   const handleBuyNow = () => {
-    alert("구매하기 로직을 구현하세요!");
+    goToPayment();
   };
 
   // 찜 토글 (좋아요)
